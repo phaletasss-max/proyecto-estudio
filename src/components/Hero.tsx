@@ -21,23 +21,35 @@ export const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative min-h-svh w-full overflow-hidden">
-      {/* Background Video (z-0) */}
+    <section className="relative min-h-svh w-full overflow-hidden bg-slate-900">
+      {/* Background Video (z-0) with multiple CDN fallbacks */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0"
-        src="https://pollen-batch-41236914.figma.site/_components/v2/f0ee2dae7671c170c34f12e31c4cb41418976c98/769c564298c132f7919405cd9f17c1b1231f341d.769c5642.mp4"
-      />
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-90"
+      >
+        <source
+          src="https://cdn.coverr.co/videos/coverr-flying-over-mountains-and-lakes-5264/1080p.mp4"
+          type="video/mp4"
+        />
+        <source
+          src="https://assets.mixkit.co/videos/preview/mixkit-top-aerial-view-of-a-beach-and-the-sea-41551-large.mp4"
+          type="video/mp4"
+        />
+        <source
+          src="https://pollen-batch-41236914.figma.site/_components/v2/f0ee2dae7671c170c34f12e31c4cb41418976c98/769c564298c132f7919405cd9f17c1b1231f341d.769c5642.mp4"
+          type="video/mp4"
+        />
+      </video>
 
-      {/* Top Gradient Overlay (z-1) */}
+      {/* Top White-to-Transparent Gradient Overlay (z-1) */}
       <div
         className="absolute inset-x-0 top-0 h-[687px] pointer-events-none z-[1]"
         style={{
           background:
-            'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)',
+            'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 45%, rgba(255,255,255,0) 100%)',
         }}
       />
 
@@ -79,7 +91,7 @@ export const Hero: React.FC = () => {
           </p>
 
           {/* Liquid Glass Prompt Card */}
-          <div className="relative w-[701px] max-md:w-[calc(100vw-48px)] min-h-[208px] bg-white/[0.06] border-[3px] border-white rounded-[44px] shadow-[0_0_4px_0_rgba(0,0,0,0.15)] overflow-hidden backdrop-blur-[20px]">
+          <div className="relative w-[701px] max-md:w-[calc(100vw-48px)] min-h-[208px] bg-white/[0.08] border-[3px] border-white rounded-[44px] shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] overflow-hidden backdrop-blur-[20px]">
             <p className="absolute left-[29px] top-[57px] -translate-y-1/2 w-[609px] max-md:w-[calc(100%-58px)] font-sans text-xl max-md:text-[17px] font-medium text-wandor-prompt leading-relaxed break-words text-left">
               I'm planning a 7-day trip to Japan in October. I love food, hidden cafes, scenic hikes, and want to avoid crowds....
             </p>
