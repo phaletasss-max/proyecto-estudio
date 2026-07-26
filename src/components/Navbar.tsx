@@ -32,12 +32,12 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform-gpu ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         isScrolled
           ? isDark
-            ? 'bg-slate-950/90 backdrop-blur-md border-b border-slate-800 shadow-lg py-3.5'
-            : 'bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-md py-3.5'
-          : 'bg-transparent py-5'
+            ? 'bg-slate-950/95 border-b border-slate-800 shadow-lg py-3'
+            : 'bg-white/95 border-b border-slate-200 shadow-md py-3'
+          : 'bg-transparent py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -69,7 +69,7 @@ export const Navbar: React.FC = () => {
 
           {/* Desktop Nav */}
           <nav className={`hidden md:flex items-center gap-1 px-4 py-1.5 rounded-full border ${
-            isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-100/90 border-slate-200'
+            isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200'
           }`}>
             {navLinks.map((link) => (
               <a
