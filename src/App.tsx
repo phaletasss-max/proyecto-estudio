@@ -8,7 +8,6 @@ import { Benefits } from '@/components/Benefits';
 import { Community } from '@/components/Community';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
-import { GlobalTerminalBackground } from '@/components/GlobalTerminalBackground';
 import { useTheme } from '@/context/ThemeContext';
 
 export const App: React.FC = () => {
@@ -23,9 +22,6 @@ export const App: React.FC = () => {
           : 'bg-slate-50 text-slate-900 selection:bg-blue-500/20 selection:text-blue-900'
       }`}
     >
-      {/* High-Contrast Global OS Terminal & Watermark Background Stream */}
-      <GlobalTerminalBackground />
-
       <Navbar />
       <main className="relative z-10">
         <Hero />
