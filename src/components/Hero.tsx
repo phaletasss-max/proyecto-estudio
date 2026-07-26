@@ -131,10 +131,10 @@ export const Hero: React.FC = () => {
             
             {/* Header Tabs */}
             <div className="flex items-center justify-between pb-6 border-b border-slate-800 flex-wrap gap-4">
-              <div className="flex items-center gap-2 bg-slate-900 p-1.5 rounded-full border border-slate-800">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-900 p-1.5 rounded-2xl sm:rounded-full border border-slate-800 w-full sm:w-auto overflow-x-auto scrollbar-none shrink-0">
                 <button
                   onClick={() => setActiveTab('dev')}
-                  className={`px-4 py-2 rounded-full text-xs font-mono transition-all ${
+                  className={`px-3 sm:px-4 py-2 rounded-xl sm:rounded-full text-xs font-mono transition-all whitespace-nowrap ${
                     activeTab === 'dev'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white'
@@ -144,7 +144,7 @@ export const Hero: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab('infra')}
-                  className={`px-4 py-2 rounded-full text-xs font-mono transition-all ${
+                  className={`px-3 sm:px-4 py-2 rounded-xl sm:rounded-full text-xs font-mono transition-all whitespace-nowrap ${
                     activeTab === 'infra'
                       ? 'bg-cyan-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white'
@@ -154,7 +154,7 @@ export const Hero: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab('ctf')}
-                  className={`px-4 py-2 rounded-full text-xs font-mono transition-all ${
+                  className={`px-3 sm:px-4 py-2 rounded-xl sm:rounded-full text-xs font-mono transition-all whitespace-nowrap ${
                     activeTab === 'ctf'
                       ? 'bg-indigo-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white'

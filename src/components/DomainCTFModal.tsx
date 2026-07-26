@@ -70,18 +70,18 @@ export const DomainCTFModal: React.FC = () => {
       <div className="flex justify-center py-6">
         <button
           onClick={() => setIsOpen(true)}
-          className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold text-base shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
+          className="group inline-flex items-center justify-center gap-2.5 px-5 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold text-xs sm:text-base shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer w-full sm:w-auto text-center"
         >
-          <Globe className="w-5 h-5 text-cyan-300 group-hover:rotate-12 transition-transform" />
+          <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-300 group-hover:rotate-12 transition-transform shrink-0" />
           <span>¿Quieres aprender a tener tu dominio?</span>
         </button>
       </div>
 
       {/* Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto" onClick={() => setIsOpen(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto" onClick={() => setIsOpen(false)}>
           <div
-            className="relative w-full max-w-xl rounded-3xl bg-slate-900 border border-slate-700 text-white p-6 sm:p-8 shadow-2xl my-8"
+            className="relative w-full max-w-xl max-h-[88vh] overflow-y-auto rounded-3xl bg-slate-900 border border-slate-700 text-white p-5 sm:p-8 shadow-2xl my-auto scrollbar-thin scrollbar-thumb-slate-700"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close */}
