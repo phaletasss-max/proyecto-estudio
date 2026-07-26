@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Globe, Key, Lock, Unlock, Download, X, Check, Search, FileText, ArrowRight, ShieldCheck } from 'lucide-react';
 import { decryptGuideWithFlag } from '@/utils/crypto';
+import { checkHoneypot } from '@/utils/honeypot';
 
 export const DomainCTFModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +10,7 @@ export const DomainCTFModal: React.FC = () => {
   const [wrongAttempt, setWrongAttempt] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [decryptedText, setDecryptedText] = useState<string | null>(null);
+  const [honeypotMessage, setHoneypotMessage] = useState<string | null>(null);
 
   const handleVerifyFlag = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,6 +18,15 @@ export const DomainCTFModal: React.FC = () => {
 
     setIsVerifying(true);
     setWrongAttempt(false);
+    setHoneypotMessage(null);
+
+    // Check Honeypot Decoy Trap
+    const honeypotResult = checkHoneypot(userFlag);
+    if (honeypotResult) {
+      setHoneypotMessage(honeypotResult);
+      setIsVerifying(false);
+      return;
+    }
 
     try {
       const guideText = await decryptGuideWithFlag(userFlag);
@@ -151,6 +162,12 @@ export const DomainCTFModal: React.FC = () => {
                 <p className="mt-2 text-xs text-rose-400 font-mono">
                   ✗ Flag incorrecta. La desencriptación AES-256 falló. Revisa los archivos del ZIP y busca la IP pública WAN.
                 </p>
+              )}
+
+              {honeypotMessage && (
+                <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-[11px] whitespace-pre-wrap leading-relaxed">
+                  {honeypotMessage}
+                </div>
               )}
 
               {isUnlocked && (
