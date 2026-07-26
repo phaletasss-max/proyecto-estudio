@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Geist', sans-serif;
-  --font-display: 'Special Elite', serif;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Special Elite', typewriter, serif;
 
   --color-wandor-dark: #0a0a0a;
   --color-wandor-text: #1a1a1a;
@@ -13,6 +13,62 @@
 body {
   font-family: 'Geist', sans-serif;
   overflow-x: hidden;
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+.font-display {
+  font-family: 'Special Elite', typewriter, serif !important;
+}
+
+.font-sans {
+  font-family: 'Geist', sans-serif !important;
+}
+
+/* Glassmorphism for Light Mode & Dark Cards */
+.liquid-glass-card {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+}
+
+.gradient-text-blue {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-cyan {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #0f766e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
   background: #ffffff;
-  color: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

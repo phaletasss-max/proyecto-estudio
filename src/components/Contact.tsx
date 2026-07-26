@@ -6,8 +6,8 @@ export const Contact: React.FC = () => {
   const [copied, setCopied] = useState(false);
 
   const phoneDisplay = '921 378 349';
-  const whatsappUrl = 'https://wa.me/51921378349?text=Hola,%20quisiera%20unirme%20a%20Plan%20Estudios%20SENATI.';
-  const defaultMessage = 'Hola, quisiera unirme a Plan Estudios SENATI.';
+  const whatsappUrl = 'https://wa.me/51921378349?text=Hola,%20quisiera%20unirme%20a%20ShadowBytes%20SENATI.';
+  const defaultMessage = 'Hola, quisiera unirme a ShadowBytes SENATI.';
 
   const handleCopyPhone = () => {
     navigator.clipboard.writeText('921378349');
@@ -16,19 +16,19 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contacto" className="py-24 relative z-10 scroll-mt-20">
+    <section id="contacto" className="py-24 relative z-10 bg-white scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono mb-4">
             <Sparkles className="w-3.5 h-3.5" />
             <span>ÚNETE HOY AL GRUPO</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
             ¿Quieres unirte?
           </h2>
-          <p className="mt-4 text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-4 text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             Envíame un mensaje por WhatsApp indicando que deseas formar parte del grupo de estudio. Posteriormente recibirás el enlace al servidor de Discord y al grupo oficial.
           </p>
         </div>
@@ -39,7 +39,7 @@ export const Contact: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="max-w-2xl mx-auto relative rounded-3xl bg-slate-900/90 border border-slate-800 p-8 sm:p-12 backdrop-blur-2xl shadow-2xl overflow-hidden"
+          className="max-w-2xl mx-auto relative rounded-3xl bg-slate-900 text-white p-8 sm:p-12 shadow-2xl overflow-hidden"
         >
           {/* Subtle Green Ambient Lighting */}
           <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
@@ -48,7 +48,7 @@ export const Contact: React.FC = () => {
           <div className="relative z-10 space-y-8">
             
             {/* Status & Header */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-8 border-b border-slate-800/80 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-8 border-b border-slate-800 text-center sm:text-left">
               <div className="relative">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 p-1 shadow-lg shadow-emerald-500/20">
                   <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-white">
@@ -67,7 +67,7 @@ export const Contact: React.FC = () => {
                   Coordinación de Grupo
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-                  Plan Estudios SENATI
+                  ShadowBytes SENATI
                 </h3>
                 <p className="text-slate-400 text-sm mt-0.5">
                   Comunidad Abierta para el 4.º Ciclo
@@ -76,9 +76,9 @@ export const Contact: React.FC = () => {
             </div>
 
             {/* Info Box: WhatsApp Number */}
-            <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between">
+            <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-mono uppercase text-slate-500 tracking-wider block mb-1">
+                <span className="text-[11px] font-mono uppercase text-slate-400 tracking-wider block mb-1">
                   Contacto de WhatsApp
                 </span>
                 <span className="text-xl font-bold text-emerald-400 font-mono">
@@ -105,7 +105,7 @@ export const Contact: React.FC = () => {
             </div>
 
             {/* Message Preview Box */}
-            <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/60 text-xs text-slate-400 font-mono">
+            <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80 text-xs text-slate-400 font-mono">
               <span className="text-emerald-400 font-semibold block mb-1">💬 Mensaje listo para enviar:</span>
               <p className="italic text-slate-200 text-sm">"{defaultMessage}"</p>
             </div>
@@ -125,7 +125,7 @@ export const Contact: React.FC = () => {
             </div>
 
             {/* Security Note */}
-            <div className="flex items-center justify-center gap-2 text-xs text-slate-500 font-mono text-center pt-2">
+            <div className="flex items-center justify-center gap-2 text-xs text-slate-400 font-mono text-center pt-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>Respuesta rápida e ingreso al servidor oficial de Discord</span>
             </div>
