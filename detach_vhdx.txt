@@ -1,0 +1,2 @@
+select vdisk file="C:\ProgramData\BlueStacks_nxt\Engine\Pie64\Data.vhdx"
+detach vdisk
