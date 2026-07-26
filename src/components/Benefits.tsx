@@ -71,20 +71,20 @@ const benefitsList: BenefitItem[] = [
 
 export const Benefits: React.FC = () => {
   return (
-    <section id="beneficios" className="py-24 relative z-10 bg-white scroll-mt-20">
+    <section id="beneficios" className="py-20 relative z-10 bg-transparent text-white border-b border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
+        {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-blue-700 text-xs font-mono mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-4 shadow-md">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>¿POR QUÉ SUMARTE?</span>
+            <span>BENEFICIOS DE UNIRTE</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
-            Beneficios de la <span className="gradient-text-blue">Comunidad</span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+            ¿Por qué <span className="gradient-text-blue">estudiar con nosotros</span>?
           </h2>
-          <p className="mt-4 text-slate-600 text-base sm:text-lg">
-            Formar parte de nuestro equipo de estudio te potencia académicamente y impulsa tu perfil profesional en el sector tecnológico.
+          <p className="mt-4 text-slate-300 text-base sm:text-lg">
+            Formar parte del grupo de estudio ShadowBytes te abre puertas a mejores proyectos, apoyo constante y trabajo colaborativo real.
           </p>
         </div>
 
@@ -99,32 +99,32 @@ export const Benefits: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.08 }}
-                className="group relative rounded-2xl bg-white border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-blue-500 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+                className="group relative rounded-2xl bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 shadow-2xl hover:border-cyan-500/60 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
               >
                 <div>
                   {/* Top Badge & Icon */}
                   <div className="flex items-center justify-between mb-5">
-                    <div className={`p-3 rounded-xl border ${item.color}`}>
+                    <div className="p-3 rounded-xl border border-cyan-500/30 bg-cyan-950/80 text-cyan-400">
                       <IconComp className="w-6 h-6" />
                     </div>
-                    <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-slate-950 text-slate-300 border border-slate-800">
                       {item.badge}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                  <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors mb-2">
                     {item.title}
                   </h3>
 
                   {/* Subtitle */}
-                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
                     {item.subtitle}
                   </p>
                 </div>
 
                 {/* Bottom checkmark indicator */}
-                <div className="mt-5 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-[11px] text-emerald-600 font-mono font-medium">
+                <div className="mt-5 pt-4 border-t border-slate-800 flex items-center gap-1.5 text-[11px] text-emerald-400 font-mono font-medium">
                   <Check className="w-3.5 h-3.5" />
                   <span>Incluido en el grupo</span>
                 </div>

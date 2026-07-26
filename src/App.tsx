@@ -12,8 +12,8 @@ import { GlobalTerminalBackground } from '@/components/GlobalTerminalBackground'
 
 export const App: React.FC = () => {
   return (
-    <div className="relative min-h-screen bg-white text-slate-900 selection:bg-purple-500/20 selection:text-purple-900 overflow-hidden">
-      {/* Global OS Terminal Log Stream & Watermarks Background */}
+    <div className="relative min-h-screen bg-slate-950 text-white selection:bg-purple-500/30 selection:text-purple-200 overflow-hidden font-sans">
+      {/* High-Contrast Global OS Terminal & Watermark Background Stream */}
       <GlobalTerminalBackground />
 
       <Navbar />

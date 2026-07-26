@@ -41,27 +41,27 @@ const steps: MethodologyStep[] = [
     description: 'Compartir recursos, noticias de ciberseguridad y preparación para certificaciones.',
     icon: Award,
     tag: 'Crecimiento Profesional',
-    badgeColor: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+    badgeColor: 'bg-cyan-950/50 text-cyan-300 border-cyan-800/50',
     time: 'Formación Continua',
   },
 ];
 
 export const Methodology: React.FC = () => {
   return (
-    <section id="metodologia" className="py-24 relative z-10 bg-slate-50 border-y border-slate-200 scroll-mt-20">
+    <section id="metodologia" className="py-20 relative z-10 bg-transparent text-white border-b border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100 border border-blue-200 text-blue-800 text-xs font-mono mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-950/80 border border-purple-500/30 text-purple-300 text-xs font-mono mb-4 shadow-md">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>NUESTRO FLUJO DE TRABAJO</span>
+            <span>NUESTRA METODOLOGÍA</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
-            Metodología de <span className="gradient-text-blue">Trabajo</span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+            ¿Cómo <span className="gradient-text-blue">trabajamos en equipo</span>?
           </h2>
-          <p className="mt-4 text-slate-600 text-base sm:text-lg">
-            Combinamos comunicación ágil, espacios virtuales de estudio y colaboración en tiempo real para optimizar el rendimiento del grupo.
+          <p className="mt-4 text-slate-300 text-base sm:text-lg">
+            Nos organizamos mediante reuniones dinámicas en Discord y coordinación directa en WhatsApp.
           </p>
         </div>
 
@@ -88,31 +88,31 @@ export const Methodology: React.FC = () => {
                 >
                   {/* Card Content Side */}
                   <div className="w-full lg:w-1/2">
-                    <div className="group relative rounded-3xl bg-white border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div className="group relative rounded-3xl bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 shadow-2xl transition-all duration-300 hover:-translate-y-1">
                       
                       {/* Card Header */}
                       <div className="flex items-center justify-between gap-4 mb-4">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono border font-medium ${step.badgeColor}`}>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-purple-950/80 text-purple-300 border border-purple-500/30 font-medium">
                           {step.tag}
                         </span>
-                        <span className="text-xs font-mono text-slate-500 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-blue-600" />
+                        <span className="text-xs font-mono text-cyan-300 flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-cyan-400" />
                           {step.time}
                         </span>
                       </div>
 
                       {/* Step Title & Icon */}
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-cyan-400 shadow-sm">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center text-cyan-400 shadow-md">
                           <IconComp className="w-6 h-6" />
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                        <h3 className="text-2xl font-bold text-white group-hover:text-cyan-400 transition-colors">
                           {step.title}
                         </h3>
                       </div>
 
                       {/* Description */}
-                      <p className="text-slate-600 text-base leading-relaxed">
+                      <p className="text-slate-300 text-base leading-relaxed">
                         {step.description}
                       </p>
 

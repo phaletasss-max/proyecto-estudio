@@ -47,21 +47,20 @@ const projectsData: ProjectCardProps[] = [
 
 export const Projects: React.FC = () => {
   return (
-    <section id="proyectos" className="py-24 relative z-10 bg-white scroll-mt-20">
+    <section id="proyectos" className="py-20 relative z-10 bg-transparent text-white border-b border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
+        {/* Section Title */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-blue-700 text-xs font-mono mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/80 border border-blue-500/30 text-cyan-300 text-xs font-mono mb-4 shadow-md">
             <Layers className="w-3.5 h-3.5" />
-            <span>NUESTROS PROYECTOS DEL 4.º CICLO</span>
+            <span>4.º CICLO SENATI</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
-            Proyectos principales en los que{' '}
-            <span className="gradient-text-blue">trabajamos juntos</span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+            Nuestros <span className="gradient-text-blue">Proyectos Clave</span>
           </h2>
-          <p className="mt-4 text-slate-600 text-base sm:text-lg">
-            Nos enfocamos en el aprendizaje práctico, cubriendo desde aplicaciones web modernas hasta infraestructura de servidores enterprise y ciberseguridad.
+          <p className="mt-4 text-slate-300 text-base sm:text-lg">
+            Combinamos el desarrollo web profesional con la administración de servidores Windows Server 2022 y la seguridad informática.
           </p>
         </div>
 
@@ -76,42 +75,42 @@ export const Projects: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: project.delay }}
-                className={`group relative rounded-3xl bg-white border border-slate-200 p-8 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl ${project.glowColor}`}
+                className={`group relative rounded-3xl bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 transition-all duration-300 hover:-translate-y-1 shadow-2xl ${project.glowColor}`}
               >
                 {/* Top Badge */}
                 <div className="flex items-center justify-between mb-6">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-blue-950/80 text-cyan-300 border border-blue-500/30 font-medium">
                     {project.badge}
                   </span>
-                  <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform shadow-sm">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform shadow-md">
                     <IconComponent className="w-6 h-6" />
                   </div>
                 </div>
 
                 {/* Card Title */}
-                <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-3">
+                <h3 className="text-2xl font-bold text-white group-hover:text-cyan-400 transition-colors mb-3">
                   {project.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                <p className="text-slate-300 text-sm leading-relaxed mb-6">
                   {project.description}
                 </p>
 
                 {/* Divider line */}
-                <div className="w-full h-px bg-slate-100 my-6" />
+                <div className="w-full h-px bg-slate-800 my-6" />
 
                 {/* Tech Tags */}
                 <div>
-                  <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-                    <Terminal className="w-3.5 h-3.5 text-blue-600" />
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+                    <Terminal className="w-3.5 h-3.5 text-cyan-400" />
                     Tecnologías & Herramientas
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 border border-slate-200 text-slate-700 font-mono"
+                        className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-cyan-300 font-mono"
                       >
                         {tag}
                       </span>

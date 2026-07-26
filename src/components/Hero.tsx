@@ -8,13 +8,13 @@ export const Hero: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dev' | 'infra' | 'ctf'>('dev');
 
   return (
-    <section id="inicio" className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-white text-slate-900">
+    <section id="inicio" className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-transparent text-white">
       
       {/* Animated Terminal Code Background Stream */}
       <TerminalBackground />
 
       {/* Background Subtle Gradient Mesh */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-blue-50/60 via-cyan-50/40 to-transparent blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-purple-900/20 via-cyan-900/10 to-transparent blur-3xl pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
@@ -27,7 +27,7 @@ export const Hero: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="flex flex-col items-center mb-6"
           >
-            <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-3xl overflow-hidden shadow-2xl border-2 border-slate-900/10 p-1 bg-slate-950 hover:scale-105 transition-transform duration-300 group">
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-3xl overflow-hidden shadow-2xl border-2 border-purple-500/30 p-1 bg-slate-950 hover:scale-105 transition-transform duration-300 group">
               <img
                 src="/logo-shadowbytes.png"
                 alt="ShadowBytes Official Logo"
@@ -36,8 +36,8 @@ export const Hero: React.FC = () => {
             </div>
             
             {/* Slogan Banner */}
-            <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-900/10 border border-purple-500/20 text-purple-700 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest">
-              <span className="w-2 h-2 rounded-full bg-purple-600 animate-ping" />
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-950/80 border border-purple-500/40 text-purple-300 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
               <span>APRENDER • COMPARTIR • CREAR • PROTEGER</span>
             </div>
           </motion.div>
@@ -46,10 +46,10 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 border border-slate-200 shadow-sm mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/80 border border-slate-800 shadow-sm mb-6"
           >
-            <span className="text-xs sm:text-sm font-mono text-slate-700">
-              SENATI 4.º Ciclo • Instructor: <span className="text-blue-600 font-semibold">Victor Kenky Rodriguez Lopez</span>
+            <span className="text-xs sm:text-sm font-mono text-slate-300">
+              SENATI 4.º Ciclo • Instructor: <span className="text-cyan-400 font-semibold">Victor Kenky Rodriguez Lopez</span>
             </span>
           </motion.div>
 
@@ -58,9 +58,9 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="mb-8 max-w-2xl mx-auto px-6 py-3 rounded-2xl bg-blue-50/80 border border-blue-200 text-center shadow-xs"
+            className="mb-8 max-w-2xl mx-auto px-6 py-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-center shadow-lg"
           >
-            <p className="text-xs sm:text-sm font-medium text-blue-950 italic leading-relaxed">
+            <p className="text-xs sm:text-sm font-medium text-purple-200 italic leading-relaxed">
               "No tengas miedo de empezar sin saber; ten miedo de saber que no sabes y aun así no hacer nada para aprender."
             </p>
           </motion.div>
@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-950 max-w-4xl leading-[1.08]"
+            className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.08]"
           >
             Construyamos el mejor grupo de estudio del{' '}
             <span className="gradient-text-blue inline-block">4.º ciclo</span>
@@ -81,7 +81,7 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl font-normal leading-relaxed"
+            className="mt-6 text-lg sm:text-xl text-slate-300 max-w-2xl font-normal leading-relaxed"
           >
             No solo buscamos terminar los proyectos del curso. Queremos crear una comunidad donde todos aprendamos, compartamos conocimientos y ayudemos a otros estudiantes de SENATI.
           </motion.p>

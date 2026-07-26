@@ -43,10 +43,20 @@ const stats: StatCard[] = [
 
 export const Community: React.FC = () => {
   return (
-    <section id="comunidad" className="py-24 relative z-10 bg-slate-50 border-y border-slate-200 scroll-mt-20 overflow-hidden">
+    <section className="py-20 relative z-10 bg-transparent text-white border-b border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Animated Statistics */}
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+            Comunidad de <span className="gradient-text-blue">Estudio Activa</span>
+          </h2>
+          <p className="mt-4 text-slate-300 text-base sm:text-lg">
+            Compartimos recursos, resolvemos dudas y organizamos reuniones de código para avanzar juntos en el ciclo.
+          </p>
+        </div>
+
+        {/* 4 Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => {
             const IconComponent = stat.icon;
@@ -57,30 +67,26 @@ export const Community: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="group relative rounded-2xl bg-white border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-blue-500 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+                className="group relative rounded-3xl bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 shadow-2xl hover:border-cyan-500/60 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`p-3 rounded-xl border ${stat.color}`}>
-                      <IconComponent className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-semibold">
-                      INDICADOR
-                    </span>
+                  <div className="w-14 h-14 rounded-2xl bg-slate-950 border border-slate-800 text-cyan-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-md">
+                    <IconComponent className="w-7 h-7" />
                   </div>
 
-                  <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors font-mono tracking-tight mb-1">
-                    {stat.value}
-                  </div>
-
-                  <h4 className="text-base font-bold text-slate-900 mb-1">
+                  <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest block mb-1 font-semibold">
                     {stat.label}
-                  </h4>
+                  </span>
 
-                  <p className="text-xs text-slate-500">
+                  <h3 className="text-3xl font-extrabold text-white tracking-tight mb-2">
+                    {stat.value}
+                  </h3>
+
+                  <p className="text-slate-300 text-sm leading-relaxed">
                     {stat.subtitle}
                   </p>
                 </div>
+
               </motion.div>
             );
           })}

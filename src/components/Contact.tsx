@@ -16,19 +16,19 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contacto" className="py-24 relative z-10 bg-white scroll-mt-20">
+    <section id="contacto" className="py-20 relative z-10 bg-transparent text-white border-b border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-xs font-mono mb-4 shadow-md">
             <Sparkles className="w-3.5 h-3.5" />
             <span>ÚNETE HOY AL GRUPO</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
             ¿Quieres unirte?
           </h2>
-          <p className="mt-4 text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-4 text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             Envíame un mensaje por WhatsApp indicando que deseas formar parte del grupo de estudio. Posteriormente recibirás el enlace al servidor de Discord y al grupo oficial.
           </p>
         </div>
