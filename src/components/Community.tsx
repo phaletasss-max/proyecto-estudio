@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Quote, MessageSquare, MessageCircle, FolderCode, HeartHandshake } from 'lucide-react';
+import { MessageSquare, MessageCircle, FolderCode, HeartHandshake } from 'lucide-react';
 
 interface StatCard {
   label: string;
@@ -46,35 +46,6 @@ export const Community: React.FC = () => {
     <section id="comunidad" className="py-24 relative z-10 bg-slate-50 border-y border-slate-200 scroll-mt-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Main Quote Banner */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="relative rounded-3xl bg-slate-900 text-white p-8 sm:p-14 text-center shadow-xl overflow-hidden mb-16"
-        >
-          {/* Subtle Background Glow Circle */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Quote Icon */}
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-500/20 border border-blue-500/30 text-cyan-300 mb-6">
-            <Quote className="w-7 h-7 rotate-180" />
-          </div>
-
-          {/* Quote Text */}
-          <blockquote className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-snug max-w-3xl mx-auto">
-            “No buscamos competir entre nosotros.{' '}
-            <span className="text-cyan-400 block mt-2 sm:inline sm:mt-0">
-              Queremos crecer juntos.
-            </span>”
-          </blockquote>
-
-          <p className="mt-6 text-sm sm:text-base font-mono text-slate-400 tracking-wide uppercase">
-            — Filosofía de la Comunidad • ShadowBytes SENATI
-          </p>
-        </motion.div>
-
         {/* Animated Statistics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => {

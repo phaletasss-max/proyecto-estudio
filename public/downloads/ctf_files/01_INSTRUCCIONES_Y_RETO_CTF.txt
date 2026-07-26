@@ -2,21 +2,35 @@
 ⚡ SHADOWBYTES SENATI — RETO CTF FORENSE DE REDES (4.º CICLO) ⚡
 ========================================================================
 
-[+] RETO: Análisis de Tráfico y Tabla de Enrutamiento de Red.
-[+] OBJETIVO: 
-    Examina los registros de consola (ipconfig, route print, tracert, ip addr)
-    de las 3 Máquinas Virtuales adjuntas (VM-Server, VM-Gateway, VM-Client).
+[+] RETO: Análisis Forense de Infraestructura Windows Server 2022
+[+] ESCENARIO:
+    Tu instructor te ha encargado auditar la infraestructura de red
+    del laboratorio de SENATI. Tienes acceso a los registros de consola
+    de 3 Máquinas Virtuales que ejecutan los siguientes servicios:
 
-[+] PREGUNTA DEL RETO:
-    ¿Cuál es la dirección IP pública/WAN por la cual el Gateway enruta
-    el tráfico de la red local hacia Internet?
+    VM1 — Windows Server 2022: DNS, DHCP, File Server, Web Server (IIS)
+    VM2 — Router/Gateway Linux: NAT, Firewall, Enrutamiento WAN
+    VM3 — Cliente Windows 10: Workstation de un estudiante
+
+[+] OBJETIVO:
+    Analiza los archivos de log de cada VM. Identifica qué rol cumple
+    cada máquina, qué servicios ejecuta, y encuentra la IP pública
+    por la que el gateway enruta todo el tráfico hacia Internet.
+
+[+] PREGUNTA:
+    ¿Cuál es la dirección IPv4 pública asignada a la interfaz WAN
+    del Router Gateway que permite la salida a Internet?
 
 [+] FORMATO DE LA FLAG:
     HTB{IP_HALLADA}
-    Ejemplo: Si la IP WAN fuese 190.12.34.56, la flag sería HTB{190.12.34.56}
+
+[+] PISTAS:
+    - Busca la interfaz marcada como "WAN" o "UPLINK" en el gateway.
+    - Revisa la tabla de enrutamiento (ip route / route print).
+    - Observa la salida de tracert desde el cliente.
+    - Analiza las reglas NAT (iptables / MASQUERADE).
 
 ========================================================================
-Pistas:
-- Revisa el archivo 03_LOGS_VM2_ROUTER_GATEWAY.txt o la salida de tracert en 04_LOGS_VM3_CLIENT_WORKSTATION.txt.
-- Examina la interfaz con el adaptador de salida externa WAN UPLINK.
+¡Buena suerte, futuro ingeniero en ciberseguridad!
+© 2026 ShadowBytes SENATI — 4.º Ciclo
 ========================================================================

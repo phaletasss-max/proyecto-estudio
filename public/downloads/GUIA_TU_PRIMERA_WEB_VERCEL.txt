@@ -1,0 +1,203 @@
+========================================================================
+⚡ SHADOWBYTES SENATI — GUÍA COMPLETA: TU PRIMERA PÁGINA WEB ⚡
+   CON DOMINIO PROPIO EN VERCEL + GITHUB
+========================================================================
+   Felicidades por resolver el CTF. Ahora aprende a desplegar.
+========================================================================
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 1: CREA TU CUENTA EN GITHUB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ve a https://github.com/signup
+2. Registra tu cuenta con tu correo personal.
+3. Confirma tu correo electrónico.
+4. Elige un nombre de usuario profesional (ej: tu-nombre-dev).
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 2: CREA TU CUENTA EN VERCEL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ve a https://vercel.com/signup
+2. Selecciona "Continue with GitHub".
+3. Autoriza a Vercel para que lea tus repositorios.
+4. ¡Listo! Tu cuenta de Vercel ya está vinculada a GitHub.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 3: VERIFICA QUE TENGAS GIT INSTALADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Abre tu terminal (CMD o PowerShell en Windows) y escribe:
+
+    git --version
+
+Si aparece algo como "git version 2.45.0", ¡está instalado!
+Si no, descárgalo de: https://git-scm.com/downloads
+
+Luego configura tu identidad:
+
+    git config --global user.name "Tu Nombre"
+    git config --global user.email "tu-correo@gmail.com"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 4: CREA UN REPOSITORIO EN GITHUB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. En GitHub, haz clic en el botón verde "New" (o ve a github.com/new).
+2. Nombre del repositorio: mi-primera-web
+3. Visibilidad: Public
+4. NO marques "Add a README" (lo haremos desde la terminal).
+5. Haz clic en "Create repository".
+6. GitHub te mostrará los comandos para subir código. Guárdalos.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 5: CREA TU PÁGINA WEB (ESTRUCTURA DE ARCHIVOS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Crea una carpeta en tu PC llamada "mi-primera-web" y dentro
+crea estos archivos con la siguiente estructura:
+
+    mi-primera-web/
+    ├── index.html          ← Tu página principal
+    ├── style.css           ← Tus estilos (colores, fuentes, etc.)
+    └── script.js           ← Tu JavaScript (opcional)
+
+Contenido mínimo de index.html:
+────────────────────────────────
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Primera Web — SENATI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>¡Hola mundo! Esta es mi primera web.</h1>
+    <p>Soy estudiante del 4.º ciclo de SENATI.</p>
+    <script src="script.js"></script>
+</body>
+</html>
+
+Contenido mínimo de style.css:
+────────────────────────────────
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+h1 {
+    color: #38bdf8;
+    font-size: 2.5rem;
+}
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 6: SUBE TU CÓDIGO A GITHUB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Abre la terminal DENTRO de la carpeta "mi-primera-web" y ejecuta:
+
+    git init
+    git branch -M main
+    git add .
+    git commit -m "mi primera pagina web"
+    git remote add origin https://github.com/TU_USUARIO/mi-primera-web.git
+    git push -u origin main
+
+(Reemplaza TU_USUARIO por tu nombre de usuario de GitHub)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 7: VINCULA VERCEL CON TU REPOSITORIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ve a https://vercel.com/new
+2. Busca tu repositorio "mi-primera-web" y selecciónalo.
+3. Framework Preset: Other (porque es HTML puro).
+4. Build Command: (déjalo vacío o pon: echo "no build needed")
+5. Output Directory: ./
+6. Haz clic en "Deploy".
+
+¡EN MENOS DE 30 SEGUNDOS TU WEB ESTARÁ ONLINE!
+
+Vercel te dará una URL como:
+    https://mi-primera-web.vercel.app
+
+¡ESE ES TU DOMINIO! Ya tienes tu página en Internet. 🎉
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 8: PERSONALIZA TU PÁGINA (OPCIONAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Para modificar estilos o contenido:
+1. Edita los archivos en tu PC (index.html, style.css, etc.)
+2. Guarda los cambios.
+3. En la terminal ejecuta:
+
+    git add .
+    git commit -m "actualicé mi página"
+    git push
+
+4. Vercel detectará los cambios y los desplegará automáticamente.
+
+Si quieres un dominio personalizado (ej: tunombre.com):
+- Compra un dominio en Namecheap, GoDaddy o Cloudflare.
+- En Vercel → Settings → Domains → Add Domain.
+- Configura estos registros DNS en tu proveedor:
+    Registro A   → Host: @    → IP: 76.76.21.21
+    Registro CNAME → Host: www → Valor: cname.vercel-dns.com
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROMPT PARA GEMINI / ANTIGRAVITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Si quieres que una IA te genere una página más completa,
+copia y pega este prompt en Gemini o Antigravity:
+
+"Crea una página web profesional de una sola página (single page)
+con HTML, CSS y JavaScript. Usa un diseño moderno y oscuro.
+La página debe tener las siguientes secciones: un encabezado con
+mi nombre, una sección 'Sobre mí' con una breve descripción,
+una sección de proyectos con 3 tarjetas, y un pie de página
+con enlaces a mis redes sociales. Incluye animaciones suaves
+al hacer scroll. Genera los archivos index.html, style.css
+y script.js por separado."
+
+Luego copia cada archivo generado en tu carpeta del proyecto,
+haz git add, commit y push. ¡Vercel lo desplegará al instante!
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+¿NO ENTENDISTE ALGÚN PASO?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Copia este prompt en Gemini para que te guíe paso a paso:
+
+"Soy estudiante de SENATI del 4.º ciclo. Nunca he subido una
+página web a Internet. Necesito que me guíes paso a paso para:
+1) Crear una cuenta en GitHub, 2) Instalar Git en Windows,
+3) Crear un repositorio, 4) Subir una página HTML + CSS simple,
+5) Conectar el repositorio con Vercel para tener mi página
+online con un dominio gratuito. Explícame cada comando y cada
+paso como si nunca hubiera usado la terminal."
+
+
+========================================================================
+© 2026 ShadowBytes SENATI — 4.º Ciclo
+Instructor: Victor Kenky Rodriguez Lopez
+========================================================================
