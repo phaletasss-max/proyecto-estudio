@@ -2,6 +2,7 @@ import React from 'react';
 import { BackgroundEffect } from '@/components/BackgroundEffect';
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
+import { LearningPerks } from '@/components/LearningPerks';
 import { Projects } from '@/components/Projects';
 import { Methodology } from '@/components/Methodology';
 import { Benefits } from '@/components/Benefits';
@@ -20,6 +21,7 @@ export const App: React.FC = () => {
         <Navbar />
         <main>
           <Hero />
+          <LearningPerks />
           <Projects />
           <Methodology />
           <Benefits />

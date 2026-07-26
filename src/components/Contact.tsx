@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle, User, Phone, Send, Copy, Check, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
+import { MessageCircle, Users, Copy, Check, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
 
 export const Contact: React.FC = () => {
   const [copied, setCopied] = useState(false);
 
   const phoneDisplay = '921 378 349';
-  const whatsappUrl = 'https://wa.me/51921378349';
-  const defaultMessage = 'Hola Manuel, me gustaría unirme al grupo de estudio de Plan Estudios SENATI para el 4.º ciclo.';
+  const whatsappUrl = 'https://wa.me/51921378349?text=Hola,%20quisiera%20unirme%20a%20Plan%20Estudios%20SENATI.';
+  const defaultMessage = 'Hola, quisiera unirme a Plan Estudios SENATI.';
 
   const handleCopyPhone = () => {
     navigator.clipboard.writeText('921378349');
@@ -23,7 +23,7 @@ export const Contact: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono mb-4">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>ÚNETE HOY</span>
+            <span>ÚNETE HOY AL GRUPO</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
             ¿Quieres unirte?
@@ -45,15 +45,14 @@ export const Contact: React.FC = () => {
           <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
           <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
 
-          {/* Contact Person Details */}
           <div className="relative z-10 space-y-8">
             
-            {/* Status & Avatar Header */}
+            {/* Status & Header */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-8 border-b border-slate-800/80 text-center sm:text-left">
               <div className="relative">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 p-1 shadow-lg shadow-emerald-500/20">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 p-1 shadow-lg shadow-emerald-500/20">
                   <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-white">
-                    <User className="w-10 h-10 text-emerald-400" />
+                    <Users className="w-8 h-8 text-emerald-400" />
                   </div>
                 </div>
                 <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
@@ -65,60 +64,50 @@ export const Contact: React.FC = () => {
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Coordinador del Grupo
+                  Coordinación de Grupo
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-                  Manuel Mendoza
+                  Plan Estudios SENATI
                 </h3>
                 <p className="text-slate-400 text-sm mt-0.5">
-                  Estudiante del 4.º ciclo • SENATI
+                  Comunidad Abierta para el 4.º Ciclo
                 </p>
               </div>
             </div>
 
-            {/* Info Grid: Nombre & WhatsApp */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              
-              {/* Field: Nombre */}
-              <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between">
-                <div>
-                  <span className="text-[11px] font-mono uppercase text-slate-500 tracking-wider block">
-                    Nombre
-                  </span>
-                  <span className="text-base font-semibold text-white">
-                    Manuel Mendoza
-                  </span>
-                </div>
-                <div className="p-2 rounded-lg bg-slate-900 text-slate-400 border border-slate-800">
-                  <User className="w-4 h-4" />
-                </div>
+            {/* Info Box: WhatsApp Number */}
+            <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-mono uppercase text-slate-500 tracking-wider block mb-1">
+                  Contacto de WhatsApp
+                </span>
+                <span className="text-xl font-bold text-emerald-400 font-mono">
+                  {phoneDisplay}
+                </span>
               </div>
-
-              {/* Field: WhatsApp */}
-              <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between">
-                <div>
-                  <span className="text-[11px] font-mono uppercase text-slate-500 tracking-wider block">
-                    WhatsApp
-                  </span>
-                  <span className="text-base font-semibold text-emerald-400 font-mono">
-                    {phoneDisplay}
-                  </span>
-                </div>
-                <button
-                  onClick={handleCopyPhone}
-                  className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
-                  title="Copiar número"
-                >
-                  {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                </button>
-              </div>
-
+              <button
+                onClick={handleCopyPhone}
+                className="p-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800 flex items-center gap-2 text-xs font-mono"
+                title="Copiar número"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    <span className="text-emerald-400">¡Copiado!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span>Copiar</span>
+                  </>
+                )}
+              </button>
             </div>
 
             {/* Message Preview Box */}
             <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/60 text-xs text-slate-400 font-mono">
-              <span className="text-emerald-400 font-semibold block mb-1">💬 Mensaje sugerido:</span>
-              <p className="italic text-slate-300">"{defaultMessage}"</p>
+              <span className="text-emerald-400 font-semibold block mb-1">💬 Mensaje listo para enviar:</span>
+              <p className="italic text-slate-200 text-sm">"{defaultMessage}"</p>
             </div>
 
             {/* Large Green WhatsApp Button */}
@@ -135,10 +124,10 @@ export const Contact: React.FC = () => {
               </a>
             </div>
 
-            {/* Security / Verification Footer Note */}
+            {/* Security Note */}
             <div className="flex items-center justify-center gap-2 text-xs text-slate-500 font-mono text-center pt-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Respuesta rápida y acceso inmediato tras verificación</span>
+              <span>Respuesta rápida e ingreso al servidor oficial de Discord</span>
             </div>
 
           </div>
