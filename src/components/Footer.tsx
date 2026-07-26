@@ -14,15 +14,25 @@ export const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-2">
             <div className="flex items-center gap-3">
-              <span className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                ShadowBytes
+              <div className="w-9 h-9 rounded-xl overflow-hidden shadow-md">
+                <img
+                  src="/logo-shadowbytes.png"
+                  alt="ShadowBytes Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span className="text-2xl font-bold tracking-tight text-white font-[Orbitron]">
+                SHADOW<span className="text-purple-400">BYTES</span>
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-cyan-300 text-xs font-mono border border-blue-500/30">
+              <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-xs font-mono border border-purple-500/30">
                 4.º ciclo
               </span>
             </div>
-            <p className="text-sm text-slate-400 max-w-md">
-              Comunidad colaborativa de estudiantes de SENATI enfocados en desarrollo web, servidores DNS, Active Directory, CTFs y ciberseguridad.
+            <p className="text-xs font-mono text-purple-400 tracking-wider font-semibold">
+              APRENDER • COMPARTIR • CREAR • PROTEGER
+            </p>
+            <p className="text-xs text-slate-400 max-w-md">
+              Comunidad colaborativa de estudiantes enfocados en desarrollo web, servidores DNS, Active Directory, CTFs y ciberseguridad.
             </p>
           </div>
 

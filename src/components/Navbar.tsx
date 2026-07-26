@@ -37,21 +37,26 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           
-          {/* Logo: ShadowBytes */}
+          {/* Logo: ShadowBytes Official Emblem */}
           <a
             href="#inicio"
             className="flex items-center gap-3 group focus:outline-none"
           >
-            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-md group-hover:bg-blue-600 transition-colors">
-              <Zap className="w-5 h-5 text-cyan-400 fill-cyan-400 group-hover:text-white transition-colors" />
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-md group-hover:scale-105 transition-transform">
+              <img
+                src="/logo-shadowbytes.png"
+                alt="ShadowBytes Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex flex-col">
-              <span className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors select-none">
-                ShadowBytes
-              </span>
-              <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase -mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                SENATI • 4.º Ciclo
+              <div className="flex items-center font-bold tracking-tight text-xl sm:text-2xl select-none">
+                <span className="text-slate-950 font-[Orbitron]">SHADOW</span>
+                <span className="text-purple-600 font-[Orbitron]">BYTES</span>
+              </div>
+              <span className="text-[9px] font-mono tracking-widest text-purple-700 uppercase font-semibold -mt-0.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+                APRENDER • COMPARTIR • CREAR • PROTEGER
               </span>
             </div>
           </a>

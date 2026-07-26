@@ -20,13 +20,34 @@ export const Hero: React.FC = () => {
         
         {/* Top Chip / Badge */}
         <div className="flex flex-col items-center justify-center text-center">
+          {/* Official Logo Emblem Display */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-center mb-6"
+          >
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-3xl overflow-hidden shadow-2xl border-2 border-slate-900/10 p-1 bg-slate-950 hover:scale-105 transition-transform duration-300 group">
+              <img
+                src="/logo-shadowbytes.png"
+                alt="ShadowBytes Official Logo"
+                className="w-full h-full object-cover rounded-2xl"
+              />
+            </div>
+            
+            {/* Slogan Banner */}
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-900/10 border border-purple-500/20 text-purple-700 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest">
+              <span className="w-2 h-2 rounded-full bg-purple-600 animate-ping" />
+              <span>APRENDER • COMPARTIR • CREAR • PROTEGER</span>
+            </div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 border border-slate-200 shadow-sm mb-6"
           >
-            <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-ping" />
             <span className="text-xs sm:text-sm font-mono text-slate-700">
               SENATI 4.º Ciclo • Instructor: <span className="text-blue-600 font-semibold">Victor Kenky Rodriguez Lopez</span>
             </span>
@@ -36,7 +57,7 @@ export const Hero: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
             className="mb-8 max-w-2xl mx-auto px-6 py-3 rounded-2xl bg-blue-50/80 border border-blue-200 text-center shadow-xs"
           >
             <p className="text-xs sm:text-sm font-medium text-blue-950 italic leading-relaxed">
