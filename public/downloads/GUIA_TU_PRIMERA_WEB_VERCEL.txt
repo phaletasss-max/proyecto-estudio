@@ -42,6 +42,18 @@ Luego configura tu identidad:
     git config --global user.name "Tu Nombre"
     git config --global user.email "tu-correo@gmail.com"
 
+⚠️  IMPORTANTE: Tu email de Git DEBE coincidir con tu cuenta
+de GitHub. Si no coincide, Vercel bloqueará tu deploy con
+el error "commit email could not be matched to a GitHub account".
+
+Si no quieres usar tu email personal, usa tu email noreply
+de GitHub (lo encuentras en GitHub → Settings → Emails):
+
+    git config --global user.email "TU_USUARIO@users.noreply.github.com"
+
+Ejemplo:
+    git config --global user.email "juan-dev@users.noreply.github.com"
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PASO 4: CREA UN REPOSITORIO EN GITHUB
@@ -121,7 +133,24 @@ Abre la terminal DENTRO de la carpeta "mi-primera-web" y ejecuta:
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PASO 7: VINCULA VERCEL CON TU REPOSITORIO
+PASO 7: AUTORIZA A VERCEL PARA VER TU REPO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  Si Vercel no muestra tu repositorio o te da el error:
+   "Invalid request: gitSource missing required property repoId"
+   es porque Vercel no tiene permisos para acceder al repo.
+
+Para solucionarlo:
+1. Ve a https://github.com/settings/installations
+2. Busca "Vercel" y haz clic en "Configure".
+3. En "Repository access", selecciona "All repositories"
+   O agrega manualmente tu repo "mi-primera-web".
+4. Haz clic en "Save".
+5. Vuelve a https://vercel.com/new y recarga la página.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 8: DESPLIEGA EN VERCEL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. Ve a https://vercel.com/new
@@ -140,7 +169,7 @@ Vercel te dará una URL como:
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PASO 8: PERSONALIZA TU PÁGINA (OPCIONAL)
+PASO 9: PERSONALIZA TU PÁGINA (OPCIONAL)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Para modificar estilos o contenido:
