@@ -21,28 +21,30 @@ export const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative min-h-svh w-full overflow-hidden bg-slate-900">
-      {/* Background Video (z-0) with multiple CDN fallbacks */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-90"
-      >
-        <source
-          src="https://cdn.coverr.co/videos/coverr-flying-over-mountains-and-lakes-5264/1080p.mp4"
-          type="video/mp4"
-        />
-        <source
-          src="https://assets.mixkit.co/videos/preview/mixkit-top-aerial-view-of-a-beach-and-the-sea-41551-large.mp4"
-          type="video/mp4"
-        />
-        <source
-          src="https://pollen-batch-41236914.figma.site/_components/v2/f0ee2dae7671c170c34f12e31c4cb41418976c98/769c564298c132f7919405cd9f17c1b1231f341d.769c5642.mp4"
-          type="video/mp4"
-        />
-      </video>
+    <section className="relative min-h-svh w-full overflow-hidden bg-slate-950">
+      {/* 
+        Background Video (z-0) 
+        Styled with anti-watermark zoom crop (scale-125 & origin-center)
+        to automatically cut off bottom-right watermarks (Gemini logo)
+      */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-85 scale-125 origin-center transition-transform duration-700"
+        >
+          <source
+            src="https://cdn.coverr.co/videos/coverr-flying-over-mountains-and-lakes-5264/1080p.mp4"
+            type="video/mp4"
+          />
+          <source
+            src="https://assets.mixkit.co/videos/preview/mixkit-top-aerial-view-of-a-beach-and-the-sea-41551-large.mp4"
+            type="video/mp4"
+          />
+        </video>
+      </div>
 
       {/* Top White-to-Transparent Gradient Overlay (z-1) */}
       <div
