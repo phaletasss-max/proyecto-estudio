@@ -1,0 +1,29 @@
+========================================================================
+LOGS DE CONSOLA: VM1 — WINDOWS SERVER 2022 (DOMAIN CONTROLLER)
+========================================================================
+
+C:\Users\Administrator> ipconfig /all
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : DC-SENATI-SERVER
+   Primary Dns Suffix  . . . . . . . : senati.local
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : Yes
+   WINS Proxy Enabled. . . . . . . . : No
+
+Ethernet adapter LAN-Internal:
+
+   Connection-specific DNS Suffix  . : senati.local
+   Description . . . . . . . . . . . : Intel(R) PRO/1000 MT Desktop Adapter
+   Physical Address. . . . . . . . . : 08-00-27-A1-42-B9
+   DHCP Enabled. . . . . . . . . . . : No
+   IPv4 Address. . . . . . . . . . . : 10.0.4.10(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 10.0.4.1
+   DNS Servers . . . . . . . . . . . : 127.0.0.1
+                                       10.0.4.1
+
+C:\Users\Administrator> netstat -ano | findstr 10.0.4.1
+  TCP    10.0.4.10:53           10.0.4.50:52100        ESTABLISHED     1040
+  TCP    10.0.4.10:389          10.0.4.50:52104        ESTABLISHED     824

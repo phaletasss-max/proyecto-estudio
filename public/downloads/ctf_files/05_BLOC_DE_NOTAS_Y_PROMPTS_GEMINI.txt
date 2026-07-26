@@ -1,0 +1,22 @@
+========================================================================
+⚡ BLOC DE NOTAS & PROMPTS DE GEMINI — GUIA DE DOMINIOS Y VERCEL ⚡
+========================================================================
+
+[+] GUIA RAPIDA PARA DESPLEGAR TU SITIO WEB:
+1. Sube tu código a GitHub:
+   git branch -M main
+   git add .
+   git commit -m "feat: initial release"
+   git push -u origin main
+
+2. En Vercel (https://vercel.com/new):
+   - Importa tu repositorio.
+   - Build Command: npm run build
+   - Output Directory: dist
+
+3. Registros DNS para tu dominio personalizado:
+   - Registro A (@): 76.76.21.21
+   - CNAME (www): cname.vercel-dns.com
+
+[+] PROMPT PARA COPIAR EN GEMINI / AGY:
+"Actúa como un Ingeniero DevSecOps experto. Ayúdame a configurar el despliegue automático de mi aplicación React + Vite en Vercel conectada a mi repositorio de GitHub. Genera un archivo vercel.json optimizado para rutas SPA y la guía DNS para mi dominio personalizado."

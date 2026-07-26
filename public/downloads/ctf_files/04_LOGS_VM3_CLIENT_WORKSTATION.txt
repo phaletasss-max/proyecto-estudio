@@ -1,0 +1,26 @@
+========================================================================
+LOGS DE CONSOLA: VM3 — CLIENT WORKSTATION (ESTUDIANTE SENATI)
+========================================================================
+
+C:\Users\Estudiante> ipconfig
+
+Windows IP Configuration
+
+Ethernet adapter Ethernet0:
+
+   Connection-specific DNS Suffix  . : senati.local
+   IPv4 Address. . . . . . . . . . . : 10.0.4.50
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 10.0.4.1
+
+C:\Users\Estudiante> tracert 8.8.8.8
+
+Tracing route to dns.google [8.8.8.8]
+over a maximum of 30 hops:
+
+  1    1 ms    1 ms    1 ms  10.0.4.1 (gw-senati-core.local)
+  2   12 ms   10 ms   11 ms  200.48.225.14 (WAN_OUT_UPLINK)
+  3   18 ms   16 ms   17 ms  200.48.200.1
+  4   25 ms   24 ms   25 ms  dns.google [8.8.8.8]
+
+Trace complete.

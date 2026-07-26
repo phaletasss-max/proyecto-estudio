@@ -1,0 +1,22 @@
+========================================================================
+⚡ SHADOWBYTES SENATI — RETO CTF FORENSE DE REDES (4.º CICLO) ⚡
+========================================================================
+
+[+] RETO: Análisis de Tráfico y Tabla de Enrutamiento de Red.
+[+] OBJETIVO: 
+    Examina los registros de consola (ipconfig, route print, tracert, ip addr)
+    de las 3 Máquinas Virtuales adjuntas (VM-Server, VM-Gateway, VM-Client).
+
+[+] PREGUNTA DEL RETO:
+    ¿Cuál es la dirección IP pública/WAN por la cual el Gateway enruta
+    el tráfico de la red local hacia Internet?
+
+[+] FORMATO DE LA FLAG:
+    HTB{IP_HALLADA}
+    Ejemplo: Si la IP WAN fuese 190.12.34.56, la flag sería HTB{190.12.34.56}
+
+========================================================================
+Pistas:
+- Revisa el archivo 03_LOGS_VM2_ROUTER_GATEWAY.txt o la salida de tracert en 04_LOGS_VM3_CLIENT_WORKSTATION.txt.
+- Examina la interfaz con el adaptador de salida externa WAN UPLINK.
+========================================================================
