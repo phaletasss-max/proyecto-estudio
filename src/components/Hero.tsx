@@ -20,28 +20,6 @@ export const Hero: React.FC = () => {
         
         {/* Top Chip / Badge */}
         <div className="flex flex-col items-center justify-center text-center">
-          {/* Official Logo Emblem Display */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col items-center mb-6"
-          >
-            <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-3xl overflow-hidden shadow-2xl border-2 border-purple-500/30 p-1 bg-slate-950 hover:scale-105 transition-transform duration-300 group">
-              <img
-                src="/logo-shadowbytes.png"
-                alt="ShadowBytes Official Logo"
-                className="w-full h-full object-cover rounded-2xl"
-              />
-            </div>
-            
-            {/* Slogan Banner */}
-            <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-950/80 border border-purple-500/40 text-purple-300 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-lg">
-              <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
-              <span>APRENDER • COMPARTIR • CREAR • PROTEGER</span>
-            </div>
-          </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}

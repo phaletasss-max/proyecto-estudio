@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, ShieldCheck, Zap } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '@/context/ThemeContext';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -26,12 +27,17 @@ export const Navbar: React.FC = () => {
     { name: 'Contacto', href: '#contacto' },
   ];
 
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-slate-950/85 backdrop-blur-2xl border-b border-slate-800/80 shadow-2xl py-3.5'
-          : 'bg-slate-950/40 backdrop-blur-md py-5'
+          ? isDark
+            ? 'bg-slate-950/85 backdrop-blur-2xl border-b border-slate-800/80 shadow-2xl py-3.5'
+            : 'bg-white/85 backdrop-blur-2xl border-b border-slate-200 shadow-md py-3.5'
+          : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,45 +57,76 @@ export const Navbar: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center font-bold tracking-tight text-xl sm:text-2xl select-none">
-                <span className="text-slate-950 font-[Orbitron]">SHADOW</span>
-                <span className="text-purple-600 font-[Orbitron]">BYTES</span>
+                <span className={isDark ? 'text-white font-[Orbitron]' : 'text-slate-950 font-[Orbitron]'}>SHADOW</span>
+                <span className="text-purple-500 font-[Orbitron]">BYTES</span>
               </div>
-              <span className="text-[9px] font-mono tracking-widest text-purple-700 uppercase font-semibold -mt-0.5 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+              <span className="text-[9px] font-mono tracking-widest text-purple-400 uppercase font-semibold -mt-0.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
                 APRENDER • COMPARTIR • CREAR • PROTEGER
               </span>
             </div>
           </a>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-900/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-slate-800">
+          <nav className={`hidden md:flex items-center gap-1 px-4 py-1.5 rounded-full border ${
+            isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-100/90 border-slate-200'
+          }`}>
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
-                className="px-4 py-1.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-full transition-all duration-200"
+                className={`px-4 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ${
+                  isDark
+                    ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white'
+                }`}
               >
                 {link.name}
               </a>
             ))}
           </nav>
 
-          {/* Right Action Button */}
+          {/* Right Actions: Theme Toggle + Join Button */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Theme Switcher Button */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2.5 rounded-full border transition-all duration-300 flex items-center justify-center ${
+                isDark
+                  ? 'bg-slate-900 border-slate-800 text-amber-400 hover:bg-slate-800 hover:border-amber-400/50 shadow-md'
+                  : 'bg-white border-slate-200 text-indigo-600 hover:bg-slate-100 hover:border-indigo-300 shadow-sm'
+              }`}
+              title={isDark ? 'Cambiar a Modo Claro ☀️' : 'Cambiar a Modo Oscuro 🌙'}
+              aria-label="Toggle Theme"
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
             <a
               href="#contacto"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-slate-900 text-white text-sm font-medium tracking-wide hover:bg-blue-600 transition-all shadow-sm hover:shadow-blue-500/20 active:scale-95 group"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-purple-600 text-white text-sm font-medium tracking-wide hover:bg-purple-500 transition-all shadow-md hover:shadow-purple-500/30 active:scale-95 group"
             >
               <span>Únete</span>
-              <ArrowUpRight className="w-4 h-4 text-cyan-400 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              <ArrowUpRight className="w-4 h-4 text-cyan-300 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden">
+          {/* Mobile Menu Button + Mobile Theme Toggle */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-xl border text-sm ${
+                isDark ? 'bg-slate-900 border-slate-800 text-amber-400' : 'bg-slate-100 border-slate-200 text-indigo-600'
+              }`}
+              aria-label="Toggle Theme Mobile"
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 focus:outline-none"
+              className={`p-2 rounded-xl border ${
+                isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-slate-100 border-slate-200 text-slate-700'
+              }`}
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
