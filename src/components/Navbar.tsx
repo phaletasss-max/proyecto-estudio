@@ -32,11 +32,11 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform-gpu ${
         isScrolled
           ? isDark
-            ? 'bg-slate-950/85 backdrop-blur-2xl border-b border-slate-800/80 shadow-2xl py-3.5'
-            : 'bg-white/85 backdrop-blur-2xl border-b border-slate-200 shadow-md py-3.5'
+            ? 'bg-slate-950/90 backdrop-blur-md border-b border-slate-800 shadow-lg py-3.5'
+            : 'bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-md py-3.5'
           : 'bg-transparent py-5'
       }`}
     >

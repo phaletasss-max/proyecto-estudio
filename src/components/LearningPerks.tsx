@@ -30,7 +30,7 @@ export const LearningPerks: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="group relative rounded-3xl bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 hover:border-blue-500/60 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+            className="group relative rounded-3xl bg-slate-900/90 backdrop-blur-sm transform-gpu border border-slate-800 p-8 hover:border-blue-500/60 hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
           >
             <div>
               <div className="w-14 h-14 rounded-2xl bg-blue-950/80 border border-blue-500/30 text-cyan-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -58,7 +58,7 @@ export const LearningPerks: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="group relative rounded-3xl bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 hover:border-purple-500/60 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+            className="group relative rounded-3xl bg-slate-900/90 backdrop-blur-sm transform-gpu border border-slate-800 p-8 hover:border-purple-500/60 hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
           >
             <div>
               <div className="w-14 h-14 rounded-2xl bg-purple-950/80 border border-purple-500/30 text-purple-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">

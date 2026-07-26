@@ -8,13 +8,13 @@ export const Hero: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dev' | 'infra' | 'ctf'>('dev');
 
   return (
-    <section id="inicio" className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-transparent text-white">
+    <section id="inicio" className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-transparent transform-gpu">
       
       {/* Animated Terminal Code Background Stream */}
       <TerminalBackground />
 
       {/* Background Subtle Gradient Mesh */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-purple-900/20 via-cyan-900/10 to-transparent blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-purple-900/15 via-cyan-900/10 to-transparent blur-2xl pointer-events-none -z-10 transform-gpu" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
