@@ -2,18 +2,86 @@ import { motion } from 'framer-motion'
 import { useSiteContent } from '../context/SiteContent'
 
 const CERTIFICATIONS = [
-  { name: 'Cisco CCNA 1', status: 'Completado', progress: 100, color: '#4ade80', glow: 'glowing-dot-green' },
-  { name: 'Cisco CCNA 2', status: 'Completado', progress: 100, color: '#4ade80', glow: 'glowing-dot-green' },
-  { name: 'Cisco CCNA 3', status: 'En curso', progress: 45, color: '#facc15', glow: 'glowing-dot-yellow' },
-  { name: 'Arch Linux Admin', status: 'Avanzado', progress: 90, color: '#89AACC', glow: 'glowing-dot-green' },
-  { name: 'Kali Linux Security', status: 'Avanzado', progress: 85, color: '#89AACC', glow: 'glowing-dot-green' },
+  {
+    name: 'Cisco CCNA – Módulo 1: Fundamentals of Networking & Protocols',
+    status: 'Completado',
+    progress: 100,
+    color: '#4ade80',
+    glow: 'glowing-dot-green',
+    desc: 'Fundamentos de redes, modelo OSI/TCP-IP, direccionamiento IPv4/IPv6, subredes y protocolos.',
+  },
+  {
+    name: 'Cisco CCNA – Módulo 2: Switching, Routing, and Wireless Essentials',
+    status: 'Completado',
+    progress: 100,
+    color: '#4ade80',
+    glow: 'glowing-dot-green',
+    desc: 'VLANs, trunking (802.1Q), EtherChannel, STP, enrutamiento estático y redes inalámbricas.',
+  },
+  {
+    name: 'Cisco CCNA – Módulo 3: Enterprise Networking, Security, and Automation',
+    status: 'En curso',
+    progress: 60,
+    color: '#facc15',
+    glow: 'glowing-dot-yellow',
+    desc: 'Seguridad en redes empresariales, VPNs, OSPF, automatización con APIs y gestión de red.',
+  },
 ]
 
-const TOOLS = [
-  'Cisco IOS', 'Packet Tracer', 'Wireshark', 'Nmap',
-  'Arch Linux', 'Ubuntu Server', 'Red Hat', 'Kali Linux',
-  'PHP', 'MySQL', 'HTML/CSS', 'Python',
-  'ESP32', 'Git', 'SSH/VPN', 'Docker',
+const ACADEMIC_COMPETENCIES = [
+  {
+    title: 'Redes, Conmutación y Servicios de Infraestructura',
+    icon: '🌐',
+    items: [
+      {
+        name: 'Routing & Switching (Cisco)',
+        detail: 'Diseño, segmentación y configuración de redes locales mediante VLANs, trunking (802.1Q), direccionamiento IPv4/IPv6, subredes, tablas de enrutamiento y políticas básicas de seguridad de red en switches y routers Cisco.',
+      },
+      {
+        name: 'Simulación & Análisis de Tráfico',
+        detail: 'Modelado de topologías de red en Cisco Packet Tracer, análisis de tráfico con Wireshark y resolución de diagramas lógicos/físicos en entorno de laboratorio.',
+      },
+      {
+        name: 'Servicios de Red',
+        detail: 'Configuración y conceptos básicos de servicios esenciales como DNS, DHCP, servicios de correo/web y modelos cliente-servidor.',
+      },
+    ],
+  },
+  {
+    title: 'Administración de Sistemas Operativos & Entornos Linux',
+    icon: '🐧',
+    items: [
+      {
+        name: 'Sistemas Operativos (Server & Workstation)',
+        detail: 'Administración y despliegue básico en Linux (Ubuntu, Kali Linux, Arch Linux), Windows y Windows Server.',
+      },
+      {
+        name: 'Automatización & Scripting',
+        detail: 'Desarrollo de scripts y algoritmos de resolución de problemas en Python 3, C++ y Java, ejecutados de forma nativa en distribuciones Linux.',
+      },
+      {
+        name: 'Virtualización de Dispositivos/IPs',
+        detail: 'Implementación de interfaces de red virtuales en Ubuntu para la simulación de nodos e IPs ficticias en escenarios de pruebas de red.',
+      },
+    ],
+  },
+  {
+    title: 'Prototipado IoT & Mecatrónica Básica',
+    icon: '⚡',
+    items: [
+      {
+        name: 'Sistemas Embebidos',
+        detail: 'Simulación de circuitos electrónicos y programación de microcontroladores utilizando Tinkercad, sentando las bases para el desarrollo de proyectos hardware con microcontroladores más avanzados.',
+      },
+    ],
+  },
+]
+
+const STACK_SUMMARY = [
+  { category: 'Redes & Simulación', skills: ['Cisco IOS', 'Packet Tracer', 'Wireshark', 'Subnetting IPv4/IPv6', 'VLANs', 'Routing/Switching'] },
+  { category: 'Sistemas Operativos', skills: ['Arch Linux', 'Ubuntu Server/Desktop', 'Kali Linux', 'Windows Server'] },
+  { category: 'Lenguajes de Programación', skills: ['Python 3', 'C++', 'Java', 'Bash Scripting'] },
+  { category: 'Herramientas de Diseño & IoT', skills: ['Tinkercad (Mecatrónica/IoT)', 'Git', 'GitHub', 'VirtualBox'] },
 ]
 
 const inView = {
@@ -25,10 +93,10 @@ export default function AboutMe() {
   const { content } = useSiteContent()
 
   const QUICK_FACTS = [
-    { icon: '🎓', label: 'Institución', value: content.aboutInstitution },
-    { icon: '📍', label: 'Ubicación', value: content.aboutLocation },
-    { icon: '💼', label: 'RUC', value: content.aboutRuc },
-    { icon: '🟢', label: 'Estado', value: content.aboutStatus },
+    { icon: '🎓', label: 'Carrera', value: 'Ciberseguridad' },
+    { icon: '🏛️', label: 'Institución', value: 'SENATI' },
+    { icon: '📅', label: 'Periodo', value: '2025 – Presente' },
+    { icon: '🟢', label: 'Estado', value: 'Matrícula Activa' },
   ]
 
   return (
@@ -46,17 +114,17 @@ export default function AboutMe() {
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-px" style={{ backgroundColor: 'hsl(var(--stroke))' }} />
             <span className="text-xs uppercase tracking-[0.3em]" style={{ color: 'hsl(var(--muted))' }}>
-              Sobre Mí
+              Educación & Formación Académica
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl mb-3" style={{ color: 'hsl(var(--text))' }}>
-            Perfil{' '}
+            Estudiante de{' '}
             <em style={{ fontFamily: "'Instrument Serif', serif", fontStyle: 'italic' }}>
-              profesional
+              Ciberseguridad
             </em>
           </h2>
-          <p className="text-sm max-w-xl" style={{ color: 'hsl(var(--muted))' }}>
-            Información clave para reclutadores y responsables de recursos humanos en ciberseguridad e infraestructura.
+          <p className="text-sm max-w-2xl leading-relaxed" style={{ color: 'hsl(var(--muted))' }}>
+            Formación integral centrada en infraestructura de redes, administración de sistemas operativos, desarrollo de software en entornos POSIX/Linux y fundamentos de ciberseguridad en SENATI (2025 – Presente).
           </p>
         </motion.div>
 
@@ -71,9 +139,8 @@ export default function AboutMe() {
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
           >
-            {/* Avatar + Name */}
+            {/* Avatar + Quick Facts */}
             <div className="premium-card p-6 md:p-8 rounded-3xl">
-              {/* Glowing Avatar container */}
               <div
                 className="relative w-24 h-24 mx-auto rounded-full p-[2px] mb-5 group-hover:scale-105 transition-transform duration-500"
                 style={{ background: 'linear-gradient(135deg, #89AACC, #4E85BF)', boxShadow: '0 0 20px rgba(78, 133, 191, 0.2)' }}
@@ -84,18 +151,17 @@ export default function AboutMe() {
                 >
                   SE
                 </div>
-                {/* Active pulse status ring */}
                 <span className="absolute bottom-1 right-1 w-4.5 h-4.5 rounded-full bg-green-500 border-2 border-[hsl(var(--bg))] glowing-dot-green" />
               </div>
 
               <h3 className="text-xl font-semibold mb-1 text-center" style={{ color: 'hsl(var(--text))' }}>
-                {content.aboutName}
+                {content.aboutName || 'Estudiante SENATI'}
               </h3>
               <p className="text-sm mb-6 text-center" style={{ color: 'hsl(var(--muted))' }}>
-                {content.aboutSubtitle}
+                Infraestructura, Redes & Ciberseguridad
               </p>
 
-              {/* Quick facts bento cells */}
+              {/* Quick facts cells */}
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {QUICK_FACTS.map(f => (
                   <div
@@ -137,9 +203,40 @@ export default function AboutMe() {
                 Descargar CV (PDF)
               </a>
             </div>
+
+            {/* Academic Stack Summary Box */}
+            <div className="premium-card p-6 md:p-8 rounded-3xl">
+              <h3 className="text-base font-semibold mb-4 flex items-center gap-2" style={{ color: 'hsl(var(--text))' }}>
+                <span>💻</span> Resumen de Stack Académico
+              </h3>
+              <div className="space-y-4">
+                {STACK_SUMMARY.map(st => (
+                  <div key={st.category}>
+                    <p className="text-xs font-mono mb-2" style={{ color: 'hsl(var(--muted))' }}>
+                      {st.category}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {st.skills.map(sk => (
+                        <span
+                          key={sk}
+                          className="text-[11px] px-2.5 py-1 rounded-lg border font-mono"
+                          style={{
+                            backgroundColor: 'rgba(255,255,255,0.03)',
+                            borderColor: 'hsl(var(--stroke) / 0.6)',
+                            color: 'hsl(var(--text))',
+                          }}
+                        >
+                          {sk}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </motion.div>
 
-          {/* Right Column — Certifications + Tools */}
+          {/* Right Column — Certifications + Labs */}
           <motion.div
             className="lg:col-span-8 flex flex-col gap-6"
             variants={inView}
@@ -148,10 +245,10 @@ export default function AboutMe() {
             viewport={{ once: true, margin: '-50px' }}
             transition={{ delay: 0.15 }}
           >
-            {/* Certifications Card */}
+            {/* Cisco Certifications Card */}
             <div className="premium-card p-6 md:p-8 rounded-3xl">
-              <h3 className="text-lg font-semibold mb-5" style={{ color: 'hsl(var(--text))' }}>
-                Certificaciones y Progreso
+              <h3 className="text-lg font-semibold mb-5 flex items-center gap-2" style={{ color: 'hsl(var(--text))' }}>
+                <span>🏆</span> Certificaciones Cisco
               </h3>
 
               <div className="flex flex-col gap-4">
@@ -170,14 +267,13 @@ export default function AboutMe() {
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
-                        {/* Glowing dot for status */}
                         <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${cert.glow}`} style={{ backgroundColor: cert.color }} />
-                        <span className="text-sm font-medium" style={{ color: 'hsl(var(--text))' }}>
+                        <span className="text-sm font-semibold" style={{ color: 'hsl(var(--text))' }}>
                           {cert.name}
                         </span>
                       </div>
                       <span
-                        className="text-[10px] px-2.5 py-0.5 rounded-full border font-semibold"
+                        className="text-[10px] px-2.5 py-0.5 rounded-full border font-semibold shrink-0"
                         style={{
                           color: cert.color,
                           borderColor: `${cert.color}40`,
@@ -187,6 +283,10 @@ export default function AboutMe() {
                         {cert.status} ({cert.progress}%)
                       </span>
                     </div>
+
+                    <p className="text-xs mb-3 pl-5" style={{ color: 'hsl(var(--muted))' }}>
+                      {cert.desc}
+                    </p>
 
                     {/* Progress bar container */}
                     <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
@@ -204,24 +304,42 @@ export default function AboutMe() {
               </div>
             </div>
 
-            {/* Tools & Technologies */}
+            {/* Academic Competencies & Lab Projects */}
             <div className="premium-card p-6 md:p-8 rounded-3xl">
-              <h3 className="text-lg font-semibold mb-5" style={{ color: 'hsl(var(--text))' }}>
-                Herramientas y Tecnologías
+              <h3 className="text-lg font-semibold mb-5 flex items-center gap-2" style={{ color: 'hsl(var(--text))' }}>
+                <span>📚</span> Competencias Académicas & Proyectos de Laboratorio
               </h3>
 
-              <div className="flex flex-wrap gap-2">
-                {TOOLS.map((tool, i) => (
-                  <motion.span
-                    key={tool}
-                    className="text-xs sm:text-sm px-4 py-2.5 rounded-full glass-badge cursor-default"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.25, delay: i * 0.03 }}
-                    viewport={{ once: true }}
+              <div className="space-y-6">
+                {ACADEMIC_COMPETENCIES.map((comp) => (
+                  <div
+                    key={comp.title}
+                    className="p-5 rounded-2xl border"
+                    style={{
+                      backgroundColor: 'rgba(255,255,255,0.01)',
+                      borderColor: 'hsl(var(--stroke) / 0.7)',
+                    }}
                   >
-                    {tool}
-                  </motion.span>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xl">{comp.icon}</span>
+                      <h4 className="text-sm font-semibold" style={{ color: 'hsl(var(--text))' }}>
+                        {comp.title}
+                      </h4>
+                    </div>
+
+                    <div className="space-y-3">
+                      {comp.items.map((item) => (
+                        <div key={item.name} className="pl-4 border-l-2 border-blue-500/40">
+                          <p className="text-xs font-bold mb-1" style={{ color: 'hsl(var(--text))' }}>
+                            {item.name}
+                          </p>
+                          <p className="text-xs leading-relaxed" style={{ color: 'hsl(var(--muted))' }}>
+                            {item.detail}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
