@@ -66,8 +66,11 @@ export const Footer: React.FC = () => {
 
         {/* Bottom copyright line */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-400 gap-4 text-center sm:text-left">
-          <p>
-            © {new Date().getFullYear()} ShadowBytes SENATI. Todos los derechos reservados.
+          <p className="flex items-center gap-2">
+            <span>© {new Date().getFullYear()} ShadowBytes SENATI. Todos los derechos reservados.</span>
+            <span className="hidden md:inline-block px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 text-[10px] border border-purple-500/20">
+              VERIFIED: SB-VERIFIED-AUTH-9756E8F-4TOCICLO-2026
+            </span>
           </p>
           <p className="flex items-center justify-center gap-1 text-slate-400">
             <span>Desarrollado con</span>
