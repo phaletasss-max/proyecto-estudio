@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronRight, CheckCircle2, Globe, Server, Trophy } from 'lucide-react';
+import { DomainCTFModal } from '@/components/DomainCTFModal';
 
 export const Hero: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dev' | 'infra' | 'ctf'>('dev');
 
   return (
-    <section id="inicio" className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden bg-white text-slate-900">
+    <section id="inicio" className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-white text-slate-900">
       
       {/* Background Subtle Gradient Mesh for White Theme */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-blue-50/60 via-cyan-50/40 to-transparent blur-3xl pointer-events-none -z-10" />
@@ -27,15 +28,15 @@ export const Hero: React.FC = () => {
             </span>
           </motion.div>
 
-          {/* Motivational Quote Banner */}
+          {/* Motivational Quote Banner (Improved Phrase) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="mb-8 max-w-2xl mx-auto px-5 py-2.5 rounded-2xl bg-blue-50/80 border border-blue-200 text-center shadow-xs"
+            className="mb-8 max-w-2xl mx-auto px-6 py-3 rounded-2xl bg-blue-50/80 border border-blue-200 text-center shadow-xs"
           >
-            <p className="text-xs sm:text-sm font-medium text-blue-950 italic">
-              "No tengas miedo de no saber nada y unirte; ten miedo de saber que no sabes nada y quedarte sin practicar."
+            <p className="text-xs sm:text-sm font-medium text-blue-950 italic leading-relaxed">
+              "No tengas miedo de empezar sin saber; ten miedo de saber que no sabes y aun así no hacer nada para aprender."
             </p>
           </motion.div>
 
@@ -88,12 +89,17 @@ export const Hero: React.FC = () => {
             </a>
           </motion.div>
 
+          {/* CTA Interactive Button: ¿Quieres aprender a tener tu dominio? */}
+          <div className="mt-4">
+            <DomainCTFModal />
+          </div>
+
           {/* Key Features Quick Bar */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-slate-600 font-medium"
+            className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-600 font-medium"
           >
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -110,12 +116,12 @@ export const Hero: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Liquid Glass Frosted SaaS Card (Wandor-inspired UI) */}
+        {/* Liquid Glass Frosted SaaS Card */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.6 }}
-          className="mt-16 relative max-w-4xl mx-auto"
+          className="mt-12 relative max-w-4xl mx-auto"
         >
           {/* Ambient Outer Glow */}
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 rounded-[36px] blur-xl opacity-30" />

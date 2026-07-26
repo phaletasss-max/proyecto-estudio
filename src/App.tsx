@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
+import { CyberMetrics } from '@/components/CyberMetrics';
 import { LearningPerks } from '@/components/LearningPerks';
 import { Projects } from '@/components/Projects';
 import { Methodology } from '@/components/Methodology';
@@ -15,6 +16,7 @@ export const App: React.FC = () => {
       <Navbar />
       <main>
         <Hero />
+        <CyberMetrics />
         <LearningPerks />
         <Projects />
         <Methodology />
