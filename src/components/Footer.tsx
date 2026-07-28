@@ -51,8 +51,24 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Back to top */}
-          <div className="flex items-center gap-4">
+          {/* Social Links & Back to top */}
+          <div className="flex items-center gap-3">
+            <a
+              href="https://chat.whatsapp.com/GQLxp8a8dVh3c3Z6POW1CU"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 text-xs font-mono font-semibold transition-all"
+            >
+              WhatsApp
+            </a>
+            <a
+              href="https://discord.gg/MPRzx6UHM"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-400 text-xs font-mono font-semibold transition-all"
+            >
+              Discord
+            </a>
             <button
               onClick={scrollToTop}
               className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white transition-colors"

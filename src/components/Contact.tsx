@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle, Users, Copy, Check, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
+import { MessageCircle, MessageSquare, Users, Copy, Check, ShieldCheck, Sparkles, ArrowRight, ExternalLink } from 'lucide-react';
 
 export const Contact: React.FC = () => {
   const [copied, setCopied] = useState(false);
 
   const phoneDisplay = '921 378 349';
-  const whatsappUrl = 'https://wa.me/51921378349?text=Hola,%20quisiera%20unirme%20a%20ShadowBytes%20SENATI.';
-  const defaultMessage = 'Hola, quisiera unirme a ShadowBytes SENATI.';
+  const whatsappGroupUrl = 'https://chat.whatsapp.com/GQLxp8a8dVh3c3Z6POW1CU';
+  const discordInviteUrl = 'https://discord.gg/MPRzx6UHM';
 
   const handleCopyPhone = () => {
     navigator.clipboard.writeText('921378349');
@@ -26,10 +26,10 @@ export const Contact: React.FC = () => {
             <span>ÚNETE HOY AL GRUPO</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            ¿Quieres unirte?
+            ¿Quieres unirte a <span className="gradient-text-blue">ShadowBytes</span>?
           </h2>
           <p className="mt-4 text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Envíame un mensaje por WhatsApp indicando que deseas formar parte del grupo de estudio. Posteriormente recibirás el enlace al servidor de Discord y al grupo oficial.
+            Súmate directamente a nuestra comunidad en WhatsApp y Discord para acceder a las salas de voz, material de estudio, retos CTF y foros de noticias.
           </p>
         </div>
 
@@ -39,18 +39,18 @@ export const Contact: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="max-w-2xl mx-auto relative rounded-3xl bg-slate-900 text-white p-8 sm:p-12 shadow-2xl overflow-hidden"
+          className="max-w-2xl mx-auto relative rounded-3xl bg-slate-900 border border-slate-800 text-white p-8 sm:p-12 shadow-2xl overflow-hidden"
         >
           {/* Subtle Green Ambient Lighting */}
           <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-          <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+          <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 space-y-8">
             
             {/* Status & Header */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-8 border-b border-slate-800 text-center sm:text-left">
               <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 p-1 shadow-lg shadow-emerald-500/20">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-indigo-600 p-1 shadow-lg shadow-emerald-500/20">
                   <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-white">
                     <Users className="w-8 h-8 text-emerald-400" />
                   </div>
@@ -64,13 +64,13 @@ export const Contact: React.FC = () => {
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Coordinación de Grupo
+                  Comunidad Oficial 24/7
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
                   ShadowBytes SENATI
                 </h3>
                 <p className="text-slate-400 text-sm mt-0.5">
-                  Comunidad Abierta para el 4.º Ciclo
+                  Grupo de Estudio Abierto & Ciberseguridad
                 </p>
               </div>
             </div>
@@ -79,10 +79,10 @@ export const Contact: React.FC = () => {
             <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-mono uppercase text-slate-400 tracking-wider block mb-1">
-                  Contacto de WhatsApp
+                  Contacto Directo WhatsApp
                 </span>
                 <span className="text-xl font-bold text-emerald-400 font-mono">
-                  {phoneDisplay}
+                  +51 {phoneDisplay}
                 </span>
               </div>
               <button
@@ -104,30 +104,37 @@ export const Contact: React.FC = () => {
               </button>
             </div>
 
-            {/* Message Preview Box */}
-            <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80 text-xs text-slate-400 font-mono">
-              <span className="text-emerald-400 font-semibold block mb-1">💬 Mensaje listo para enviar:</span>
-              <p className="italic text-slate-200 text-sm">"{defaultMessage}"</p>
-            </div>
-
-            {/* Large Green WhatsApp Button */}
-            <div>
+            {/* Action Buttons Grid: WhatsApp + Discord */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Green WhatsApp Button */}
               <a
-                href={whatsappUrl}
+                href={whatsappGroupUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/50 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 group"
+                className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base shadow-lg shadow-emerald-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
               >
-                <MessageCircle className="w-6 h-6 fill-current" />
-                <span>Enviar mensaje</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <MessageCircle className="w-5 h-5 fill-current" />
+                <span>Grupo WhatsApp</span>
+                <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </a>
+
+              {/* Purple Discord Button */}
+              <a
+                href={discordInviteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base shadow-lg shadow-indigo-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
+              >
+                <MessageSquare className="w-5 h-5 fill-current" />
+                <span>Servidor Discord</span>
+                <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </a>
             </div>
 
             {/* Security Note */}
             <div className="flex items-center justify-center gap-2 text-xs text-slate-400 font-mono text-center pt-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Respuesta rápida e ingreso al servidor oficial de Discord</span>
+              <span>Acceso directo sin necesidad de aprobación previa</span>
             </div>
 
           </div>
