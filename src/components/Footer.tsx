@@ -42,7 +42,7 @@ export const Footer: React.FC = () => {
               APRENDER • COMPARTIR • CREAR • PROTEGER
             </p>
             <p className={`text-xs max-w-md ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Comunidad colaborativa de estudiantes enfocados en desarrollo web, servidores DNS, Active Directory, CTFs y ciberseguridad.
+              Hub de CTF writeups y labs. Resuelve retos, sube tus resoluciones y aprende ciberseguridad con la comunidad.
             </p>
           </div>
 
@@ -105,13 +105,13 @@ export const Footer: React.FC = () => {
           <p className="flex items-center gap-2">
             <span>© {new Date().getFullYear()} ShadowBytes SENATI. Todos los derechos reservados.</span>
             <span className="hidden md:inline-block px-2 py-0.5 rounded bg-purple-500/10 text-purple-500 text-[10px] border border-purple-500/20">
-              VERIFIED: SB-VERIFIED-AUTH-9756E8F-4TOCICLO-2026
+              Hub de CTF Writeups & Labs
             </span>
           </p>
           <p className={`flex items-center justify-center gap-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             <span>Desarrollado con</span>
             <span className="text-rose-500">♥</span>
-            <span>para el 4.º ciclo de SENATI</span>
+            <span>por la comunidad ShadowBytes • SENATI</span>
           </p>
         </div>
 

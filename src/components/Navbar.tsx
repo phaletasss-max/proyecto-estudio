@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, Sun, Moon } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, Sun, Moon, Trophy, Compass, Award, Upload, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
+import { UserNavbarBadge } from '@/components/UserNavbarBadge';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,35 +23,42 @@ export const Navbar: React.FC = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Inicio', href: '#inicio' },
-    { name: 'Proyectos', href: '#proyectos' },
-    { name: 'Metodología', href: '#metodologia' },
-    { name: 'Beneficios', href: '#beneficios' },
-    { name: 'Contacto', href: '#contacto' },
+    { name: 'Inicio', href: '/' },
+    { name: 'Labs', href: '/labs', icon: Trophy },
+    { name: 'Rutas', href: '/paths', icon: Compass },
+    { name: 'Cheatsheets', href: '/cheatsheets', icon: BookOpen },
+    { name: 'Ranking', href: '/leaderboard', icon: Trophy },
+    { name: 'Logros', href: '/achievements', icon: Award },
+    { name: 'Subir', href: '/upload', icon: Upload },
   ];
 
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
+
+  const isActive = (href: string) => {
+    if (href === '/') return location.pathname === '/';
+    return location.pathname.startsWith(href);
+  };
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         isScrolled
           ? isDark
-            ? 'bg-slate-950/95 border-b border-slate-800 shadow-lg py-3'
-            : 'bg-white/95 border-b border-slate-200 shadow-md py-3'
-          : 'bg-transparent py-4'
+            ? 'bg-slate-950/95 border-b border-slate-800 shadow-lg py-2.5'
+            : 'bg-white/95 border-b border-slate-200 shadow-md py-2.5'
+          : 'bg-transparent py-3.5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           
           {/* Logo: ShadowBytes Official Emblem */}
-          <a
-            href="#inicio"
-            className="flex items-center gap-3 group focus:outline-none"
+          <Link
+            to="/"
+            className="flex items-center gap-3 group focus:outline-none shrink-0"
           >
-            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-md group-hover:scale-105 transition-transform">
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden shadow-md group-hover:scale-105 transition-transform border border-purple-500/30">
               <img
                 src="/logo-shadowbytes.png"
                 alt="ShadowBytes Logo"
@@ -56,42 +66,46 @@ export const Navbar: React.FC = () => {
               />
             </div>
             <div className="flex flex-col">
-              <div className="flex items-center font-bold tracking-tight text-xl sm:text-2xl select-none">
+              <div className="flex items-center font-bold tracking-tight text-lg sm:text-xl select-none">
                 <span className={isDark ? 'text-white font-[Orbitron]' : 'text-slate-950 font-[Orbitron]'}>SHADOW</span>
                 <span className="text-purple-500 font-[Orbitron]">BYTES</span>
               </div>
-              <span className="text-[9px] font-mono tracking-widest text-purple-400 uppercase font-semibold -mt-0.5 flex items-center gap-1">
+              <span className="text-[8px] sm:text-[9px] font-mono tracking-widest text-purple-400 uppercase font-semibold -mt-0.5 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-                APRENDER • COMPARTIR • CREAR • PROTEGER
+                CTF & LABS PLATFORM
               </span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
-          <nav className={`hidden md:flex items-center gap-1 px-4 py-1.5 rounded-full border ${
-            isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200'
+          <nav className={`hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-full border ${
+            isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-100/90 border-slate-200'
           }`}>
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
-                className={`px-4 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ${
-                  isDark
-                    ? 'text-slate-300 hover:text-white hover:bg-slate-800'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-white'
+                to={link.href}
+                className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-full transition-all duration-200 flex items-center gap-1.5 ${
+                  isActive(link.href)
+                    ? isDark
+                      ? 'bg-purple-600/25 text-purple-300 font-bold shadow-sm'
+                      : 'bg-purple-100 text-purple-700 font-bold'
+                    : isDark
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      : 'text-slate-700 hover:text-slate-950 hover:bg-white'
                 }`}
               >
-                {link.name}
-              </a>
+                <span>{link.name}</span>
+              </Link>
             ))}
           </nav>
 
-          {/* Right Actions: Theme Toggle + Join Button */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Right Actions: Theme Toggle + User Badge */}
+          <div className="hidden sm:flex items-center gap-3 shrink-0">
             {/* Theme Switcher Button */}
             <button
               onClick={toggleTheme}
-              className={`p-2.5 rounded-full border transition-all duration-300 flex items-center justify-center ${
+              className={`p-2 rounded-full border transition-all duration-300 flex items-center justify-center ${
                 isDark
                   ? 'bg-slate-900 border-slate-800 text-amber-400 hover:bg-slate-800 hover:border-amber-400/50 shadow-md'
                   : 'bg-white border-slate-200 text-indigo-600 hover:bg-slate-100 hover:border-indigo-300 shadow-sm'
@@ -102,26 +116,14 @@ export const Navbar: React.FC = () => {
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            <a
-              href="#contacto"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-purple-600 text-white text-sm font-medium tracking-wide hover:bg-purple-500 transition-all shadow-md hover:shadow-purple-500/30 active:scale-95 group"
-            >
-              <span>Únete</span>
-              <ArrowUpRight className="w-4 h-4 text-cyan-300 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-            </a>
+            {/* User Navbar Badge */}
+            <UserNavbarBadge />
           </div>
 
-          {/* Mobile Menu Button + Mobile Theme Toggle */}
-          <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-xl border text-sm ${
-                isDark ? 'bg-slate-900 border-slate-800 text-amber-400' : 'bg-slate-100 border-slate-200 text-indigo-600'
-              }`}
-              aria-label="Toggle Theme Mobile"
-            >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
+          {/* Mobile Menu Button + Mobile User / Theme Toggle */}
+          <div className="flex lg:hidden items-center gap-2">
+            <UserNavbarBadge />
+
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className={`p-2 rounded-xl border ${
@@ -129,7 +131,7 @@ export const Navbar: React.FC = () => {
               }`}
               aria-label="Toggle Navigation Menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -142,29 +144,42 @@ export const Navbar: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white/95 border-b border-slate-200 backdrop-blur-2xl overflow-hidden"
+            transition={{ duration: 0.25 }}
+            className={`lg:hidden border-b backdrop-blur-2xl overflow-hidden ${
+              isDark ? 'bg-slate-950/95 border-slate-800' : 'bg-white/95 border-slate-200'
+            }`}
           >
-            <div className="px-5 pt-4 pb-6 space-y-3">
+            <div className="px-5 pt-4 pb-6 space-y-2">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
-                  href={link.href}
+                  to={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  className={`block px-4 py-2.5 rounded-xl text-sm font-mono font-medium transition-colors ${
+                    isActive(link.href)
+                      ? isDark
+                        ? 'bg-purple-600/20 text-purple-300 font-bold'
+                        : 'bg-purple-100 text-purple-700 font-bold'
+                      : isDark
+                        ? 'text-slate-300 hover:text-white hover:bg-slate-900'
+                        : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
-              <div className="pt-2">
-                <a
-                  href="#contacto"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-slate-900 text-white font-medium text-base shadow-md"
+
+              <div className="pt-3 flex items-center justify-between border-t border-slate-800">
+                <span className="text-xs font-mono text-slate-400">Modo de Pantalla:</span>
+                <button
+                  onClick={toggleTheme}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono ${
+                    isDark ? 'bg-slate-900 border-slate-800 text-amber-400' : 'bg-slate-100 border-slate-200 text-indigo-600'
+                  }`}
                 >
-                  <span>Únete al Grupo</span>
-                  <ArrowUpRight className="w-5 h-5 text-cyan-400" />
-                </a>
+                  {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                  <span>{isDark ? 'Claro' : 'Oscuro'}</span>
+                </button>
               </div>
             </div>
           </motion.div>

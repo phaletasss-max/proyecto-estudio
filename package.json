@@ -1,7 +1,7 @@
 {
-  "name": "proyecto-estudio",
+  "name": "shadowbytes",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,6 +15,7 @@
     "vite": "^8.1.1"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.0",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
@@ -25,7 +26,9 @@
     "lucide-react": "^1.27.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.18.1",
+    "remark-gfm": "^4.0.1",
     "tailwindcss-animate": "^1.0.7"
   }
 }

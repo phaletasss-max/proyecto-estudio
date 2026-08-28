@@ -75,3 +75,24 @@ export async function decryptGuideWithFlag(flagCandidate: string): Promise<strin
     return null;
   }
 }
+
+/**
+ * Generates a SHA-256 hash of a flag string for storage.
+ */
+export async function hashFlag(flag: string): Promise<string> {
+  const clean = cleanFlagInput(flag);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(clean);
+  const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Verifies a flag candidate against a stored SHA-256 hash.
+ */
+export async function verifyFlag(input: string, storedHash: string): Promise<boolean> {
+  const candidateHash = await hashFlag(input);
+  return candidateHash === storedHash;
+}
+
