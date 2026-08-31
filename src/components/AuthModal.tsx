@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Lock, Mail, User, Shield, Terminal, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
   const { login, register } = useAuth();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const isOnline = isSupabaseConfigured();
 
   if (!isOpen) return null;
 
@@ -41,6 +43,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
       } else {
         if (!username || !email) {
           setErrorMsg('Por favor ingresa tu usuario y correo');
+          setIsSubmitting(false);
+          return;
+        }
+        if (isOnline && !password) {
+          setErrorMsg('Ingresa una contraseña para crear tu cuenta.');
           setIsSubmitting(false);
           return;
         }
@@ -193,7 +200,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             )}
 
             <div>
-              <label className="block text-xs font-mono mb-1 text-slate-400">Contraseña (Opcional en demo)</label>
+              <label className="block text-xs font-mono mb-1 text-slate-400">
+                Contraseña {isOnline ? '*' : '(opcional en demo)'}
+              </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
@@ -201,6 +210,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  required={isOnline}
                   className={`w-full pl-9 pr-4 py-2.5 rounded-xl text-sm border font-mono focus:outline-none transition-colors ${
                     isDark ? 'bg-slate-900 border-slate-800 text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-purple-500'
                   }`}
@@ -231,33 +241,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             </button>
           </form>
 
-          {/* Quick Demo Access Bar */}
-          <div className="mt-6 pt-4 border-t border-slate-800 text-center">
-            <p className="text-[11px] font-mono text-slate-500 mb-2">⚡ Acceso rápido para miembros de SENATI:</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickGuest('phaletas_max')}
-                className="px-2.5 py-1 rounded-lg text-[10px] font-mono bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border border-purple-500/20"
-              >
-                👤 Manuel (Admin)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickGuest('mrpacay')}
-                className="px-2.5 py-1 rounded-lg text-[10px] font-mono bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20"
-              >
-                👤 mrpacay
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickGuest('camitex_sec')}
-                className="px-2.5 py-1 rounded-lg text-[10px] font-mono bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20"
-              >
-                👤 camitex
-              </button>
+          {!isOnline && (
+            <div className="mt-6 pt-4 border-t border-slate-800 text-center">
+              <p className="text-[11px] font-mono text-slate-500 mb-2">⚡ Acceso rápido para la demo local:</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleQuickGuest('phaletas_max')}
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-mono bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border border-purple-500/20"
+                >
+                  👤 Manuel (demo)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickGuest('mrpacay')}
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-mono bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20"
+                >
+                  👤 mrpacay
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </motion.div>
       </div>
     </AnimatePresence>

@@ -13,11 +13,12 @@ export const LEARNING_PATHS: LearningPath[] = [
     modules: [
       {
         id: 'm1',
-        title: 'Entorno de Laboratorio: Kali Linux & VirtualBox',
-        description: 'Configuración de máquinas virtuales, adaptadores de red (NAT vs Host-Only) y herramientas esenciales.',
-        type: 'theory',
+        title: 'Prepara tu entorno Linux con WSL 2',
+        description: 'Configura un entorno Linux ligero en Windows antes de empezar a practicar.',
+        labSlug: 'wsl2-linux-alternativa-vms',
+        type: 'lab',
         durationMinutes: 45,
-        points: 50,
+        points: 100,
       },
       {
         id: 'm2',
@@ -35,6 +36,21 @@ export const LEARNING_PATHS: LearningPath[] = [
         type: 'theory',
         durationMinutes: 40,
         points: 50,
+        guide: {
+          objective: 'Crear un proceso repetible para investigar un reto sin perderte entre herramientas.',
+          keyIdeas: [
+            'Primero comprende qué te entregan antes de ejecutar comandos.',
+            'Enumera de forma ordenada: servicios, archivos, usuarios y configuraciones.',
+            'Anota hallazgos y pruebas fallidas; también son parte de la solución.',
+          ],
+          steps: [
+            'Define el objetivo y el formato de respuesta esperado.',
+            'Haz una lista corta de evidencias disponibles y prioriza las más útiles.',
+            'Prueba una hipótesis a la vez y guarda el resultado.',
+            'Al resolver, escribe qué señal te llevó a la respuesta correcta.',
+          ],
+          practice: 'Abre el reto forense de la ruta y redacta tres hipótesis antes de buscar la flag.',
+        },
       },
     ],
   },
@@ -55,6 +71,21 @@ export const LEARNING_PATHS: LearningPath[] = [
         type: 'theory',
         durationMinutes: 90,
         points: 75,
+        guide: {
+          objective: 'Entender qué resuelve Active Directory y por qué DNS es una pieza central del laboratorio.',
+          keyIdeas: [
+            'Un controlador de dominio centraliza identidades, equipos y políticas.',
+            'DNS permite que los equipos encuentren servicios por nombre.',
+            'Un laboratorio aislado evita que una práctica afecte redes reales.',
+          ],
+          steps: [
+            'Dibuja la red del laboratorio y define el nombre del dominio.',
+            'Identifica qué equipo será el controlador de dominio.',
+            'Comprueba que DNS responde antes de agregar otros equipos.',
+            'Documenta cada cambio de rol y dirección IP.',
+          ],
+          practice: 'Haz un diagrama simple de tu red de práctica: controlador, cliente y gateway.',
+        },
       },
       {
         id: 'w2',
@@ -72,6 +103,21 @@ export const LEARNING_PATHS: LearningPath[] = [
         type: 'challenge',
         durationMinutes: 60,
         points: 150,
+        guide: {
+          objective: 'Reconocer controles básicos que reducen el impacto de credenciales comprometidas.',
+          keyIdeas: [
+            'Las políticas deben responder a un riesgo concreto, no aplicarse al azar.',
+            'Las cuentas privilegiadas necesitan controles más estrictos.',
+            'Probar y documentar un cambio evita bloquear a usuarios legítimos.',
+          ],
+          steps: [
+            'Identifica la cuenta, grupo o equipo que quieres proteger.',
+            'Elige una política pequeña y define cómo comprobarás su efecto.',
+            'Aplica el cambio en un entorno de práctica.',
+            'Verifica el resultado y escribe cómo revertirlo si fuera necesario.',
+          ],
+          practice: 'Explica con tus palabras la diferencia entre una política de contraseñas y una política de bloqueo.',
+        },
       },
     ],
   },
@@ -92,6 +138,21 @@ export const LEARNING_PATHS: LearningPath[] = [
         type: 'theory',
         durationMinutes: 45,
         points: 50,
+        guide: {
+          objective: 'Leer una petición HTTP y usar un proxy de práctica sin perder de vista el objetivo.',
+          keyIdeas: [
+            'Una petición contiene método, ruta, cabeceras y, a veces, cuerpo.',
+            'El proxy sirve para observar el tráfico de tus propios laboratorios.',
+            'No modifiques aplicaciones ajenas: trabaja solo sobre objetivos autorizados.',
+          ],
+          steps: [
+            'Abre una aplicación de práctica y realiza una acción sencilla.',
+            'Identifica método, URL y código de respuesta en la petición.',
+            'Compara una petición válida con una que cause un error controlado.',
+            'Anota qué dato viaja en cada parte de la petición.',
+          ],
+          practice: 'En una aplicación de práctica, identifica qué cambia entre una petición GET y una POST.',
+        },
       },
       {
         id: 'wb2',
@@ -109,6 +170,21 @@ export const LEARNING_PATHS: LearningPath[] = [
         type: 'theory',
         durationMinutes: 45,
         points: 50,
+        guide: {
+          objective: 'Comprender por qué las consultas parametrizadas son la defensa base frente a inyecciones.',
+          keyIdeas: [
+            'Los datos del usuario no deben convertirse en parte del código SQL.',
+            'Una consulta parametrizada separa instrucciones y valores.',
+            'Validar entradas complementa, pero no reemplaza, la parametrización.',
+          ],
+          steps: [
+            'Localiza dónde una aplicación recibe datos de formulario.',
+            'Traza cómo esos datos llegan a la consulta de base de datos.',
+            'Sustituye la concatenación por parámetros de la biblioteca correspondiente.',
+            'Prueba entradas normales y entradas con caracteres especiales.',
+          ],
+          practice: 'Compara una consulta construida por concatenación con una consulta parametrizada y explica la diferencia.',
+        },
       },
     ],
   },

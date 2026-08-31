@@ -18,6 +18,9 @@ export const REAL_LABS: CTFLab[] = [
     author: 'Victor Kenky / ShadowBytes',
     created_at: '2026-01-15T00:00:00.000Z',
     is_published: true,
+    is_admission_challenge: true,
+    is_members_only: false,
+    points: 100,
     tasks: [
       {
         id: 'fr_t1',

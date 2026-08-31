@@ -42,7 +42,7 @@ export const LabCard: React.FC<LabCardProps> = ({ lab }) => {
     Hard: 500,
     Insane: 1000,
   };
-  const points = pointsMap[lab.difficulty] || 100;
+  const points = lab.points ?? pointsMap[lab.difficulty] ?? 100;
 
   return (
     <Link to={`/lab/${lab.slug}`} className="block h-full group">

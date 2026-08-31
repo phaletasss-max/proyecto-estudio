@@ -8,6 +8,17 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { RANKS, type LeaderboardEntry, type RankTier } from '@/types/auth';
 
+interface RemoteLeaderboardRow {
+  user_id: string;
+  username: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  points: number | null;
+  rank: string | null;
+  specialty: string | null;
+  solved_count: number | string | null;
+}
+
 export const Leaderboard: React.FC = () => {
   const { user: currentUser } = useAuth();
   const { theme } = useTheme();
@@ -25,21 +36,19 @@ export const Leaderboard: React.FC = () => {
       if (isSupabaseConfigured()) {
         try {
           const { data, error } = await supabase
-            .from('profiles')
-            .select('id, username, full_name, avatar_url, points, rank, specialty')
-            .order('points', { ascending: false });
+            .rpc('get_leaderboard');
 
-          if (!error && data && data.length > 0) {
-            const mapped: LeaderboardEntry[] = data.map((p, idx) => ({
+          if (!error && data) {
+            const mapped: LeaderboardEntry[] = (data as RemoteLeaderboardRow[]).map((p, idx) => ({
               rankPosition: idx + 1,
-              userId: p.id,
+              userId: p.user_id,
               username: p.username || 'anon',
               fullName: p.full_name || p.username || 'Estudiante',
               avatarUrl: p.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
               points: p.points || 0,
               rank: (p.rank as RankTier) || 'Script Kiddie',
               specialty: p.specialty || 'Ciberseguridad',
-              solvedCount: 0,
+              solvedCount: Number(p.solved_count || 0),
               badgesCount: 0,
             }));
             setLeaderboardData(mapped);

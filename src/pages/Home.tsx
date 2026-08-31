@@ -1,221 +1,218 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Trophy, Shield, Users, Zap, Terminal, Compass, Award, Sparkles, BookOpen } from 'lucide-react';
-import { DomainCTFModal } from '@/components/DomainCTFModal';
-import { TerminalBackground } from '@/components/TerminalBackground';
+import {
+  ArrowRight,
+  Award,
+  CheckCircle2,
+  Compass,
+  LockKeyhole,
+  ShieldCheck,
+  Sparkles,
+  Terminal,
+  Trophy,
+  Users,
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { LEARNING_PATHS } from '@/data/learningPaths';
 import { BADGES_CATALOG } from '@/data/badges';
 import { REAL_LABS } from '@/data/mockLabs';
 
+const ENTRY_STEPS = [
+  {
+    number: '01',
+    title: 'Crea tu perfil',
+    description: 'Guarda tus avances y construye tu historial de aprendizaje.',
+    icon: Users,
+  },
+  {
+    number: '02',
+    title: 'Completa la admisión',
+    description: 'Resuelve un reto guiado para activar tu acceso al grupo.',
+    icon: ShieldCheck,
+  },
+  {
+    number: '03',
+    title: 'Avanza a tu ritmo',
+    description: 'Sigue rutas, practica en labs y aprende junto a la comunidad.',
+    icon: Trophy,
+  },
+];
+
 export const Home: React.FC = () => {
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const isDark = theme === 'dark';
-
-  const stats = [
-    { label: 'Participantes', value: '22', icon: Users },
-    { label: 'Labs Disponibles', value: `${REAL_LABS.length}`, icon: Terminal },
-    { label: 'Categorías CTF', value: '7', icon: Shield },
-    { label: 'Grupo de Estudio', value: 'SENATI', icon: Zap },
-  ];
+  const isMember = user?.accessStatus === 'member' || user?.accessStatus === 'admin';
+  const primaryAction = isMember ? { to: '/labs', label: 'Explorar labs' } : { to: '/admission', label: 'Empezar la admisión' };
 
   return (
     <>
-      {/* Hero Section */}
-      <section id="inicio" className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-transparent transform-gpu">
-        <TerminalBackground />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-purple-900/15 via-cyan-900/10 to-transparent blur-2xl pointer-events-none -z-10 transform-gpu" />
+      <section className="relative isolate overflow-hidden pt-28 pb-14 sm:pt-36 sm:pb-20">
+        <div className={`absolute inset-0 -z-10 ${isDark ? 'bg-[#070a12]' : 'bg-slate-50'}`} />
+        <div className="absolute -top-40 left-1/2 -z-10 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-purple-600/15 blur-[110px]" />
+        <div className="absolute right-[-8rem] top-40 -z-10 h-72 w-72 rounded-full bg-cyan-400/10 blur-[100px]" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col items-center justify-center text-center">
-
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border shadow-sm mb-6 ${
-                isDark
-                  ? 'bg-slate-900/80 border-slate-800'
-                  : 'bg-white/90 border-slate-200 shadow-md'
-              }`}
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className={`text-xs sm:text-sm font-mono ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                SENATI 4.º Ciclo • 22 Participantes •{' '}
-                <span className={`font-semibold ${isDark ? 'text-cyan-400' : 'text-blue-600'}`}>
-                  Instructor: Victor Kenky Rodriguez Lopez
-                </span>
-              </span>
-            </motion.div>
-
-            {/* Quote */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className={`mb-8 max-w-2xl mx-auto px-6 py-3 rounded-2xl border text-center shadow-lg ${
-                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'
-              }`}
-            >
-              <p className={`text-xs sm:text-sm font-medium italic leading-relaxed ${
-                isDark ? 'text-purple-200' : 'text-slate-600'
-              }`}>
-                "No tengas miedo de empezar sin saber; ten miedo de saber que no sabes y aun así no hacer nada para aprender."
-              </p>
-            </motion.div>
-
-            {/* Title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className={`text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight max-w-5xl leading-[1.08] ${
-                isDark ? 'text-white' : 'text-slate-900'
-              }`}
-            >
-              Resuelve CTFs, sube{' '}
-              <span className="gradient-text-blue inline-block">writeups</span>{' '}
-              y sube en el{' '}
-              <span className="gradient-text-cyan inline-block">ranking</span>
-            </motion.h1>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className={`mt-6 text-lg sm:text-xl max-w-2xl font-normal leading-relaxed ${
-                isDark ? 'text-slate-300' : 'text-slate-600'
-              }`}
-            >
-              Plataforma de entrenamiento técnico en ciberseguridad para el grupo de estudio de SENATI. Resuelve laboratorios prácticos, documenta writeups y comparte conocimiento.
-            </motion.p>
-
-            {/* Action Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
-            >
-              <Link
-                to="/labs"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-semibold text-base shadow-lg bg-purple-600 text-white hover:bg-purple-500 shadow-purple-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
-              >
-                <Trophy className="w-5 h-5" />
-                <span>Explorar Labs CTF</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-
-              <Link
-                to="/paths"
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-base hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 ${
-                  isDark
-                    ? 'bg-slate-800 border border-slate-700 text-slate-100 hover:bg-slate-700'
-                    : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-100 shadow-sm'
-                }`}
-              >
-                <Compass className="w-5 h-5 text-cyan-400" />
-                <span>Rutas de Aprendizaje</span>
-              </Link>
-            </motion.div>
-
-            {/* CTF Modal */}
-            <div className="mt-4">
-              <DomainCTFModal />
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+          >
+            <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-semibold ${
+              isDark ? 'border-purple-400/20 bg-purple-400/10 text-purple-200' : 'border-purple-200 bg-white text-purple-700 shadow-sm'
+            }`}>
+              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              GRUPO DE ESTUDIO · SENATI
             </div>
 
-            {/* Stats Bar */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full max-w-3xl"
-            >
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-2xl border ${
-                    isDark
-                      ? 'bg-slate-900/60 border-slate-800'
-                      : 'bg-white/80 border-slate-200 shadow-sm'
-                  }`}
-                >
-                  <stat.icon className={`w-5 h-5 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
-                  <span className={`text-2xl font-bold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {stat.value}
-                  </span>
-                  <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {stat.label}
-                  </span>
+            <h1 className={`mt-6 max-w-3xl text-4xl font-black tracking-[-0.045em] sm:text-6xl lg:text-7xl ${
+              isDark ? 'text-white' : 'text-slate-950'
+            }`}>
+              Aprende ciberseguridad <span className="text-purple-500">haciendo.</span>
+            </h1>
+
+            <p className={`mt-6 max-w-2xl text-base leading-8 sm:text-lg ${
+              isDark ? 'text-slate-300' : 'text-slate-600'
+            }`}>
+              Un espacio claro para empezar, practicar retos reales y compartir lo que descubres. Sin competir por aparentar: aprende paso a paso y con acompañamiento.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                to={primaryAction.to}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-purple-600 px-5 text-sm font-bold text-white shadow-lg shadow-purple-600/25 transition-all hover:-translate-y-0.5 hover:bg-purple-500 hover:shadow-purple-600/35"
+              >
+                {primaryAction.label}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/paths"
+                className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border px-5 text-sm font-bold transition-colors ${
+                  isDark ? 'border-slate-700 bg-slate-900/70 text-slate-100 hover:bg-slate-800' : 'border-slate-200 bg-white text-slate-800 shadow-sm hover:bg-slate-100'
+                }`}
+              >
+                <Compass className="h-4 w-4 text-cyan-500" />
+                Ver rutas guiadas
+              </Link>
+            </div>
+
+            <div className={`mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> Retos con contexto</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> Progreso guardado</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> Comunidad de apoyo</span>
+            </div>
+          </motion.div>
+
+          <motion.aside
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.12 }}
+            className={`relative overflow-hidden rounded-[2rem] border p-6 shadow-2xl sm:p-8 ${
+              isDark ? 'border-slate-800 bg-slate-950/90 shadow-purple-950/30' : 'border-slate-200 bg-white shadow-slate-300/40'
+            }`}
+          >
+            <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-purple-500/15 blur-3xl" />
+            <div className="relative">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold tracking-[0.18em] text-purple-400">TU PUNTO DE PARTIDA</p>
+                  <h2 className={`mt-2 text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    Empieza sin perderte.
+                  </h2>
                 </div>
-              ))}
-            </motion.div>
-          </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/15 text-purple-400">
+                  <Sparkles className="h-6 w-6" />
+                </div>
+              </div>
+
+              <div className="mt-7 space-y-1">
+                {ENTRY_STEPS.map((step, index) => (
+                  <div key={step.number} className="relative flex gap-4 py-3">
+                    {index < ENTRY_STEPS.length - 1 && <span className={`absolute left-5 top-12 h-7 w-px ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`} />}
+                    <div className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+                      isDark ? 'border-slate-700 bg-slate-900 text-purple-300' : 'border-purple-100 bg-purple-50 text-purple-600'
+                    }`}>
+                      <step.icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 pt-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-bold text-purple-400">{step.number}</span>
+                        <h3 className={`text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{step.title}</h3>
+                      </div>
+                      <p className={`mt-1 text-sm leading-5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                to="/admission"
+                className={`mt-6 flex min-h-12 items-center justify-between rounded-2xl border px-4 text-sm font-bold transition-colors ${
+                  isDark ? 'border-slate-700 bg-slate-900 text-white hover:border-purple-400/60' : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-purple-300 hover:bg-white'
+                }`}
+              >
+                {isAuthenticated ? 'Ver estado de mi admisión' : 'Crear mi cuenta'}
+                <ArrowRight className="h-4 w-4 text-purple-500" />
+              </Link>
+            </div>
+          </motion.aside>
         </div>
       </section>
 
-      {/* Featured Learning Paths Section */}
-      <section className="py-16 border-t border-slate-800/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-            <div>
-              <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-400 mb-1">
-                <Compass className="w-3.5 h-3.5" />
-                <span>RUTAS ESTRUCTURADAS</span>
+      <section className={`border-y py-5 ${isDark ? 'border-slate-800 bg-slate-950/60' : 'border-slate-200 bg-white'}`}>
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:px-6 lg:px-8">
+          {[
+            { value: `${REAL_LABS.length}+`, label: 'Labs para practicar', icon: Terminal },
+            { value: '7', label: 'Áreas CTF', icon: ShieldCheck },
+            { value: 'Paso a paso', label: 'Rutas guiadas', icon: Compass },
+            { value: 'En equipo', label: 'Comunidad', icon: Users },
+          ].map((stat) => (
+            <div key={stat.label} className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 ${isDark ? 'bg-slate-900/50' : 'bg-slate-50'}`}>
+              <stat.icon className="h-4 w-4 shrink-0 text-purple-400" />
+              <div>
+                <p className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{stat.value}</p>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{stat.label}</p>
               </div>
-              <h2 className={`text-2xl sm:text-3xl font-extrabold font-[Orbitron] ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Rutas de Aprendizaje
-              </h2>
             </div>
-            <Link
-              to="/paths"
-              className="text-xs font-mono font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1"
-            >
-              <span>Ver todas las rutas</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+          ))}
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold tracking-[0.16em] text-cyan-500">RUTAS GUIADAS</p>
+              <h2 className={`mt-2 text-3xl font-black tracking-tight sm:text-4xl ${isDark ? 'text-white' : 'text-slate-900'}`}>No tienes que adivinar qué sigue.</h2>
+              <p className={`mt-3 max-w-2xl text-sm leading-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Elige una ruta y alterna conceptos breves con prácticas que puedes completar en tu propio ritmo.</p>
+            </div>
+            <Link to="/paths" className="inline-flex items-center gap-1.5 text-sm font-bold text-purple-500 hover:text-purple-400">
+              Ver todas las rutas <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {LEARNING_PATHS.map((path) => (
               <Link
                 key={path.id}
                 to="/paths"
-                className={`p-6 rounded-3xl border transition-all duration-300 hover:scale-102 flex flex-col justify-between ${
-                  isDark
-                    ? 'bg-slate-900/60 border-slate-800 hover:border-purple-500/40 shadow-lg shadow-purple-950/10'
-                    : 'bg-white border-slate-200 hover:border-purple-300 shadow-sm'
+                className={`group flex min-h-56 flex-col rounded-3xl border p-5 transition-all hover:-translate-y-1 ${
+                  isDark ? 'border-slate-800 bg-slate-950 hover:border-purple-500/50' : 'border-slate-200 bg-white shadow-sm hover:border-purple-300 hover:shadow-lg'
                 }`}
               >
-                <div>
-                  <div className="text-3xl mb-3">{path.icon}</div>
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase mb-2 ${
-                    path.level === 'Fundamental'
-                      ? 'bg-emerald-500/15 text-emerald-400'
-                      : path.level === 'Intermedio'
-                        ? 'bg-cyan-500/15 text-cyan-400'
-                        : 'bg-purple-500/15 text-purple-400'
-                  }`}>
-                    {path.level}
-                  </span>
-                  <h3 className={`font-bold font-mono text-sm mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {path.title}
-                  </h3>
-                  <p className={`text-xs line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    {path.description}
-                  </p>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-3xl">{path.icon}</span>
+                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                    path.level === 'Fundamental' ? 'bg-emerald-500/10 text-emerald-600' : path.level === 'Intermedio' ? 'bg-cyan-500/10 text-cyan-600' : 'bg-purple-500/10 text-purple-600'
+                  }`}>{path.level}</span>
                 </div>
-                <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <h3 className={`mt-5 text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{path.title}</h3>
+                <p className={`mt-2 text-sm leading-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{path.description}</p>
+                <div className={`mt-auto flex items-center justify-between border-t pt-4 text-sm ${isDark ? 'border-slate-800 text-slate-400' : 'border-slate-100 text-slate-500'}`}>
                   <span>{path.modules.length} módulos</span>
-                  <span className="text-cyan-400 font-semibold flex items-center gap-1">
-                    <span>Iniciar</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </span>
+                  <span className="font-bold text-purple-500 transition-transform group-hover:translate-x-1">Empezar →</span>
                 </div>
               </Link>
             ))}
@@ -223,43 +220,44 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Badges Section */}
-      <section className="py-16 border-t border-slate-800/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+      <section className={`border-t py-16 sm:py-20 ${isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-white'}`}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="inline-flex items-center gap-2 text-xs font-mono text-purple-400 mb-1">
-                <Award className="w-3.5 h-3.5" />
-                <span>GAMIFICACIÓN & RECONOCIMIENTOS</span>
-              </div>
-              <h2 className={`text-2xl sm:text-3xl font-extrabold font-[Orbitron] ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Insignias del Programa
-              </h2>
+              <p className="text-xs font-bold tracking-[0.16em] text-purple-500">PROGRESO VISIBLE</p>
+              <h2 className={`mt-2 text-3xl font-black tracking-tight sm:text-4xl ${isDark ? 'text-white' : 'text-slate-900'}`}>Cada reto deja una huella.</h2>
             </div>
-            <Link
-              to="/achievements"
-              className="text-xs font-mono font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1"
-            >
-              <span>Ver todos los logros</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+            <Link to="/achievements" className="inline-flex items-center gap-1.5 text-sm font-bold text-purple-500 hover:text-purple-400">
+              Ver mis logros <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {BADGES_CATALOG.slice(0, 4).map((badge) => (
-              <div
-                key={badge.code}
-                className={`p-4 rounded-2xl border flex items-center gap-3 ${
-                  isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'
-                }`}
-              >
-                <div className="text-3xl">{badge.icon}</div>
-                <div>
-                  <h4 className="text-xs font-bold font-mono text-white">{badge.title}</h4>
-                  <span className="text-[10px] font-mono text-amber-400 font-semibold">+{badge.pointsBonus} pts</span>
+              <div key={badge.code} className={`rounded-3xl border p-5 ${isDark ? 'border-slate-800 bg-slate-900/60' : 'border-slate-200 bg-slate-50'}`}>
+                <div className="flex items-start justify-between">
+                  <span className="text-3xl">{badge.icon}</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-1 text-xs font-bold text-amber-500"><Award className="h-3 w-3" /> +{badge.pointsBonus}</span>
                 </div>
+                <h3 className={`mt-5 text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{badge.title}</h3>
+                <p className={`mt-2 text-sm leading-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{badge.description}</p>
               </div>
             ))}
+          </div>
+
+          <div className={`mt-8 flex flex-col items-start gap-3 rounded-3xl border p-5 sm:flex-row sm:items-center sm:justify-between ${
+            isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-200 bg-slate-50'
+          }`}>
+            <div className="flex items-start gap-3">
+              <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-purple-500" />
+              <div>
+                <h3 className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Tu avance se guarda de forma segura.</h3>
+                <p className={`mt-1 text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Las flags se validan sin exponer respuestas y los puntos quedan asociados a tu perfil.</p>
+              </div>
+            </div>
+            <Link to="/admission" className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl bg-purple-600 px-4 text-sm font-bold text-white transition-colors hover:bg-purple-500">
+              {isAuthenticated ? 'Continuar' : 'Crear cuenta'} <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>

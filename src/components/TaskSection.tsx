@@ -79,9 +79,11 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks, onQuestionSolve
             }`}
           >
             {/* Task Header */}
-            <div
+            <button
+              type="button"
               onClick={() => toggleTask(task.id)}
-              className="p-5 cursor-pointer flex items-center justify-between gap-4 select-none hover:bg-slate-900/30 transition-colors"
+              aria-expanded={isExpanded}
+              className="w-full p-5 cursor-pointer flex items-center justify-between gap-4 text-left select-none hover:bg-slate-900/30 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div
@@ -107,7 +109,7 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks, onQuestionSolve
               <div className="flex items-center gap-2">
                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
               </div>
-            </div>
+            </button>
 
             {/* Task Body */}
             {isExpanded && (
@@ -162,6 +164,7 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks, onQuestionSolve
                               value={answers[q.id] || ''}
                               onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
                               placeholder={q.answerFormat || 'Ingresa tu respuesta...'}
+                              aria-label={`Respuesta para: ${q.question}`}
                               className={`flex-1 px-3.5 py-2 rounded-xl text-xs font-mono border focus:outline-none transition-colors ${
                                 isDark
                                   ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500 focus:border-purple-500'
@@ -178,7 +181,7 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks, onQuestionSolve
                                 <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                               ) : (
                                 <>
-                                  <span>Submit</span>
+                                  <span>Verificar</span>
                                   <Send className="w-3 h-3" />
                                 </>
                               )}

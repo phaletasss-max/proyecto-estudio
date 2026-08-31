@@ -42,13 +42,18 @@ export interface CTFLab {
   description: string;
   targetIp?: string; // Simulated IP for AttackBox
   zip_url: string | null;
-  flag_hash: string;
-  writeup_markdown: string;
+  /** Available only in local demo data. Production flags never reach the browser. */
+  flag_hash?: string;
+  /** Available only in local demo data or after get_challenge_writeup succeeds. */
+  writeup_markdown?: string;
   tasks?: LabTask[];
   comments?: LabComment[];
   author: string;
   created_at: string;
   is_published: boolean;
+  points?: number;
+  is_admission_challenge?: boolean;
+  is_members_only?: boolean;
   estimatedMinutes?: number;
 }
 
@@ -63,6 +68,8 @@ export interface LabFormData {
   writeup_markdown: string;
   flag: string;
   zipFile: File | null;
+  isAdmissionChallenge?: boolean;
+  isMembersOnly?: boolean;
 }
 
 export const DIFFICULTY_COLORS: Record<Difficulty, { bg: string; text: string; border: string }> = {

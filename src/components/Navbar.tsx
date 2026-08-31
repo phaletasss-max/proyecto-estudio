@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sun, Moon, Trophy, Compass, Award, Upload, BookOpen } from 'lucide-react';
+import { Menu, X, Sun, Moon, Trophy, Compass, Award, Upload, BookOpen, ChevronDown, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import { UserNavbarBadge } from '@/components/UserNavbarBadge';
@@ -8,6 +8,7 @@ import { UserNavbarBadge } from '@/components/UserNavbarBadge';
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export const Navbar: React.FC = () => {
 
   const navLinks = [
     { name: 'Inicio', href: '/' },
+    { name: 'Admisión', href: '/admission', icon: ShieldCheck },
     { name: 'Labs', href: '/labs', icon: Trophy },
     { name: 'Rutas', href: '/paths', icon: Compass },
     { name: 'Cheatsheets', href: '/cheatsheets', icon: BookOpen },
@@ -39,6 +41,9 @@ export const Navbar: React.FC = () => {
     if (href === '/') return location.pathname === '/';
     return location.pathname.startsWith(href);
   };
+
+  const primaryLinks = navLinks.slice(0, 4);
+  const secondaryLinks = navLinks.slice(4);
 
   return (
     <header
@@ -81,7 +86,7 @@ export const Navbar: React.FC = () => {
           <nav className={`hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-full border ${
             isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-100/90 border-slate-200'
           }`}>
-            {navLinks.map((link) => (
+            {primaryLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
@@ -98,6 +103,44 @@ export const Navbar: React.FC = () => {
                 <span>{link.name}</span>
               </Link>
             ))}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreMenuOpen((open) => !open)}
+                aria-expanded={moreMenuOpen}
+                aria-haspopup="menu"
+                className={`inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 text-xs font-mono font-medium transition-all duration-200 ${
+                  secondaryLinks.some((link) => isActive(link.href))
+                    ? isDark ? 'bg-purple-600/25 text-purple-300 font-bold shadow-sm' : 'bg-purple-100 text-purple-700 font-bold'
+                    : isDark ? 'text-slate-300 hover:bg-slate-800 hover:text-white' : 'text-slate-700 hover:bg-white hover:text-slate-950'
+                }`}
+              >
+                Más
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {moreMenuOpen && (
+                <div role="menu" className={`absolute right-0 top-full mt-2 w-44 rounded-2xl border p-1.5 shadow-xl ${
+                  isDark ? 'border-slate-800 bg-slate-950' : 'border-slate-200 bg-white'
+                }`}>
+                  {secondaryLinks.map((link) => (
+                    <Link
+                      key={link.name}
+                      to={link.href}
+                      role="menuitem"
+                      onClick={() => setMoreMenuOpen(false)}
+                      className={`flex min-h-10 items-center gap-2 rounded-xl px-3 text-xs font-mono font-medium transition-colors ${
+                        isActive(link.href)
+                          ? isDark ? 'bg-purple-600/20 text-purple-300' : 'bg-purple-100 text-purple-700'
+                          : isDark ? 'text-slate-300 hover:bg-slate-900 hover:text-white' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
+                      }`}
+                    >
+                      {link.icon && <link.icon className="h-3.5 w-3.5 text-purple-400" />}
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right Actions: Theme Toggle + User Badge */}

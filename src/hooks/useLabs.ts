@@ -8,6 +8,7 @@ interface UseLabsOptions {
   category?: CTFCategory | null;
   framework?: string | null;
   search?: string;
+  admissionOnly?: boolean;
 }
 
 export function useLabs(options: UseLabsOptions = {}) {
@@ -40,6 +41,9 @@ export function useLabs(options: UseLabsOptions = {}) {
             l.framework?.toLowerCase().includes(q)
         );
       }
+      if (options.admissionOnly) {
+        filtered = filtered.filter((l) => l.is_admission_challenge);
+      }
       setLabs(filtered);
       setLoading(false);
       return;
@@ -58,6 +62,9 @@ export function useLabs(options: UseLabsOptions = {}) {
       if (options.category) {
         query = query.eq('category', options.category);
       }
+      if (options.admissionOnly) {
+        query = query.eq('is_admission_challenge', true);
+      }
       if (options.search) {
         query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
       }
@@ -72,7 +79,7 @@ export function useLabs(options: UseLabsOptions = {}) {
     } finally {
       setLoading(false);
     }
-  }, [options.difficulty, options.category, options.framework, options.search]);
+  }, [options.difficulty, options.category, options.framework, options.search, options.admissionOnly]);
 
   useEffect(() => {
     fetchLabs();

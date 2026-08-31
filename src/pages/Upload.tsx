@@ -5,6 +5,8 @@ import { ArrowLeft, Upload as UploadIcon, Check, AlertCircle, Eye, FileText } fr
 import { WriteupRenderer } from '@/components/WriteupRenderer';
 import { useTheme } from '@/context/ThemeContext';
 import { useUploadLab } from '@/hooks/useUploadLab';
+import { useAuth } from '@/context/AuthContext';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import type { Difficulty, CTFCategory, LabFormData } from '@/types/ctf';
 
 const DIFFICULTIES: Difficulty[] = ['Easy', 'Medium', 'Hard', 'Insane'];
@@ -14,6 +16,7 @@ export const Upload: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { uploadLab, uploading, error, success, reset } = useUploadLab();
+  const { user } = useAuth();
   const [showPreview, setShowPreview] = useState(false);
 
   const [form, setForm] = useState<LabFormData>({
@@ -25,6 +28,8 @@ export const Upload: React.FC = () => {
     writeup_markdown: '',
     flag: '',
     zipFile: null,
+    isAdmissionChallenge: false,
+    isMembersOnly: true,
   });
 
   const handleTitleChange = (title: string) => {
@@ -50,6 +55,23 @@ export const Upload: React.FC = () => {
   }`;
 
   const labelClasses = `block text-xs font-mono font-semibold mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`;
+
+  const canManageChallenges = !isSupabaseConfigured() || user?.accessStatus === 'admin';
+
+  if (!canManageChallenges) {
+    return (
+      <section className="pt-28 pb-16 min-h-screen">
+        <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
+          <div className={`rounded-2xl border p-8 ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}`}>
+            <AlertCircle className="w-10 h-10 text-amber-400 mx-auto mb-4" />
+            <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Gestión reservada al equipo</h1>
+            <p className="mt-2 text-sm text-slate-400">Pide a un administrador que revise y publique tu reto. Las flags y writeups se gestionan desde cuentas autorizadas.</p>
+            <Link to="/labs" className="inline-flex mt-6 px-5 py-2.5 rounded-xl bg-purple-600 text-white text-sm font-bold">Explorar labs</Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (success) {
     return (
@@ -78,7 +100,7 @@ export const Upload: React.FC = () => {
                 Ver Labs
               </Link>
               <button
-                onClick={() => { reset(); setForm({ title: '', slug: '', difficulty: 'Easy', category: 'Web', description: '', writeup_markdown: '', flag: '', zipFile: null }); }}
+                onClick={() => { reset(); setForm({ title: '', slug: '', difficulty: 'Easy', category: 'Web', description: '', writeup_markdown: '', flag: '', zipFile: null, isAdmissionChallenge: false, isMembersOnly: true }); }}
                 className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors border ${
                   isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-slate-100'
                 }`}
@@ -198,9 +220,35 @@ export const Upload: React.FC = () => {
               required
             />
             <p className={`mt-1 text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-              Se almacenará como hash SHA-256. Los usuarios deberán ingresar la flag para desbloquear el writeup.
+              Se transmite por HTTPS a Supabase, donde se hashea y almacena fuera del alcance del navegador.
             </p>
           </div>
+
+          <fieldset className={`rounded-xl border p-4 space-y-3 ${isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50'}`}>
+            <legend className={`px-1 text-xs font-mono font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Visibilidad y admisión</legend>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.isAdmissionChallenge || false}
+                onChange={(e) => setForm(prev => ({ ...prev, isAdmissionChallenge: e.target.checked }))}
+                className="mt-0.5 h-4 w-4 accent-purple-600"
+              />
+              <span className="text-xs leading-relaxed text-slate-400">
+                <strong className={isDark ? 'text-purple-300' : 'text-purple-700'}>Reto de admisión.</strong> Una flag válida convierte al postulante en miembro del grupo.
+              </span>
+            </label>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.isMembersOnly ?? true}
+                onChange={(e) => setForm(prev => ({ ...prev, isMembersOnly: e.target.checked }))}
+                className="mt-0.5 h-4 w-4 accent-purple-600"
+              />
+              <span className="text-xs leading-relaxed text-slate-400">
+                <strong className={isDark ? 'text-purple-300' : 'text-purple-700'}>Solo miembros.</strong> Los postulantes no verán este reto hasta aprobar la admisión.
+              </span>
+            </label>
+          </fieldset>
 
           {/* ZIP Upload */}
           <div>

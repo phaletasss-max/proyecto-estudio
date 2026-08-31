@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { hashFlag } from '@/utils/crypto';
 import type { LabFormData } from '@/types/ctf';
 
 export function useUploadLab() {
@@ -22,10 +21,7 @@ export function useUploadLab() {
     }
 
     try {
-      // 1. Hash the flag
-      const flagHash = await hashFlag(formData.flag);
-
-      // 2. Upload ZIP if provided
+      // 1. Upload ZIP if provided
       let zipUrl: string | null = null;
       if (formData.zipFile) {
         const fileName = `${formData.slug}_${Date.now()}.zip`;
@@ -42,17 +38,19 @@ export function useUploadLab() {
         zipUrl = urlData.publicUrl;
       }
 
-      // 3. Insert lab record
-      const { error: insertError } = await supabase.from('labs').insert({
-        title: formData.title,
-        slug: formData.slug,
-        difficulty: formData.difficulty,
-        category: formData.category,
-        description: formData.description,
-        zip_url: zipUrl,
-        flag_hash: flagHash,
-        writeup_markdown: formData.writeup_markdown,
-        is_published: false, // Requires admin approval
+      // 2. The RPC hashes the flag and saves the writeup in a private table.
+      // Only accounts marked as admin in Supabase may create a challenge.
+      const { error: insertError } = await supabase.rpc('create_challenge', {
+        p_title: formData.title,
+        p_slug: formData.slug,
+        p_difficulty: formData.difficulty,
+        p_category: formData.category,
+        p_description: formData.description,
+        p_flag: formData.flag,
+        p_writeup_markdown: formData.writeup_markdown,
+        p_zip_url: zipUrl,
+        p_is_admission_challenge: formData.isAdmissionChallenge || false,
+        p_is_members_only: formData.isMembersOnly ?? true,
       });
 
       if (insertError) throw insertError;

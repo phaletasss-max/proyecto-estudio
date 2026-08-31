@@ -14,7 +14,9 @@ import Profile from '@/pages/Profile';
 import Leaderboard from '@/pages/Leaderboard';
 import Achievements from '@/pages/Achievements';
 import LearningPaths from '@/pages/LearningPaths';
+import LearningLesson from '@/pages/LearningLesson';
 import CheatSheets from '@/pages/CheatSheets';
+import Admission from '@/pages/Admission';
 
 export const App: React.FC = () => {
   const { theme } = useTheme();
@@ -40,7 +42,9 @@ export const App: React.FC = () => {
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/paths" element={<LearningPaths />} />
+          <Route path="/learn/:pathSlug/:moduleId" element={<LearningLesson />} />
           <Route path="/cheatsheets" element={<CheatSheets />} />
+          <Route path="/admission" element={<Admission />} />
         </Routes>
       </main>
       <FloatingTerminal />

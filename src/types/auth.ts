@@ -1,4 +1,5 @@
 export type RankTier = 'Script Kiddie' | 'Byte Hunter' | 'Cyber Specialist' | 'Root Operator' | 'Shadow Master';
+export type AccessStatus = 'applicant' | 'member' | 'admin' | 'suspended';
 
 export interface RankInfo {
   tier: RankTier;
@@ -88,6 +89,7 @@ export interface UserProfile {
   specialty: string;
   points: number;
   rank: RankTier;
+  accessStatus: AccessStatus;
   githubUrl?: string;
   discordTag?: string;
   linkedinUrl?: string;
@@ -117,6 +119,12 @@ export interface LearningModule {
   type: 'theory' | 'lab' | 'challenge';
   durationMinutes: number;
   points: number;
+  guide?: {
+    objective: string;
+    keyIdeas: string[];
+    steps: string[];
+    practice: string;
+  };
 }
 
 export interface LearningPath {

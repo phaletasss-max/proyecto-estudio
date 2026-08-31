@@ -65,6 +65,7 @@ export const Profile: React.FC = () => {
               specialty: data.specialty || 'Ciberseguridad',
               points: data.points || 0,
               rank: data.rank || 'Script Kiddie',
+              accessStatus: data.access_status || 'applicant',
               githubUrl: data.github_url || '',
               discordTag: data.discord_tag || '',
               linkedinUrl: data.linkedin_url || '',

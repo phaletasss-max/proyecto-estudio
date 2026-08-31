@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, LogOut, Trophy, Award, Sparkles, ChevronDown, Compass } from 'lucide-react';
+import { User, LogOut, Trophy, Award, Sparkles, ChevronDown, Compass, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { RANKS } from '@/types/auth';
@@ -42,6 +42,7 @@ export const UserNavbarBadge: React.FC = () => {
   }
 
   const rankInfo = RANKS[user.rank] || RANKS['Script Kiddie'];
+  const hasMembership = user.accessStatus === 'member' || user.accessStatus === 'admin';
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -94,6 +95,14 @@ export const UserNavbarBadge: React.FC = () => {
               <span className="text-slate-400">Labs:</span>
               <span className="font-bold text-emerald-400">{user.solvedLabs.length} resueltos</span>
             </div>
+            <Link
+              to="/admission"
+              onClick={() => setDropdownOpen(false)}
+              className={`mt-2 flex items-center gap-1.5 text-[10px] font-mono font-bold ${hasMembership ? 'text-emerald-400' : 'text-amber-400 hover:text-amber-300'}`}
+            >
+              <ShieldCheck className="w-3 h-3" />
+              {hasMembership ? 'Miembro activo' : 'Completar admisión'}
+            </Link>
           </div>
 
           <div className="space-y-1">

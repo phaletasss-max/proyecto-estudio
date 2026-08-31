@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import type { UserProfile, UserSolve, RankTier, Badge } from '@/types/auth';
+import { cleanFlagInput, verifyFlag } from '@/utils/crypto';
+import type { AccessStatus, UserProfile, UserSolve, RankTier, Badge } from '@/types/auth';
 import { BADGES_CATALOG } from '@/data/badges';
 
 const calculateRank = (points: number): RankTier => {
@@ -10,6 +11,37 @@ const calculateRank = (points: number): RankTier => {
   if (points >= 500) return 'Byte Hunter';
   return 'Script Kiddie';
 };
+
+interface StoredSolve {
+  lab_id: string;
+  points_earned: number;
+  solved_at: string;
+  labs?: {
+    slug?: string | null;
+    title?: string | null;
+    category?: string | null;
+    difficulty?: string | null;
+  } | Array<{
+    slug?: string | null;
+    title?: string | null;
+    category?: string | null;
+    difficulty?: string | null;
+  }> | null;
+}
+
+const toUserSolves = (solves: StoredSolve[] | null): UserSolve[] =>
+  (solves || []).map((solve) => {
+    const lab = Array.isArray(solve.labs) ? solve.labs[0] : solve.labs;
+    return {
+      labId: solve.lab_id,
+      labSlug: lab?.slug || '',
+      labTitle: lab?.title || 'Reto resuelto',
+      category: lab?.category || 'Misc',
+      difficulty: lab?.difficulty || 'Easy',
+      pointsEarned: solve.points_earned,
+      solvedAt: solve.solved_at,
+    };
+  });
 
 const DEFAULT_GUEST_USER: UserProfile = {
   id: 'u1',
@@ -21,6 +53,7 @@ const DEFAULT_GUEST_USER: UserProfile = {
   specialty: 'Ciberseguridad & Redes',
   points: 0,
   rank: 'Script Kiddie',
+  accessStatus: 'applicant',
   githubUrl: 'https://github.com/phaletasss-max',
   discordTag: '',
   linkedinUrl: '',
@@ -35,6 +68,14 @@ interface SolveResult {
   newBadges: Badge[];
 }
 
+interface FlagSubmission {
+  accepted: boolean;
+  alreadySolved: boolean;
+  pointsEarned: number;
+  newBadges: Badge[];
+  message?: string;
+}
+
 interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
@@ -44,6 +85,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateProfile: (updatedData: Partial<UserProfile>) => Promise<{ error?: string }>;
   recordSolve: (lab: { id: string; slug: string; title: string; category: string; difficulty: string }) => Promise<SolveResult>;
+  submitFlag: (lab: { id: string; slug: string; title: string; category: string; difficulty: string; flag_hash?: string }, flag: string) => Promise<FlagSubmission>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,6 +94,7 @@ const LOCAL_STORAGE_KEY = 'shadowbytes_user_profile_v2';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
+    if (isSupabaseConfigured()) return null;
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
@@ -67,6 +110,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Sync to localStorage
   useEffect(() => {
+    if (isSupabaseConfigured()) {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      return;
+    }
     if (user) {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(user));
     } else {
@@ -88,6 +135,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             .eq('id', session.user.id)
             .single();
 
+          const { data: solves } = await supabase
+            .from('user_solves')
+            .select('lab_id, points_earned, solved_at, labs(slug, title, category, difficulty)')
+            .eq('user_id', session.user.id);
+
+          const { data: badges } = await supabase
+            .from('user_badges')
+            .select('badge_code')
+            .eq('user_id', session.user.id);
+
           if (profile) {
             setUser({
               id: profile.id,
@@ -98,11 +155,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               specialty: profile.specialty || '',
               points: profile.points || 0,
               rank: profile.rank || calculateRank(profile.points || 0),
+              accessStatus: (profile.access_status as AccessStatus) || 'applicant',
               githubUrl: profile.github_url || '',
               discordTag: profile.discord_tag || '',
               linkedinUrl: profile.linkedin_url || '',
-              solvedLabs: user?.solvedLabs || [],
-              unlockedBadges: user?.unlockedBadges || ['FIRST_BLOOD', 'SENATI_VETERAN'],
+              solvedLabs: toUserSolves(solves),
+              unlockedBadges: (badges || []).map((badge) => badge.badge_code),
               createdAt: profile.created_at,
             });
           }
@@ -117,7 +175,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (usernameOrEmail: string, password?: string) => {
     setLoading(true);
-    if (!isSupabaseConfigured() || !password) {
+    if (!isSupabaseConfigured()) {
       // Offline / Demo Login
       const cleanUsername = usernameOrEmail.split('@')[0].trim().toLowerCase();
       const demoUser: UserProfile = {
@@ -130,6 +188,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(demoUser);
       setLoading(false);
       return {};
+    }
+
+    if (!password) {
+      setLoading(false);
+      return { error: 'Ingresa tu contraseña para iniciar sesión.' };
     }
 
     try {
@@ -147,6 +210,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .eq('id', data.user.id)
           .single();
 
+        const { data: solves } = await supabase
+          .from('user_solves')
+          .select('lab_id, points_earned, solved_at, labs(slug, title, category, difficulty)')
+          .eq('user_id', data.user.id);
+
+        const { data: badges } = await supabase
+          .from('user_badges')
+          .select('badge_code')
+          .eq('user_id', data.user.id);
+
         if (profile) {
           setUser({
             id: profile.id,
@@ -157,11 +230,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             specialty: profile.specialty || '',
             points: profile.points || 0,
             rank: profile.rank || calculateRank(profile.points || 0),
+            accessStatus: (profile.access_status as AccessStatus) || 'applicant',
             githubUrl: profile.github_url || '',
             discordTag: profile.discord_tag || '',
             linkedinUrl: profile.linkedin_url || '',
-            solvedLabs: [],
-            unlockedBadges: ['SENATI_VETERAN'],
+            solvedLabs: toUserSolves(solves),
+            unlockedBadges: (badges || []).map((badge) => badge.badge_code),
             createdAt: profile.created_at,
           });
         }
@@ -178,7 +252,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     const cleanUsername = username.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
 
-    if (!isSupabaseConfigured() || !password) {
+    if (!isSupabaseConfigured()) {
       const newUser: UserProfile = {
         id: `user_${Date.now()}`,
         username: cleanUsername,
@@ -189,6 +263,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         specialty: 'Ciberseguridad',
         points: 100,
         rank: 'Script Kiddie',
+        accessStatus: 'member',
         solvedLabs: [],
         unlockedBadges: ['SENATI_VETERAN'],
         createdAt: new Date().toISOString(),
@@ -196,6 +271,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(newUser);
       setLoading(false);
       return {};
+    }
+
+    if (!password) {
+      setLoading(false);
+      return { error: 'Ingresa una contraseña para crear tu cuenta.' };
     }
 
     try {
@@ -221,10 +301,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
           bio: 'Nuevo recluta de ShadowBytes SENATI.',
           specialty: 'Ciberseguridad',
-          points: 100,
+          points: 0,
           rank: 'Script Kiddie',
+          accessStatus: 'applicant',
           solvedLabs: [],
-          unlockedBadges: ['SENATI_VETERAN'],
+          unlockedBadges: [],
           createdAt: new Date().toISOString(),
         });
       }
@@ -375,31 +456,86 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     setUser(updatedUser);
 
-    // Sync solve and points with Supabase if online
-    if (isSupabaseConfigured()) {
-      try {
-        await supabase.from('profiles').update({ points: finalPoints, rank: newRank }).eq('id', user.id);
-        await supabase.from('user_solves').insert({
-          user_id: user.id,
-          lab_id: lab.id,
-          points_earned: earned,
-        });
-        for (const b of newBadges) {
-          await supabase.from('user_badges').insert({
-            user_id: user.id,
-            badge_code: b.code,
-          });
-        }
-      } catch (err) {
-        console.error('Error saving solve to Supabase:', err);
-      }
-    }
-
     return {
       alreadySolved: false,
       pointsEarned: earned,
       newBadges,
     };
+  };
+
+  const submitFlag = async (
+    lab: { id: string; slug: string; title: string; category: string; difficulty: string; flag_hash?: string },
+    flag: string,
+  ): Promise<FlagSubmission> => {
+    if (!user) {
+      return { accepted: false, alreadySolved: false, pointsEarned: 0, newBadges: [], message: 'Inicia sesión para enviar una flag.' };
+    }
+
+    if (!isSupabaseConfigured()) {
+      const candidate = cleanFlagInput(flag).toLowerCase();
+      const expected = cleanFlagInput(lab.flag_hash || '').toLowerCase();
+      const matchesHash = lab.flag_hash ? await verifyFlag(flag, lab.flag_hash) : false;
+
+      if (!matchesHash && candidate !== expected) {
+        return { accepted: false, alreadySolved: false, pointsEarned: 0, newBadges: [], message: 'Flag incorrecta. Revisa las pistas.' };
+      }
+
+      const result = await recordSolve(lab);
+      return {
+        accepted: true,
+        alreadySolved: result.alreadySolved,
+        pointsEarned: result.pointsEarned,
+        newBadges: result.newBadges,
+      };
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('submit_flag', {
+        p_lab_id: lab.id,
+        p_flag: flag,
+      });
+      if (error) throw error;
+
+      const result = Array.isArray(data) ? data[0] : data;
+      if (!result?.accepted) {
+        return { accepted: false, alreadySolved: false, pointsEarned: 0, newBadges: [], message: 'Flag incorrecta. Revisa las pistas.' };
+      }
+
+      if (!result.already_solved) {
+        const newSolve: UserSolve = {
+          labId: lab.id,
+          labSlug: lab.slug,
+          labTitle: lab.title,
+          category: lab.category,
+          difficulty: lab.difficulty,
+          pointsEarned: result.points_earned,
+          solvedAt: new Date().toISOString(),
+        };
+
+        setUser((current) => current ? {
+          ...current,
+          points: result.total_points,
+          rank: calculateRank(result.total_points),
+          accessStatus: result.access_status as AccessStatus,
+          solvedLabs: [newSolve, ...current.solvedLabs],
+        } : current);
+      }
+
+      return {
+        accepted: true,
+        alreadySolved: result.already_solved,
+        pointsEarned: result.points_earned,
+        newBadges: [],
+      };
+    } catch (err) {
+      return {
+        accepted: false,
+        alreadySolved: false,
+        pointsEarned: 0,
+        newBadges: [],
+        message: err instanceof Error ? err.message : 'No se pudo validar la flag.',
+      };
+    }
   };
 
   return (
@@ -413,6 +549,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         logout,
         updateProfile,
         recordSolve,
+        submitFlag,
       }}
     >
       {children}

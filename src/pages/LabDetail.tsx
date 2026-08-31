@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -28,6 +28,7 @@ import { LabDiscussion } from '@/components/LabDiscussion';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { useLabDetail } from '@/hooks/useLabDetail';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { CATEGORY_ICONS } from '@/types/ctf';
 import type { Badge } from '@/types/auth';
 
@@ -35,7 +36,7 @@ export const LabDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const { user, recordSolve } = useAuth();
+  const { user, submitFlag } = useAuth();
   const { lab, loading, error } = useLabDetail(slug || '');
 
   const [activeTab, setActiveTab] = useState<'tasks' | 'terminal' | 'writeup' | 'discussion'>('tasks');
@@ -43,28 +44,48 @@ export const LabDetail: React.FC = () => {
   const [achievementModalOpen, setAchievementModalOpen] = useState(false);
   const [pointsAwarded, setPointsAwarded] = useState(0);
   const [awardedBadges, setAwardedBadges] = useState<Badge[]>([]);
+  const [secureWriteup, setSecureWriteup] = useState<string | null>(null);
 
-  // Check if current user already solved this lab
   const isAlreadySolved = user?.solvedLabs.some((s) => s.labSlug === slug || (lab && s.labId === lab.id)) || false;
+  const canViewWriteup = writeupUnlocked || isAlreadySolved;
 
-  const handleFlagUnlocked = async () => {
-    setWriteupUnlocked(true);
+  useEffect(() => {
+    if (!lab || !canViewWriteup || !isSupabaseConfigured() || secureWriteup !== null) return;
 
-    if (lab) {
-      const result = await recordSolve({
+    supabase.rpc('get_challenge_writeup', { p_lab_id: lab.id })
+      .then(({ data, error: writeupError }) => {
+        if (writeupError) {
+          console.error('No se pudo cargar el writeup protegido:', writeupError.message);
+          return;
+        }
+        setSecureWriteup(data || '');
+      });
+  }, [lab, canViewWriteup, secureWriteup]);
+
+  const handleFlagSubmission = async (flag: string) => {
+    if (!lab) {
+      return { accepted: false, alreadySolved: false, message: 'Reto no disponible.' };
+    }
+
+    const result = await submitFlag({
         id: lab.id,
         slug: lab.slug,
         title: lab.title,
         category: lab.category,
         difficulty: lab.difficulty,
-      });
+        flag_hash: lab.flag_hash,
+      }, flag);
 
+    if (result.accepted) {
+      setWriteupUnlocked(true);
       if (!result.alreadySolved) {
         setPointsAwarded(result.pointsEarned);
         setAwardedBadges(result.newBadges);
         setAchievementModalOpen(true);
       }
     }
+
+    return result;
   };
 
   const handleQuestionSolved = (questionId: string, points: number) => {
@@ -97,8 +118,6 @@ export const LabDetail: React.FC = () => {
     month: 'long',
     day: 'numeric',
   });
-
-  const canViewWriteup = writeupUnlocked || isAlreadySolved || lab.flag_hash.startsWith('demo');
 
   return (
     <section className="pt-28 pb-20 min-h-screen">
@@ -221,11 +240,13 @@ export const LabDetail: React.FC = () => {
         </div>
 
         {/* Navigation Tabs (TryHackMe Style) */}
-        <div className={`flex items-center gap-2 p-1.5 rounded-2xl border mb-6 overflow-x-auto ${
+        <div role="tablist" aria-label="Secciones del reto" className={`flex items-center gap-2 p-1.5 rounded-2xl border mb-6 overflow-x-auto ${
           isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
         }`}>
           <button
             onClick={() => setActiveTab('tasks')}
+            role="tab"
+            aria-selected={activeTab === 'tasks'}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 ${
               activeTab === 'tasks'
                 ? 'bg-purple-600 text-white shadow-md'
@@ -233,11 +254,13 @@ export const LabDetail: React.FC = () => {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>Tareas & Preguntas ({lab.tasks?.length || 1})</span>
+            <span>Tareas ({lab.tasks?.length || 1})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('terminal')}
+            role="tab"
+            aria-selected={activeTab === 'terminal'}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 ${
               activeTab === 'terminal'
                 ? 'bg-purple-600 text-white shadow-md'
@@ -245,11 +268,13 @@ export const LabDetail: React.FC = () => {
             }`}
           >
             <Terminal className="w-3.5 h-3.5" />
-            <span>Consola AttackBox</span>
+            <span>Consola</span>
           </button>
 
           <button
             onClick={() => setActiveTab('writeup')}
+            role="tab"
+            aria-selected={activeTab === 'writeup'}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 ${
               activeTab === 'writeup'
                 ? 'bg-purple-600 text-white shadow-md'
@@ -257,11 +282,13 @@ export const LabDetail: React.FC = () => {
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Guía Writeup {canViewWriteup ? '🔓' : '🔒'}</span>
+            <span>Guía {canViewWriteup ? '🔓' : '🔒'}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('discussion')}
+            role="tab"
+            aria-selected={activeTab === 'discussion'}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 ${
               activeTab === 'discussion'
                 ? 'bg-purple-600 text-white shadow-md'
@@ -269,7 +296,7 @@ export const LabDetail: React.FC = () => {
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>Discusión SENATI</span>
+            <span>Comunidad</span>
           </button>
         </div>
 
@@ -288,10 +315,10 @@ export const LabDetail: React.FC = () => {
 
             {/* Root Flag Submission Box */}
             <div className={`rounded-2xl border p-6 ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
-              <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2">
                   {canViewWriteup ? <Unlock className="w-4 h-4 text-emerald-500" /> : <Lock className="w-4 h-4 text-amber-500" />}
-                  <h3 className="text-sm font-bold font-mono">Flag Principal del Reto (Root Machine)</h3>
+                  <h3 className="text-sm font-bold font-mono">Flag principal del reto</h3>
                 </div>
                 <span className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5" />
@@ -299,7 +326,7 @@ export const LabDetail: React.FC = () => {
                 </span>
               </div>
 
-              <FlagInput flagHash={lab.flag_hash} onUnlocked={handleFlagUnlocked} disabled={canViewWriteup} />
+              <FlagInput onSubmit={handleFlagSubmission} disabled={canViewWriteup} />
             </div>
           </div>
         )}
@@ -315,7 +342,7 @@ export const LabDetail: React.FC = () => {
         {activeTab === 'writeup' && (
           <div className={`rounded-3xl border p-6 sm:p-8 shadow-xl ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white border-slate-200'}`}>
             {canViewWriteup ? (
-              <WriteupRenderer content={lab.writeup_markdown} />
+              <WriteupRenderer content={secureWriteup ?? lab.writeup_markdown ?? 'Writeup no disponible.'} />
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <Lock className="w-12 h-12 text-slate-600 mb-3" />
