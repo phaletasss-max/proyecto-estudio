@@ -59,7 +59,8 @@ export function useLabDetail(slug: string) {
           .eq('lab_id', (data as unknown as PublicLabRow).id)
           .order('step_number', { ascending: true });
 
-        if (stepsError && stepsError.code !== '42P01') throw stepsError;
+        const missingStepsTable = stepsError && ['42P01', 'PGRST204', 'PGRST205'].includes(stepsError.code || '');
+        if (stepsError && !missingStepsTable) throw stepsError;
         const tasks = mapLabSteps((stepData as unknown as LabStepRow[]) || []);
         setLab(mapPublicLab(data as unknown as PublicLabRow, tasks));
       } catch (err) {

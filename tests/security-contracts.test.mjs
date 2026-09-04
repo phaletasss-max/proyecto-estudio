@@ -22,6 +22,7 @@ test('la compatibilidad legacy descarta URLs públicas de archivos', () => {
   const mapper = read('src/lib/labs.ts');
   assert.match(mapper, /LEGACY_PUBLIC_LAB_COLUMNS/);
   assert.match(mapper, /\^https\?:\\\/\\\//);
+  assert.match(read('src/hooks/useLabDetail.ts'), /PGRST205/);
 });
 
 test('las rutas críticas y la pantalla 404 existen', () => {
