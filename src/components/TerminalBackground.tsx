@@ -9,7 +9,7 @@ const staticCodeLines = [
   'Get-ADDomainController -Filter * | Select Name, IPAddress',
   '# DC-SENATI-LAB -> 10.0.4.10 [Active Directory Integrated]',
   'iptables -t nat -A POSTROUTING -o eth1_WAN -j MASQUERADE',
-  '# Route established: 10.0.4.0/24 -> WAN 200.48.225.14',
+  '# Route established: 10.0.4.0/24 -> documentation network',
   'nmap -sV --script=banner 10.0.4.10 -p 53,80,443,3389',
   '# 53/tcp open domain Microsoft DNS (senati.local)',
   'git commit -m "feat: deploy to Vercel production"',

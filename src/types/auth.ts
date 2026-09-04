@@ -119,6 +119,7 @@ export interface LearningModule {
   type: 'theory' | 'lab' | 'challenge';
   durationMinutes: number;
   points: number;
+  status?: 'available' | 'coming_soon';
   guide?: {
     objective: string;
     keyIdeas: string[];

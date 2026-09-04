@@ -14,6 +14,10 @@ export const isSupabaseConfigured = () => {
   );
 };
 
+/** Demo fixtures are opt-in and development-only so production errors stay visible. */
+export const isDemoModeEnabled = () =>
+  import.meta.env.DEV && import.meta.env.VITE_ENABLE_DEMO_DATA === 'true';
+
 // Safe client: If credentials are not set, use safe placeholders so React never throws an unhandled error
 export const supabase = createClient(
   isSupabaseConfigured() ? supabaseUrl : 'https://placeholder-shadowbytes.supabase.co',

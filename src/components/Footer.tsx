@@ -26,7 +26,9 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl overflow-hidden shadow-md">
                 <img
-                  src="/logo-shadowbytes.png"
+                  src="/logo-shadowbytes.webp"
+                  width="36"
+                  height="36"
                   alt="ShadowBytes Logo"
                   className="w-full h-full object-cover"
                 />

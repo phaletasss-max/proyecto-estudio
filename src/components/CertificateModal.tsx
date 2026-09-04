@@ -58,7 +58,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
             {/* Header Badge */}
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-2xl overflow-hidden border border-purple-500/30 shadow">
-                <img src="/logo-shadowbytes.png" alt="ShadowBytes" className="w-full h-full object-cover" />
+                <img src="/logo-shadowbytes.webp" width="64" height="64" alt="ShadowBytes" className="w-full h-full object-cover" />
               </div>
               <span className="font-[Orbitron] font-extrabold text-xl tracking-wider">
                 SHADOW<span className="text-purple-500">BYTES</span>

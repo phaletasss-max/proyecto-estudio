@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, isDemoModeEnabled } from '@/lib/supabase';
 import type { CTFLab, Difficulty, CTFCategory } from '@/types/ctf';
 import { REAL_LABS } from '@/data/mockLabs';
+import { mapPublicLab, PUBLIC_LAB_COLUMNS, type PublicLabRow } from '@/lib/labs';
 
 interface UseLabsOptions {
   difficulty?: Difficulty | null;
@@ -20,7 +21,7 @@ export function useLabs(options: UseLabsOptions = {}) {
     setLoading(true);
     setError(null);
 
-    if (!isSupabaseConfigured()) {
+    if (!isSupabaseConfigured() && isDemoModeEnabled()) {
       let filtered = [...REAL_LABS];
       if (options.difficulty) {
         filtered = filtered.filter((l) => l.difficulty === options.difficulty);
@@ -49,10 +50,17 @@ export function useLabs(options: UseLabsOptions = {}) {
       return;
     }
 
+    if (!isSupabaseConfigured()) {
+      setLabs([]);
+      setError('Supabase no está configurado. Añade las variables públicas o activa el modo demo solo en desarrollo.');
+      setLoading(false);
+      return;
+    }
+
     try {
       let query = supabase
         .from('labs')
-        .select('*')
+        .select(PUBLIC_LAB_COLUMNS)
         .eq('is_published', true)
         .order('created_at', { ascending: false });
 
@@ -72,10 +80,10 @@ export function useLabs(options: UseLabsOptions = {}) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) throw fetchError;
-      setLabs((data as CTFLab[]) || []);
+      setLabs(((data as unknown as PublicLabRow[]) || []).map((row) => mapPublicLab(row)));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar los labs');
-      setLabs(REAL_LABS);
+      setLabs([]);
     } finally {
       setLoading(false);
     }

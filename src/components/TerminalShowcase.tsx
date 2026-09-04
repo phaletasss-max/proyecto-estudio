@@ -93,8 +93,8 @@ const terminalConfigs: Record<TerminalType, TerminalInfo> = {
       { text: '443/tcp  open  ssl/https     Microsoft IIS httpd 10.0', color: 'text-emerald-400' },
       { text: '3389/tcp open  ms-wbt-server Microsoft Terminal Services', color: 'text-cyan-300' },
       { text: '' },
-      { text: '└─$ cat /home/kali/ctf/flag.txt', color: 'text-blue-400' },
-      { text: 'HTB{200.48.225.14} — [WAN GATEWAY CAPTURED SUCCESSFUL]', color: 'text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded' },
+      { text: '└─$ cat /home/kali/ctf/resultado.txt', color: 'text-blue-400' },
+      { text: 'Evidencia localizada. Envía tu respuesta desde el laboratorio.', color: 'text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded' },
     ],
   },
   arch: {

@@ -39,7 +39,8 @@ La configuración se divide en dos scripts para que una instalación nueva quede
 
 1. Ejecuta [`supabase/schema.sql`](./supabase/schema.sql) en el SQL Editor de Supabase.
 2. Ejecuta [`supabase/migrations/20260831_secure_ctf_admission.sql`](./supabase/migrations/20260831_secure_ctf_admission.sql).
-3. Sigue la guía de operación en [`supabase/README.md`](./supabase/README.md) para promover al primer administrador, crear el bucket de archivos y publicar el CTF de admisión.
+3. Ejecuta [`supabase/migrations/20260904_guided_learning_mvp.sql`](./supabase/migrations/20260904_guided_learning_mvp.sql) para activar pasos guiados, pistas progresivas, rate limiting y Storage privado.
+4. Sigue la guía de operación en [`supabase/README.md`](./supabase/README.md) para promover al primer administrador y publicar el CTF de admisión.
 
 El segundo script mueve flags y writeups a una tabla privada, valida respuestas desde una función SQL y guarda cada solve junto con sus puntos. El navegador nunca recibe flags reales.
 
@@ -55,9 +56,11 @@ Cada despliegue nuevo leerá esas variables. Si cambias una variable, crea un de
 ## Comandos útiles
 
 ```bash
-pnpm dev       # desarrollo local
-pnpm build     # verificación de TypeScript y compilación de producción
-pnpm preview   # previsualizar la compilación generada
+pnpm dev        # desarrollo local
+pnpm typecheck  # verificación TypeScript
+pnpm test       # contratos de seguridad y rutas
+pnpm build      # compilación de producción
+pnpm preview    # previsualizar la compilación generada
 ```
 
 ## Estructura del proyecto
@@ -71,7 +74,9 @@ pnpm preview   # previsualizar la compilación generada
 
 ## Antes de publicar cambios
 
-1. Ejecuta `pnpm build`.
+1. Ejecuta `pnpm typecheck`, `pnpm test` y `pnpm build`.
 2. Prueba registro, inicio de sesión, admisión y envío de flag.
 3. Comprueba que un estudiante no puede ver flags ni writeups antes de resolver el reto.
 4. Revisa que las variables de Vercel estén configuradas y crea un nuevo despliegue.
+
+Los fixtures solo se habilitan en desarrollo con `VITE_ENABLE_DEMO_DATA=true`. En producción, una configuración o conexión fallida muestra un error real y no sustituye información de ejemplo.

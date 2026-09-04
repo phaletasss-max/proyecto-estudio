@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   full_name TEXT NOT NULL DEFAULT '',
-  avatar_url TEXT NOT NULL DEFAULT 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
+  avatar_url TEXT NOT NULL DEFAULT '',
   bio TEXT DEFAULT 'Estudiante y Miembro de ShadowBytes SENATI',
   specialty TEXT DEFAULT 'Ciberseguridad & Redes',
   points INTEGER NOT NULL DEFAULT 0,
@@ -115,7 +115,7 @@ BEGIN
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1)),
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'Hacker ShadowBytes'),
-    COALESCE(NEW.raw_user_meta_data->>'avatar_url', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80')
+    COALESCE(NEW.raw_user_meta_data->>'avatar_url', '')
   );
   RETURN NEW;
 END;

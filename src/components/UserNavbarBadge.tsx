@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, LogOut, Trophy, Award, Sparkles, ChevronDown, Compass, ShieldCheck } from 'lucide-react';
+import { User, LogOut, Trophy, Award, Sparkles, ChevronDown, Compass, ShieldCheck, LayoutDashboard, Settings } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { RANKS } from '@/types/auth';
-import { AuthModal } from '@/components/AuthModal';
+
+const AuthModal = lazy(() => import('@/components/AuthModal').then((module) => ({ default: module.AuthModal })));
 
 export const UserNavbarBadge: React.FC = () => {
   const { user, logout } = useAuth();
@@ -36,7 +37,7 @@ export const UserNavbarBadge: React.FC = () => {
           <User className="w-3.5 h-3.5" />
           <span>Ingresar</span>
         </button>
-        <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+        {authModalOpen && <Suspense fallback={null}><AuthModal isOpen onClose={() => setAuthModalOpen(false)} /></Suspense>}
       </>
     );
   }
@@ -56,8 +57,8 @@ export const UserNavbarBadge: React.FC = () => {
         }`}
       >
         {/* Avatar */}
-        <div className="relative w-8 h-8 rounded-full overflow-hidden border border-purple-500/30">
-          <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+        <div className="relative flex w-8 h-8 items-center justify-center rounded-full overflow-hidden border border-purple-500/30 bg-purple-500/15 text-xs font-bold text-purple-200">
+          {user.avatarUrl ? <img src={user.avatarUrl} alt="" width="32" height="32" className="w-full h-full object-cover" /> : user.username.slice(0, 2).toUpperCase()}
           <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-slate-950" />
         </div>
 
@@ -107,6 +108,16 @@ export const UserNavbarBadge: React.FC = () => {
 
           <div className="space-y-1">
             <Link
+              to="/dashboard"
+              onClick={() => setDropdownOpen(false)}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-mono transition-colors ${
+                isDark ? 'text-slate-300 hover:text-white hover:bg-slate-900' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Dashboard</span>
+            </Link>
+            <Link
               to="/profile"
               onClick={() => setDropdownOpen(false)}
               className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-mono transition-colors ${
@@ -149,6 +160,12 @@ export const UserNavbarBadge: React.FC = () => {
               <Compass className="w-3.5 h-3.5 text-emerald-400" />
               <span>Rutas de Aprendizaje</span>
             </Link>
+
+            {user.accessStatus === 'admin' && <Link
+              to="/admin/labs/new"
+              onClick={() => setDropdownOpen(false)}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-mono transition-colors ${isDark ? 'text-slate-300 hover:text-white hover:bg-slate-900' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'}`}
+            ><Settings className="w-3.5 h-3.5 text-amber-400" /><span>Administrar labs</span></Link>}
           </div>
 
           <div className="pt-2 mt-2 border-t border-slate-800">

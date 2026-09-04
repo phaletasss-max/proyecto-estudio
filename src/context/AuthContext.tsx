@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { cleanFlagInput, verifyFlag } from '@/utils/crypto';
+import { supabase, isDemoModeEnabled, isSupabaseConfigured } from '@/lib/supabase';
 import type { AccessStatus, UserProfile, UserSolve, RankTier, Badge } from '@/types/auth';
 import { BADGES_CATALOG } from '@/data/badges';
 
@@ -44,17 +43,17 @@ const toUserSolves = (solves: StoredSolve[] | null): UserSolve[] =>
   });
 
 const DEFAULT_GUEST_USER: UserProfile = {
-  id: 'u1',
-  username: 'phaletas_max',
-  fullName: 'Manuel Phaletas',
-  email: 'manuel@senati.pe',
-  avatarUrl: '/logo-shadowbytes.png',
-  bio: 'Estudiante de Ciberseguridad en SENATI (4.º ciclo).',
-  specialty: 'Ciberseguridad & Redes',
+  id: 'demo-user',
+  username: 'estudiante_demo',
+  fullName: 'Estudiante Demo',
+  email: 'demo@example.invalid',
+  avatarUrl: '/logo-shadowbytes.webp',
+  bio: 'Perfil local habilitado únicamente para desarrollo.',
+  specialty: 'Fundamentos de ciberseguridad',
   points: 0,
   rank: 'Script Kiddie',
   accessStatus: 'applicant',
-  githubUrl: 'https://github.com/phaletasss-max',
+  githubUrl: '',
   discordTag: '',
   linkedinUrl: '',
   solvedLabs: [],
@@ -85,7 +84,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateProfile: (updatedData: Partial<UserProfile>) => Promise<{ error?: string }>;
   recordSolve: (lab: { id: string; slug: string; title: string; category: string; difficulty: string }) => Promise<SolveResult>;
-  submitFlag: (lab: { id: string; slug: string; title: string; category: string; difficulty: string; flag_hash?: string }, flag: string) => Promise<FlagSubmission>;
+  submitFlag: (lab: { id: string; slug: string; title: string; category: string; difficulty: string }, flag: string) => Promise<FlagSubmission>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -95,6 +94,7 @@ const LOCAL_STORAGE_KEY = 'shadowbytes_user_profile_v2';
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     if (isSupabaseConfigured()) return null;
+    if (!isDemoModeEnabled()) return null;
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
@@ -114,7 +114,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.removeItem(LOCAL_STORAGE_KEY);
       return;
     }
-    if (user) {
+    if (isDemoModeEnabled() && user) {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(user));
     } else {
       localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -131,7 +131,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (session?.user) {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('*')
+            .select('id, username, full_name, avatar_url, bio, specialty, points, rank, access_status, github_url, discord_tag, linkedin_url, created_at')
             .eq('id', session.user.id)
             .single();
 
@@ -176,6 +176,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (usernameOrEmail: string, password?: string) => {
     setLoading(true);
     if (!isSupabaseConfigured()) {
+      if (!isDemoModeEnabled()) {
+        setLoading(false);
+        return { error: 'Supabase no está configurado. El acceso local requiere VITE_ENABLE_DEMO_DATA=true en desarrollo.' };
+      }
       // Offline / Demo Login
       const cleanUsername = usernameOrEmail.split('@')[0].trim().toLowerCase();
       const demoUser: UserProfile = {
@@ -206,7 +210,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (data.user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('*')
+          .select('id, username, full_name, avatar_url, bio, specialty, points, rank, access_status, github_url, discord_tag, linkedin_url, created_at')
           .eq('id', data.user.id)
           .single();
 
@@ -253,12 +257,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const cleanUsername = username.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
 
     if (!isSupabaseConfigured()) {
+      if (!isDemoModeEnabled()) {
+        setLoading(false);
+        return { error: 'Supabase no está configurado. El registro local está deshabilitado.' };
+      }
       const newUser: UserProfile = {
         id: `user_${Date.now()}`,
         username: cleanUsername,
         fullName: fullName || cleanUsername,
         email,
-        avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
+        avatarUrl: '/logo-shadowbytes.webp',
         bio: 'Nuevo recluta de ShadowBytes SENATI.',
         specialty: 'Ciberseguridad',
         points: 100,
@@ -298,7 +306,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           username: cleanUsername,
           fullName: fullName || cleanUsername,
           email,
-          avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
+          avatarUrl: '/logo-shadowbytes.webp',
           bio: 'Nuevo recluta de ShadowBytes SENATI.',
           specialty: 'Ciberseguridad',
           points: 0,
@@ -464,7 +472,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const submitFlag = async (
-    lab: { id: string; slug: string; title: string; category: string; difficulty: string; flag_hash?: string },
+    lab: { id: string; slug: string; title: string; category: string; difficulty: string },
     flag: string,
   ): Promise<FlagSubmission> => {
     if (!user) {
@@ -472,20 +480,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     if (!isSupabaseConfigured()) {
-      const candidate = cleanFlagInput(flag).toLowerCase();
-      const expected = cleanFlagInput(lab.flag_hash || '').toLowerCase();
-      const matchesHash = lab.flag_hash ? await verifyFlag(flag, lab.flag_hash) : false;
-
-      if (!matchesHash && candidate !== expected) {
-        return { accepted: false, alreadySolved: false, pointsEarned: 0, newBadges: [], message: 'Flag incorrecta. Revisa las pistas.' };
-      }
-
-      const result = await recordSolve(lab);
       return {
-        accepted: true,
-        alreadySolved: result.alreadySolved,
-        pointsEarned: result.pointsEarned,
-        newBadges: result.newBadges,
+        accepted: false,
+        alreadySolved: false,
+        pointsEarned: 0,
+        newBadges: [],
+        message: 'La validación requiere conexión con Supabase. El modo local no contiene flags.',
       };
     }
 

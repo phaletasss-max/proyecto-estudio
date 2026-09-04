@@ -40,7 +40,7 @@ const moduleType = (module: LearningModule) => {
 };
 
 const moduleDestination = (path: LearningPath, module: LearningModule) =>
-  module.labSlug ? `/lab/${module.labSlug}` : module.guide ? `/learn/${path.slug}/${module.id}` : null;
+  module.status === 'coming_soon' ? null : module.labSlug ? `/lab/${module.labSlug}` : module.guide ? `/learn/${path.slug}/${module.id}` : null;
 
 export const LearningPaths: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -187,7 +187,10 @@ export const LearningPaths: React.FC = () => {
                           <p className="text-[10px] font-bold tracking-[0.14em] text-slate-500">RECOMENDADO PARA CONTINUAR</p>
                           <p className="mt-1 text-sm font-bold text-white">{currentModule.title}</p>
                         </div>
-                        {currentDestination && <Link to={currentDestination} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-cyan-300 px-4 text-sm font-bold text-slate-950 transition-colors hover:bg-cyan-200"><Play className="h-4 w-4 fill-current" /> Continuar</Link>}
+                        <div className="flex flex-wrap gap-2">
+                          <Link to={`/paths/${path.slug}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 text-sm font-bold text-slate-200 hover:border-slate-500">Ver ruta completa</Link>
+                          {currentDestination && <Link to={currentDestination} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-cyan-300 px-4 text-sm font-bold text-slate-950 transition-colors hover:bg-cyan-200"><Play className="h-4 w-4 fill-current" /> Continuar</Link>}
+                        </div>
                       </div>
 
                       <ol className="relative space-y-1 before:absolute before:bottom-8 before:left-[23px] before:top-8 before:w-px before:bg-slate-700 sm:before:left-[27px]">
@@ -197,7 +200,7 @@ export const LearningPaths: React.FC = () => {
                           const solved = Boolean(module.labSlug && solvedSlugs.has(module.labSlug));
                           const current = moduleIndex === currentModuleIndex && !solved;
                           const Icon = kind.icon;
-                          const actionText = solved ? 'Revisar' : module.labSlug ? 'Abrir lab' : module.guide ? 'Leer' : 'Abrir';
+                          const actionText = solved ? 'Revisar' : module.status === 'coming_soon' ? 'Próximamente' : module.labSlug ? 'Abrir lab' : module.guide ? 'Leer' : 'Abrir';
                           const item = (
                             <>
                               <span className={`relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-sm font-black sm:h-14 sm:w-14 ${solved ? 'border-emerald-300/40 bg-emerald-400 text-slate-950' : current ? 'border-cyan-300/50 bg-cyan-300/10 text-cyan-200' : 'border-slate-700 bg-slate-900 text-slate-400'}`}>
@@ -207,7 +210,8 @@ export const LearningPaths: React.FC = () => {
                                 <div className="flex flex-wrap items-center gap-2">
                                   <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.11em] text-slate-500"><Icon className="h-3.5 w-3.5" /> {kind.label.toUpperCase()}</span>
                                   {solved && <span className="inline-flex items-center gap-1 rounded bg-emerald-400/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-emerald-300"><CheckCircle2 className="h-3 w-3" /> COMPLETADO</span>}
-                                  {current && <span className="rounded bg-cyan-300/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-cyan-200">SIGUIENTE</span>}
+                                  {current && module.status !== 'coming_soon' && <span className="rounded bg-cyan-300/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-cyan-200">SIGUIENTE</span>}
+                                  {module.status === 'coming_soon' && <span className="rounded bg-slate-700 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-slate-300">PRÓXIMAMENTE</span>}
                                 </div>
                                 <h4 className="mt-2 text-sm font-bold text-white sm:text-base">{module.title}</h4>
                                 <p className="mt-1 text-sm leading-6 text-slate-400">{module.description}</p>

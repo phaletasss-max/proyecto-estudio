@@ -51,7 +51,7 @@ export const FloatingTerminal: React.FC = () => {
               </button>
             </div>
 
-            <CyberTerminal targetIp="10.10.184.72" />
+            <CyberTerminal />
           </motion.div>
         )}
       </AnimatePresence>

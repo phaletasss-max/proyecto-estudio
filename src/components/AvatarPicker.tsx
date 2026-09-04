@@ -3,14 +3,7 @@ import { Check, Upload, Image as ImageIcon } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
 export const HACKER_AVATARS = [
-  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
-  'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&q=80',
-  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80',
-  'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&q=80',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80',
-  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80',
+  '/logo-shadowbytes.webp',
 ];
 
 interface AvatarPickerProps {

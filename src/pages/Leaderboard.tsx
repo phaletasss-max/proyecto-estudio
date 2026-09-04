@@ -44,7 +44,7 @@ export const Leaderboard: React.FC = () => {
               userId: p.user_id,
               username: p.username || 'anon',
               fullName: p.full_name || p.username || 'Estudiante',
-              avatarUrl: p.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
+              avatarUrl: p.avatar_url || '/logo-shadowbytes.webp',
               points: p.points || 0,
               rank: (p.rank as RankTier) || 'Script Kiddie',
               specialty: p.specialty || 'Ciberseguridad',

@@ -51,7 +51,7 @@ export const Profile: React.FC = () => {
       setLoadingUser(true);
       supabase
         .from('profiles')
-        .select('*')
+        .select('id, username, full_name, avatar_url, bio, specialty, points, rank, access_status, github_url, discord_tag, linkedin_url, created_at')
         .eq('username', username.toLowerCase())
         .single()
         .then(({ data, error }) => {
@@ -60,7 +60,7 @@ export const Profile: React.FC = () => {
               id: data.id,
               username: data.username,
               fullName: data.full_name,
-              avatarUrl: data.avatar_url || '/logo-shadowbytes.png',
+              avatarUrl: data.avatar_url || '/logo-shadowbytes.webp',
               bio: data.bio || '',
               specialty: data.specialty || 'Ciberseguridad',
               points: data.points || 0,

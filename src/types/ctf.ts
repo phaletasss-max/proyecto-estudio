@@ -5,10 +5,9 @@ export type CTFCategory = 'Web' | 'Forensics' | 'Pwn' | 'Crypto' | 'Reversing' |
 export interface TaskQuestion {
   id: string;
   question: string;
-  hint?: string;
   points: number;
-  answerHash: string; // SHA-256 or direct expected answer for comparison
   answerFormat?: string; // e.g. "HTB{...}" or "***.***.***.***"
+  hintCount?: number;
   isCompleted?: boolean;
 }
 
@@ -42,10 +41,6 @@ export interface CTFLab {
   description: string;
   targetIp?: string; // Simulated IP for AttackBox
   zip_url: string | null;
-  /** Available only in local demo data. Production flags never reach the browser. */
-  flag_hash?: string;
-  /** Available only in local demo data or after get_challenge_writeup succeeds. */
-  writeup_markdown?: string;
   tasks?: LabTask[];
   comments?: LabComment[];
   author: string;

@@ -12,12 +12,10 @@ import {
   Trophy,
   Users,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { LEARNING_PATHS } from '@/data/learningPaths';
 import { BADGES_CATALOG } from '@/data/badges';
-import { REAL_LABS } from '@/data/mockLabs';
 
 const ENTRY_STEPS = [
   {
@@ -51,15 +49,8 @@ export const Home: React.FC = () => {
     <>
       <section className="relative isolate overflow-hidden pt-28 pb-14 sm:pt-36 sm:pb-20">
         <div className={`absolute inset-0 -z-10 ${isDark ? 'bg-[#070a12]' : 'bg-slate-50'}`} />
-        <div className="absolute -top-40 left-1/2 -z-10 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-purple-600/15 blur-[110px]" />
-        <div className="absolute right-[-8rem] top-40 -z-10 h-72 w-72 rounded-full bg-cyan-400/10 blur-[100px]" />
-
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-          >
+          <div>
             <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-semibold ${
               isDark ? 'border-purple-400/20 bg-purple-400/10 text-purple-200' : 'border-purple-200 bg-white text-purple-700 shadow-sm'
             }`}>
@@ -82,7 +73,7 @@ export const Home: React.FC = () => {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 to={primaryAction.to}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-purple-600 px-5 text-sm font-bold text-white shadow-lg shadow-purple-600/25 transition-all hover:-translate-y-0.5 hover:bg-purple-500 hover:shadow-purple-600/35"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-purple-600 px-5 text-sm font-bold text-white transition-colors hover:bg-purple-500"
               >
                 {primaryAction.label}
                 <ArrowRight className="h-4 w-4" />
@@ -103,17 +94,13 @@ export const Home: React.FC = () => {
               <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> Progreso guardado</span>
               <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> Comunidad de apoyo</span>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.aside
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.12 }}
-            className={`relative overflow-hidden rounded-[2rem] border p-6 shadow-2xl sm:p-8 ${
-              isDark ? 'border-slate-800 bg-slate-950/90 shadow-purple-950/30' : 'border-slate-200 bg-white shadow-slate-300/40'
+          <aside
+            className={`relative overflow-hidden rounded-xl border p-6 sm:p-8 ${
+              isDark ? 'border-slate-800 bg-slate-950/90' : 'border-slate-200 bg-white'
             }`}
           >
-            <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-purple-500/15 blur-3xl" />
             <div className="relative">
               <div className="flex items-center justify-between gap-4">
                 <div>
@@ -157,14 +144,14 @@ export const Home: React.FC = () => {
                 <ArrowRight className="h-4 w-4 text-purple-500" />
               </Link>
             </div>
-          </motion.aside>
+          </aside>
         </div>
       </section>
 
       <section className={`border-y py-5 ${isDark ? 'border-slate-800 bg-slate-950/60' : 'border-slate-200 bg-white'}`}>
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:px-6 lg:px-8">
           {[
-            { value: `${REAL_LABS.length}+`, label: 'Labs para practicar', icon: Terminal },
+            { value: '2', label: 'Labs iniciales', icon: Terminal },
             { value: '7', label: 'Áreas CTF', icon: ShieldCheck },
             { value: 'Paso a paso', label: 'Rutas guiadas', icon: Compass },
             { value: 'En equipo', label: 'Comunidad', icon: Users },
@@ -197,9 +184,9 @@ export const Home: React.FC = () => {
             {LEARNING_PATHS.map((path) => (
               <Link
                 key={path.id}
-                to="/paths"
-                className={`group flex min-h-56 flex-col rounded-3xl border p-5 transition-all hover:-translate-y-1 ${
-                  isDark ? 'border-slate-800 bg-slate-950 hover:border-purple-500/50' : 'border-slate-200 bg-white shadow-sm hover:border-purple-300 hover:shadow-lg'
+                to={`/paths/${path.slug}`}
+                className={`group flex min-h-56 flex-col rounded-xl border p-5 transition-colors ${
+                  isDark ? 'border-slate-800 bg-slate-950 hover:border-purple-500/50' : 'border-slate-200 bg-white hover:border-purple-300'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -234,7 +221,7 @@ export const Home: React.FC = () => {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {BADGES_CATALOG.slice(0, 4).map((badge) => (
-              <div key={badge.code} className={`rounded-3xl border p-5 ${isDark ? 'border-slate-800 bg-slate-900/60' : 'border-slate-200 bg-slate-50'}`}>
+              <div key={badge.code} className={`rounded-xl border p-5 ${isDark ? 'border-slate-800 bg-slate-900/60' : 'border-slate-200 bg-slate-50'}`}>
                 <div className="flex items-start justify-between">
                   <span className="text-3xl">{badge.icon}</span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-1 text-xs font-bold text-amber-500"><Award className="h-3 w-3" /> +{badge.pointsBonus}</span>
@@ -245,7 +232,7 @@ export const Home: React.FC = () => {
             ))}
           </div>
 
-          <div className={`mt-8 flex flex-col items-start gap-3 rounded-3xl border p-5 sm:flex-row sm:items-center sm:justify-between ${
+          <div className={`mt-8 flex flex-col items-start gap-3 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between ${
             isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-200 bg-slate-50'
           }`}>
             <div className="flex items-start gap-3">

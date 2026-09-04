@@ -1,0 +1,12 @@
+{
+  "name": "ShadowBytes",
+  "short_name": "ShadowBytes",
+  "description": "Laboratorios guiados de ciberseguridad en español.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090f",
+  "theme_color": "#07090f",
+  "icons": [
+    { "src": "/logo-shadowbytes.webp", "sizes": "256x256", "type": "image/webp" }
+  ]
+}

@@ -199,7 +199,7 @@ export const CHEATSHEETS: CheatSheetSection[] = [
     description: 'Filtros avanzados de Wireshark y comandos Tshark para analizar tráfico malicioso y capturas pcap.',
     commands: [
       {
-        command: 'ip.addr == 200.48.225.14 && tcp.flags.syn == 1 && tcp.flags.ack == 0',
+        command: 'ip.addr == 203.0.113.24 && tcp.flags.syn == 1 && tcp.flags.ack == 0',
         description: 'Filtro Wireshark para detectar intentos de conexión entrante (SYN) desde una IP WAN específica.',
         category: 'Filtros Wireshark',
       },

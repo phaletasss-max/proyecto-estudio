@@ -21,7 +21,6 @@ import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { FlagInput } from '@/components/FlagInput';
 import { WriteupRenderer } from '@/components/WriteupRenderer';
 import { AchievementModal } from '@/components/AchievementModal';
-import { MachineSpawner } from '@/components/MachineSpawner';
 import { CyberTerminal } from '@/components/CyberTerminal';
 import { TaskSection } from '@/components/TaskSection';
 import { LabDiscussion } from '@/components/LabDiscussion';
@@ -45,6 +44,7 @@ export const LabDetail: React.FC = () => {
   const [pointsAwarded, setPointsAwarded] = useState(0);
   const [awardedBadges, setAwardedBadges] = useState<Badge[]>([]);
   const [secureWriteup, setSecureWriteup] = useState<string | null>(null);
+  const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'error'>('idle');
 
   const isAlreadySolved = user?.solvedLabs.some((s) => s.labSlug === slug || (lab && s.labId === lab.id)) || false;
   const canViewWriteup = writeupUnlocked || isAlreadySolved;
@@ -73,7 +73,6 @@ export const LabDetail: React.FC = () => {
         title: lab.title,
         category: lab.category,
         difficulty: lab.difficulty,
-        flag_hash: lab.flag_hash,
       }, flag);
 
     if (result.accepted) {
@@ -88,8 +87,21 @@ export const LabDetail: React.FC = () => {
     return result;
   };
 
-  const handleQuestionSolved = (questionId: string, points: number) => {
+  const handleQuestionSolved = (_questionId: string, _points: number) => {
     // When an individual task question is solved
+  };
+
+  const handleSecureDownload = async () => {
+    const storagePath = lab?.zip_url;
+    if (!storagePath || !isSupabaseConfigured()) return;
+    setDownloadState('loading');
+    const { data, error: signedUrlError } = await supabase.storage.from('ctf-zips').createSignedUrl(storagePath, 60);
+    if (signedUrlError || !data?.signedUrl) {
+      setDownloadState('error');
+      return;
+    }
+    window.location.assign(data.signedUrl);
+    setDownloadState('idle');
   };
 
   if (loading) {
@@ -222,22 +234,19 @@ export const LabDetail: React.FC = () => {
           {/* ZIP Download Link */}
           {lab.zip_url && (
             <div className="mt-5 relative z-10">
-              <a
-                href={lab.zip_url}
-                download
+              <button
+                type="button"
+                onClick={handleSecureDownload}
+                disabled={downloadState === 'loading'}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold transition-all shadow-md shadow-blue-600/25 active:scale-95"
               >
                 <Download className="w-4 h-4" />
-                <span>Descargar Archivos del Reto (.zip)</span>
-              </a>
+                <span>{downloadState === 'loading' ? 'Preparando enlace…' : 'Descargar archivos (enlace privado)'}</span>
+              </button>
+              {downloadState === 'error' && <p className="mt-2 text-xs text-red-400" role="alert">No se pudo autorizar la descarga. Comprueba tu sesión o membresía.</p>}
             </div>
           )}
         </motion.div>
-
-        {/* Machine Spawner (Virtual Target Controller) */}
-        <div className="mb-6">
-          <MachineSpawner labSlug={lab.slug} defaultIp={lab.targetIp} />
-        </div>
 
         {/* Navigation Tabs (TryHackMe Style) */}
         <div role="tablist" aria-label="Secciones del reto" className={`flex items-center gap-2 p-1.5 rounded-2xl border mb-6 overflow-x-auto ${
@@ -268,7 +277,7 @@ export const LabDetail: React.FC = () => {
             }`}
           >
             <Terminal className="w-3.5 h-3.5" />
-            <span>Consola</span>
+            <span>Terminal guiada</span>
           </button>
 
           <button
@@ -334,7 +343,7 @@ export const LabDetail: React.FC = () => {
         {/* Tab 2: AttackBox Terminal */}
         {activeTab === 'terminal' && (
           <div className="space-y-4">
-            <CyberTerminal labSlug={lab.slug} targetIp={lab.targetIp} />
+            <CyberTerminal labSlug={lab.slug} />
           </div>
         )}
 
@@ -342,7 +351,7 @@ export const LabDetail: React.FC = () => {
         {activeTab === 'writeup' && (
           <div className={`rounded-3xl border p-6 sm:p-8 shadow-xl ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white border-slate-200'}`}>
             {canViewWriteup ? (
-              <WriteupRenderer content={secureWriteup ?? lab.writeup_markdown ?? 'Writeup no disponible.'} />
+              <WriteupRenderer content={secureWriteup ?? 'Cargando writeup protegido…'} />
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <Lock className="w-12 h-12 text-slate-600 mb-3" />

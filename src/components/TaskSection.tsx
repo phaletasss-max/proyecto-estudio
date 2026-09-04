@@ -1,233 +1,153 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, CheckCircle2, HelpCircle, Sparkles, Send, Lock, Unlock, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { AlertCircle, CheckCircle2, ChevronDown, HelpCircle, Send, Sparkles } from 'lucide-react';
 import type { LabTask, TaskQuestion } from '@/types/ctf';
 import { useTheme } from '@/context/ThemeContext';
-import { verifyFlag } from '@/utils/crypto';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 interface TaskSectionProps {
   tasks: LabTask[];
   onQuestionSolved?: (questionId: string, points: number) => void;
 }
 
+interface StepAnswerResult {
+  accepted: boolean;
+  already_completed: boolean;
+  points_earned: number;
+  explanation: string;
+}
+
+interface HintResult {
+  content: string;
+  hint_number: number;
+  point_penalty: number;
+}
+
 export const TaskSection: React.FC<TaskSectionProps> = ({ tasks, onQuestionSolved }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-
-  const [expandedTaskId, setExpandedTaskId] = useState<string>(tasks[0]?.id || '');
+  const [expandedTaskId, setExpandedTaskId] = useState(tasks[0]?.id || '');
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [solvedQuestions, setSolvedQuestions] = useState<Set<string>>(new Set());
-  const [revealedHints, setRevealedHints] = useState<Set<string>>(new Set());
+  const [explanations, setExplanations] = useState<Record<string, string>>({});
+  const [hints, setHints] = useState<Record<string, HintResult[]>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [verifying, setVerifying] = useState<string | null>(null);
+  const [loadingHint, setLoadingHint] = useState<string | null>(null);
 
-  const toggleTask = (taskId: string) => {
-    setExpandedTaskId(expandedTaskId === taskId ? '' : taskId);
-  };
+  useEffect(() => {
+    if (!isSupabaseConfigured() || tasks.length === 0) return;
+    const stepIds = tasks.flatMap((task) => task.questions.map((question) => question.id));
+    if (stepIds.length === 0) return;
 
-  const toggleHint = (questionId: string) => {
-    setRevealedHints((prev) => {
-      const next = new Set(prev);
-      if (next.has(questionId)) next.delete(questionId);
-      else next.add(questionId);
-      return next;
-    });
-  };
+    supabase
+      .from('lab_step_progress')
+      .select('step_id')
+      .in('step_id', stepIds)
+      .then(({ data }) => setSolvedQuestions(new Set((data || []).map((row) => row.step_id))));
+  }, [tasks]);
 
-  const handleAnswerSubmit = async (q: TaskQuestion) => {
-    const val = answers[q.id]?.trim();
-    if (!val || solvedQuestions.has(q.id) || verifying) return;
-
-    setVerifying(q.id);
-    setErrors((prev) => ({ ...prev, [q.id]: '' }));
-
+  const revealNextHint = async (question: TaskQuestion) => {
+    if (!isSupabaseConfigured() || loadingHint) return;
+    setLoadingHint(question.id);
+    setErrors((current) => ({ ...current, [question.id]: '' }));
     try {
-      // Validate either against answerHash (SHA256) or direct string match
-      const isMatch = await verifyFlag(val, q.answerHash) || val.toLowerCase() === q.answerHash.toLowerCase();
+      const { data, error } = await supabase.rpc('get_next_hint', { p_step_id: question.id });
+      if (error) throw error;
+      const result = (Array.isArray(data) ? data[0] : data) as HintResult | null;
+      if (!result?.content) throw new Error('No hay más pistas disponibles.');
+      setHints((current) => ({ ...current, [question.id]: [...(current[question.id] || []), result] }));
+    } catch (error) {
+      setErrors((current) => ({ ...current, [question.id]: error instanceof Error ? error.message : 'No se pudo cargar la pista.' }));
+    } finally {
+      setLoadingHint(null);
+    }
+  };
 
-      if (isMatch) {
-        setSolvedQuestions((prev) => new Set(prev).add(q.id));
-        if (onQuestionSolved) onQuestionSolved(q.id, q.points);
-      } else {
-        setErrors((prev) => ({ ...prev, [q.id]: 'Respuesta incorrecta. Revisa la pista o inspecciona el código.' }));
-        setTimeout(() => {
-          setErrors((prev) => ({ ...prev, [q.id]: '' }));
-        }, 3500);
+  const handleAnswerSubmit = async (question: TaskQuestion) => {
+    const answer = answers[question.id]?.trim();
+    if (!answer || solvedQuestions.has(question.id) || verifying) return;
+    if (!isSupabaseConfigured()) {
+      setErrors((current) => ({ ...current, [question.id]: 'La validación de respuestas requiere Supabase; no hay verificadores en el navegador.' }));
+      return;
+    }
+
+    setVerifying(question.id);
+    setErrors((current) => ({ ...current, [question.id]: '' }));
+    try {
+      const { data, error } = await supabase.rpc('submit_step_answer', { p_step_id: question.id, p_answer: answer });
+      if (error) throw error;
+      const result = (Array.isArray(data) ? data[0] : data) as StepAnswerResult | null;
+      if (!result?.accepted) {
+        setErrors((current) => ({ ...current, [question.id]: 'Respuesta incorrecta. Revisa la evidencia o solicita una pista.' }));
+        return;
       }
+
+      setSolvedQuestions((current) => new Set(current).add(question.id));
+      if (result.explanation) setExplanations((current) => ({ ...current, [question.id]: result.explanation }));
+      setAnswers((current) => ({ ...current, [question.id]: '' }));
+      onQuestionSolved?.(question.id, result.points_earned || 0);
     } catch {
-      setErrors((prev) => ({ ...prev, [q.id]: 'Error de verificación.' }));
+      setErrors((current) => ({ ...current, [question.id]: 'No se pudo validar la respuesta. Inténtalo nuevamente.' }));
     } finally {
       setVerifying(null);
     }
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {tasks.map((task) => {
         const isExpanded = expandedTaskId === task.id;
-        const totalQ = task.questions.length;
-        const solvedQ = task.questions.filter((q) => solvedQuestions.has(q.id)).length;
-        const isTaskDone = totalQ > 0 && solvedQ === totalQ;
+        const solvedCount = task.questions.filter((question) => solvedQuestions.has(question.id)).length;
+        const completed = task.questions.length > 0 && solvedCount === task.questions.length;
 
         return (
-          <div
-            key={task.id}
-            className={`rounded-2xl border overflow-hidden transition-all ${
-              isTaskDone
-                ? isDark ? 'bg-emerald-950/15 border-emerald-500/30' : 'bg-emerald-50/50 border-emerald-200'
-                : isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
-            }`}
-          >
-            {/* Task Header */}
-            <button
-              type="button"
-              onClick={() => toggleTask(task.id)}
-              aria-expanded={isExpanded}
-              className="w-full p-5 cursor-pointer flex items-center justify-between gap-4 text-left select-none hover:bg-slate-900/30 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono text-xs font-bold shrink-0 ${
-                    isTaskDone
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-purple-500/15 text-purple-400 border border-purple-500/20'
-                  }`}
-                >
-                  {isTaskDone ? <CheckCircle2 className="w-4 h-4" /> : task.taskNumber}
-                </div>
-
-                <div>
-                  <h4 className={`text-sm font-bold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {task.title}
-                  </h4>
-                  <p className="text-[11px] text-slate-400 font-mono">
-                    {solvedQ} de {totalQ} preguntas completadas
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-              </div>
+          <section key={task.id} className={`overflow-hidden rounded-2xl border ${completed ? 'border-emerald-500/30 bg-emerald-950/10' : isDark ? 'border-slate-800 bg-slate-950/70' : 'border-slate-200 bg-white'}`}>
+            <button type="button" onClick={() => setExpandedTaskId(isExpanded ? '' : task.id)} aria-expanded={isExpanded} className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left hover:bg-slate-500/5">
+              <span className="flex items-center gap-3">
+                <span className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold ${completed ? 'bg-emerald-500 text-white' : 'bg-violet-500/15 text-violet-300'}`}>{completed ? <CheckCircle2 className="h-4 w-4" /> : task.taskNumber}</span>
+                <span><strong className={isDark ? 'text-white' : 'text-slate-900'}>{task.title}</strong><small className="mt-0.5 block text-xs text-slate-500">{solvedCount} de {task.questions.length} actividades completadas</small></span>
+              </span>
+              <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* Task Body */}
             {isExpanded && (
-              <div className={`p-5 sm:p-6 border-t ${isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                <p className={`text-xs leading-relaxed mb-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                  {task.description}
-                </p>
-
-                {/* Questions */}
+              <div className={`border-t p-5 sm:p-6 ${isDark ? 'border-slate-800 bg-slate-900/35' : 'border-slate-200 bg-slate-50'}`}>
+                <p className={`mb-6 text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{task.description}</p>
                 <div className="space-y-5">
-                  {task.questions.map((q, qIdx) => {
-                    const isSolved = solvedQuestions.has(q.id);
-                    const isHintOpen = revealedHints.has(q.id);
-                    const error = errors[q.id];
-
+                  {task.questions.map((question, index) => {
+                    const solved = solvedQuestions.has(question.id);
+                    const revealed = hints[question.id] || [];
+                    const remainingHints = Math.max((question.hintCount || 0) - revealed.length, 0);
                     return (
-                      <div
-                        key={q.id}
-                        className={`p-4 rounded-xl border transition-all ${
-                          isSolved
-                            ? isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'
-                            : isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
-                        }`}
-                      >
-                        {/* Question Title */}
-                        <div className="flex items-start justify-between gap-3 mb-2">
-                          <span className={`text-xs font-mono font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                            {qIdx + 1}. {q.question}
-                          </span>
-                          <span className="text-[10px] font-mono text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 shrink-0 flex items-center gap-1">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            +{q.points} pts
-                          </span>
+                      <article key={question.id} className={`rounded-xl border p-4 ${solved ? 'border-emerald-500/30 bg-emerald-500/5' : isDark ? 'border-slate-800 bg-slate-950' : 'border-slate-200 bg-white'}`}>
+                        <div className="flex items-start justify-between gap-3">
+                          <p className={`text-sm font-semibold leading-6 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{index + 1}. {question.question}</p>
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-amber-500/10 px-2 py-1 text-xs font-bold text-amber-400"><Sparkles className="h-3 w-3" /> {question.points} pts</span>
                         </div>
 
-                        {/* Input or Solved state */}
-                        {isSolved ? (
-                          <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 font-bold bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/20">
-                            <CheckCircle2 className="w-4 h-4" />
-                            <span>¡Respuesta correcta! Puntos acreditados.</span>
-                          </div>
+                        {solved ? (
+                          <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-200"><p className="flex items-center gap-2 font-semibold"><CheckCircle2 className="h-4 w-4" /> Respuesta validada por el servidor.</p>{explanations[question.id] && <p className="mt-2 leading-6 text-slate-300">{explanations[question.id]}</p>}</div>
                         ) : (
-                          <form
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              handleAnswerSubmit(q);
-                            }}
-                            className="flex flex-col sm:flex-row gap-2 mt-3"
-                          >
-                            <input
-                              type="text"
-                              value={answers[q.id] || ''}
-                              onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
-                              placeholder={q.answerFormat || 'Ingresa tu respuesta...'}
-                              aria-label={`Respuesta para: ${q.question}`}
-                              className={`flex-1 px-3.5 py-2 rounded-xl text-xs font-mono border focus:outline-none transition-colors ${
-                                isDark
-                                  ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500 focus:border-purple-500'
-                                  : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-purple-500'
-                              }`}
-                            />
-
-                            <button
-                              type="submit"
-                              disabled={verifying === q.id || !answers[q.id]?.trim()}
-                              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95"
-                            >
-                              {verifying === q.id ? (
-                                <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                <>
-                                  <span>Verificar</span>
-                                  <Send className="w-3 h-3" />
-                                </>
-                              )}
-                            </button>
+                          <form onSubmit={(event) => { event.preventDefault(); void handleAnswerSubmit(question); }} className="mt-4 flex flex-col gap-2 sm:flex-row">
+                            <label className="sr-only" htmlFor={`answer-${question.id}`}>Respuesta para {question.question}</label>
+                            <input id={`answer-${question.id}`} value={answers[question.id] || ''} onChange={(event) => setAnswers((current) => ({ ...current, [question.id]: event.target.value }))} autoComplete="off" placeholder={question.answerFormat || 'Escribe tu respuesta'} className={`min-h-11 flex-1 rounded-lg border px-3 font-mono text-sm outline-none focus:border-violet-400 ${isDark ? 'border-slate-700 bg-slate-900 text-white' : 'border-slate-300 bg-white text-slate-900'}`} />
+                            <button type="submit" disabled={!answers[question.id]?.trim() || verifying === question.id} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 text-sm font-bold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" /> {verifying === question.id ? 'Validando…' : 'Validar'}</button>
                           </form>
                         )}
 
-                        {error && (
-                          <div className="mt-2 text-xs font-mono text-rose-400 flex items-center gap-1.5">
-                            <AlertCircle className="w-3.5 h-3.5" />
-                            <span>{error}</span>
-                          </div>
-                        )}
+                        <div aria-live="polite">
+                          {errors[question.id] && <p className="mt-3 flex items-start gap-2 text-sm text-rose-400"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {errors[question.id]}</p>}
+                          {revealed.map((hint) => <div key={hint.hint_number} className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3 text-sm leading-6 text-cyan-100"><strong>Pista {hint.hint_number}:</strong> {hint.content}{hint.point_penalty > 0 && <span className="ml-2 text-amber-300">−{hint.point_penalty} pts</span>}</div>)}
+                        </div>
 
-                        {/* Hint Button & Box */}
-                        {q.hint && (
-                          <div className="mt-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleHint(q.id)}
-                              className="inline-flex items-center gap-1 text-[11px] font-mono text-cyan-400 hover:text-cyan-300"
-                            >
-                              <HelpCircle className="w-3.5 h-3.5" />
-                              <span>{isHintOpen ? 'Ocultar Pista' : '💡 Ver Pista'}</span>
-                            </button>
-
-                            {isHintOpen && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className={`mt-2 p-3 rounded-xl border text-[11px] font-mono leading-relaxed ${
-                                  isDark ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300' : 'bg-cyan-50 border-cyan-200 text-cyan-800'
-                                }`}
-                              >
-                                {q.hint}
-                              </motion.div>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                        {!solved && remainingHints > 0 && <button type="button" onClick={() => void revealNextHint(question)} disabled={loadingHint === question.id} className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-cyan-300 hover:text-cyan-200 disabled:opacity-50"><HelpCircle className="h-4 w-4" /> {loadingHint === question.id ? 'Cargando…' : `Solicitar pista (${remainingHints})`}</button>}
+                      </article>
                     );
                   })}
                 </div>
               </div>
             )}
-          </div>
+          </section>
         );
       })}
     </div>

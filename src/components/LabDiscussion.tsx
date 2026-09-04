@@ -14,28 +14,7 @@ export const LabDiscussion: React.FC<LabDiscussionProps> = ({ labSlug, initialCo
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  const defaultComments: LabComment[] = [
-    {
-      id: 'c1',
-      userId: 'u1',
-      username: 'phaletas_max',
-      userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
-      userRank: 'Root Operator',
-      content: '¡Excelente lab! Para la parte de Laravel, recuerden revisar si `APP_DEBUG=true` está activo en el archivo `.env` o si el endpoint `/_ignition/execute-solution` responde.',
-      createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
-      upvotes: 6,
-    },
-    {
-      id: 'c2',
-      userId: 'u2',
-      username: 'mrpacay',
-      userAvatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&q=80',
-      userRank: 'Root Operator',
-      content: 'En la tarea 2 de escalada, usen `sudo -l` para ver qué binarios de PHP tienen permisos NOPASSWD.',
-      createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-      upvotes: 4,
-    },
-  ];
+  const defaultComments: LabComment[] = [];
 
   const [comments, setComments] = useState<LabComment[]>(initialComments && initialComments.length > 0 ? initialComments : defaultComments);
   const [newComment, setNewComment] = useState('');
@@ -129,8 +108,8 @@ export const LabDiscussion: React.FC<LabDiscussionProps> = ({ labSlug, initialCo
             >
               <div className="flex items-center justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-xl overflow-hidden border border-slate-700 bg-slate-800 shrink-0">
-                    <img src={c.userAvatar} alt={c.username} className="w-full h-full object-cover" />
+                  <div className="flex w-7 h-7 items-center justify-center rounded-xl overflow-hidden border border-slate-700 bg-slate-800 shrink-0 text-[10px] font-bold text-slate-300">
+                    {c.userAvatar ? <img src={c.userAvatar} width="28" height="28" alt="" className="w-full h-full object-cover" /> : c.username.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
                     <span className="text-xs font-bold font-mono text-white mr-2">
