@@ -18,6 +18,12 @@ test('las consultas públicas usan listas de columnas explícitas', () => {
   for (const source of sources) assert.doesNotMatch(read(source), /\.select\(\s*['"]\*['"]\s*\)/, source);
 });
 
+test('la compatibilidad legacy descarta URLs públicas de archivos', () => {
+  const mapper = read('src/lib/labs.ts');
+  assert.match(mapper, /LEGACY_PUBLIC_LAB_COLUMNS/);
+  assert.match(mapper, /\^https\?:\\\/\\\//);
+});
+
 test('las rutas críticas y la pantalla 404 existen', () => {
   const app = read('src/App.tsx');
   for (const route of ['/dashboard', '/setup/wsl', '/paths/:slug', '/admin/labs/new', 'path="*"']) assert.ok(app.includes(route), route);

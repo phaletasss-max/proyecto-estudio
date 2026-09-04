@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured, isDemoModeEnabled } from '@/lib/supabase';
 import type { CTFLab, Difficulty, CTFCategory } from '@/types/ctf';
 import { REAL_LABS } from '@/data/mockLabs';
-import { mapPublicLab, PUBLIC_LAB_COLUMNS, type PublicLabRow } from '@/lib/labs';
+import { LEGACY_PUBLIC_LAB_COLUMNS, mapPublicLab, PUBLIC_LAB_COLUMNS, type PublicLabRow } from '@/lib/labs';
 
 interface UseLabsOptions {
   difficulty?: Difficulty | null;
@@ -77,7 +77,17 @@ export function useLabs(options: UseLabsOptions = {}) {
         query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
       }
 
-      const { data, error: fetchError } = await query;
+      let { data, error: fetchError } = await query;
+
+      if (fetchError && !options.admissionOnly && ['42703', 'PGRST204'].includes(fetchError.code || '')) {
+        const fallback = await supabase
+          .from('labs')
+          .select(LEGACY_PUBLIC_LAB_COLUMNS)
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
+        data = fallback.data;
+        fetchError = fallback.error;
+      }
 
       if (fetchError) throw fetchError;
       setLabs(((data as unknown as PublicLabRow[]) || []).map((row) => mapPublicLab(row)));

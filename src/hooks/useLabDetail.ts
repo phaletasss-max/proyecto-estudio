@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured, isDemoModeEnabled } from '@/lib/supabase';
 import type { CTFLab } from '@/types/ctf';
 import { REAL_LABS } from '@/data/mockLabs';
-import { mapLabSteps, mapPublicLab, PUBLIC_LAB_COLUMNS, type LabStepRow, type PublicLabRow } from '@/lib/labs';
+import { LEGACY_PUBLIC_LAB_COLUMNS, mapLabSteps, mapPublicLab, PUBLIC_LAB_COLUMNS, type LabStepRow, type PublicLabRow } from '@/lib/labs';
 
 export function useLabDetail(slug: string) {
   const [lab, setLab] = useState<CTFLab | null>(null);
@@ -33,14 +33,25 @@ export function useLabDetail(slug: string) {
       }
 
       try {
-        const { data, error: fetchError } = await supabase
+        let { data, error: fetchError } = await supabase
           .from('labs')
           .select(PUBLIC_LAB_COLUMNS)
           .eq('slug', slug)
           .eq('is_published', true)
           .single();
 
-        if (fetchError) throw fetchError;
+        if (fetchError && ['42703', 'PGRST204'].includes(fetchError.code || '')) {
+          const fallback = await supabase
+            .from('labs')
+            .select(LEGACY_PUBLIC_LAB_COLUMNS)
+            .eq('slug', slug)
+            .eq('is_published', true)
+            .single();
+          data = fallback.data;
+          fetchError = fallback.error;
+        }
+
+        if (fetchError || !data) throw fetchError || new Error('Lab no encontrado');
 
         const { data: stepData, error: stepsError } = await supabase
           .from('lab_steps')

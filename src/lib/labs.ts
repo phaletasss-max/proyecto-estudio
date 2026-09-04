@@ -6,6 +6,11 @@ export const PUBLIC_LAB_COLUMNS = [
   'is_members_only', 'framework', 'tags', 'target_ip', 'estimated_minutes',
 ].join(',');
 
+export const LEGACY_PUBLIC_LAB_COLUMNS = [
+  'id', 'title', 'slug', 'difficulty', 'category', 'description', 'zip_url',
+  'author', 'created_at', 'is_published',
+].join(',');
+
 export interface PublicLabRow {
   id: string;
   title: string;
@@ -13,7 +18,7 @@ export interface PublicLabRow {
   difficulty: Difficulty;
   category: CTFCategory;
   description: string;
-  zip_url: string | null;
+  zip_url?: string | null;
   author: string;
   created_at: string;
   is_published: boolean;
@@ -44,7 +49,9 @@ export const mapPublicLab = (row: PublicLabRow, tasks?: LabTask[]): CTFLab => ({
   difficulty: row.difficulty,
   category: row.category,
   description: row.description,
-  zip_url: row.zip_url,
+  // Legacy public URLs are intentionally ignored until the object is migrated
+  // to the private bucket. New records store an object path, not a URL.
+  zip_url: row.zip_url && !/^https?:\/\//i.test(row.zip_url) ? row.zip_url : null,
   author: row.author,
   created_at: row.created_at,
   is_published: row.is_published,
