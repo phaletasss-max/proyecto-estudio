@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Award, Printer, ShieldCheck, CheckCircle2, Sparkles, User, Calendar } from 'lucide-react';
@@ -18,7 +19,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
   if (!isOpen) return null;
 
   const rankInfo = RANKS[user.rank] || RANKS['Script Kiddie'];
-  const certId = `SB-CERT-2026-${user.id.slice(0, 8).toUpperCase()}`;
+  const certId = `SB-ACT-${user.id.slice(0, 8).toUpperCase()}`;
   const issueDate = new Date().toLocaleDateString('es-PE', {
     day: '2-digit',
     month: 'long',
@@ -66,15 +67,15 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
             </div>
 
             <p className="text-[10px] font-mono tracking-widest text-purple-400 uppercase font-bold mb-6">
-              COMUNIDAD DE CIBERSEGURIDAD • SENATI 4.º CICLO
+              SHADOWBYTES · CIBERSEGURIDAD
             </p>
 
             <h2 className="text-xl sm:text-2xl font-extrabold font-[Orbitron] tracking-tight mb-2 uppercase text-cyan-400">
-              Certificado de Acreditación Práctica
+              Resumen de actividad CTF
             </h2>
 
             <p className="text-xs font-mono text-slate-400 mb-6">
-              Se certifica que el estudiante y miembro activo
+              Actividad registrada para
             </p>
 
             {/* Student Name */}
@@ -88,14 +89,14 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
             </div>
 
             <p className={`text-xs max-w-lg mx-auto leading-relaxed mb-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-              Ha demostrado competencias técnicas avanzadas en la resolución de laboratorios de seguridad ofensiva, análisis forense de redes, auditoría de aplicaciones web y administración de infraestructura.
+              Este resumen refleja los retos resueltos y los puntos registrados en ShadowBytes. No constituye una certificación profesional.
             </p>
 
             {/* Achievement Stats */}
             <div className="grid grid-cols-3 gap-3 max-w-md mx-auto mb-8 font-mono text-xs">
               <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
                 <span className="text-slate-500 block text-[10px]">Rango Obtenido</span>
-                <span className="font-bold text-amber-400">{rankInfo.icon} {user.rank}</span>
+                <span className="font-bold text-amber-400"><ContentIcon name={rankInfo.icon} /> {user.rank}</span>
               </div>
               <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
                 <span className="text-slate-500 block text-[10px]">Puntos Acumulados</span>
@@ -111,13 +112,13 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
             <div className="grid grid-cols-2 gap-8 pt-6 border-t border-slate-800 text-center text-xs font-mono">
               <div>
                 <div className="w-32 h-0.5 bg-slate-700 mx-auto mb-2" />
-                <p className="font-bold text-slate-200">Victor Kenky Rodriguez Lopez</p>
-                <p className="text-[10px] text-slate-500">Instructor del Curso • SENATI</p>
+                <p className="font-bold text-slate-200">Comunidad ShadowBytes</p>
+                <p className="text-[10px] text-slate-500">Registro de actividad</p>
               </div>
 
               <div>
                 <div className="w-32 h-0.5 bg-slate-700 mx-auto mb-2" />
-                <p className="font-bold text-purple-400">ShadowBytes Council</p>
+                <p className="font-bold text-purple-400">ShadowBytes</p>
                 <p className="text-[10px] text-slate-500">{issueDate}</p>
               </div>
             </div>
@@ -126,7 +127,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
             <div className="mt-8 pt-4 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono text-slate-500 gap-2">
               <span className="flex items-center gap-1 text-emerald-400">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>VERIFIED ACCREDITATION: {certId}</span>
+                <span>REFERENCIA DE ACTIVIDAD: {certId}</span>
               </span>
               <span>shadowbytes.vercel.app</span>
             </div>

@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import { motion } from 'framer-motion'
 import { useSiteContent } from '../context/SiteContent'
 
@@ -31,7 +32,7 @@ const CERTIFICATIONS = [
 const ACADEMIC_COMPETENCIES = [
   {
     title: 'Redes, Conmutación y Servicios de Infraestructura',
-    icon: '🌐',
+    icon: 'globe',
     items: [
       {
         name: 'Routing & Switching (Cisco)',
@@ -49,7 +50,7 @@ const ACADEMIC_COMPETENCIES = [
   },
   {
     title: 'Administración de Sistemas Operativos & Entornos Linux',
-    icon: '🐧',
+    icon: 'terminal',
     items: [
       {
         name: 'Sistemas Operativos (Server & Workstation)',
@@ -67,7 +68,7 @@ const ACADEMIC_COMPETENCIES = [
   },
   {
     title: 'Prototipado IoT & Mecatrónica Básica',
-    icon: '⚡',
+    icon: 'zap',
     items: [
       {
         name: 'Sistemas Embebidos',
@@ -93,10 +94,10 @@ export default function AboutMe() {
   const { content } = useSiteContent()
 
   const QUICK_FACTS = [
-    { icon: '🎓', label: 'Carrera', value: 'Ciberseguridad' },
-    { icon: '🏛️', label: 'Institución', value: 'SENATI' },
-    { icon: '📅', label: 'Periodo', value: '2025 – Presente' },
-    { icon: '🟢', label: 'Estado', value: 'Matrícula Activa' },
+    { icon: 'award', label: 'Especialidad', value: 'Ciberseguridad' },
+    { icon: 'building', label: 'Comunidad', value: 'ShadowBytes' },
+    { icon: 'calendar', label: 'Formato', value: 'Rutas y laboratorios' },
+    { icon: 'check', label: 'Enfoque', value: 'Práctica técnica' },
   ]
 
   return (
@@ -114,7 +115,7 @@ export default function AboutMe() {
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-px" style={{ backgroundColor: 'hsl(var(--stroke))' }} />
             <span className="text-xs uppercase tracking-[0.3em]" style={{ color: 'hsl(var(--muted))' }}>
-              Educación & Formación Académica
+              Formación y práctica técnica
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl mb-3" style={{ color: 'hsl(var(--text))' }}>
@@ -124,7 +125,7 @@ export default function AboutMe() {
             </em>
           </h2>
           <p className="text-sm max-w-2xl leading-relaxed" style={{ color: 'hsl(var(--muted))' }}>
-            Formación integral centrada en infraestructura de redes, administración de sistemas operativos, desarrollo de software en entornos POSIX/Linux y fundamentos de ciberseguridad en SENATI (2025 – Presente).
+            Rutas de práctica en infraestructura, redes, sistemas operativos y ciberseguridad, con laboratorios y documentación técnica.
           </p>
         </motion.div>
 
@@ -155,7 +156,7 @@ export default function AboutMe() {
               </div>
 
               <h3 className="text-xl font-semibold mb-1 text-center" style={{ color: 'hsl(var(--text))' }}>
-                {content.aboutName || 'Estudiante SENATI'}
+                {content.aboutName || 'ShadowBytes'}
               </h3>
               <p className="text-sm mb-6 text-center" style={{ color: 'hsl(var(--muted))' }}>
                 Infraestructura, Redes & Ciberseguridad
@@ -172,7 +173,7 @@ export default function AboutMe() {
                       borderColor: 'hsl(var(--stroke) / 0.7)',
                     }}
                   >
-                    <span className="text-lg">{f.icon}</span>
+                    <span className="text-lg"><ContentIcon name={f.icon} /></span>
                     <div className="mt-2">
                       <p className="text-[9px] uppercase tracking-widest" style={{ color: 'hsl(var(--muted))' }}>
                         {f.label}
@@ -207,7 +208,7 @@ export default function AboutMe() {
             {/* Academic Stack Summary Box */}
             <div className="premium-card p-6 md:p-8 rounded-3xl">
               <h3 className="text-base font-semibold mb-4 flex items-center gap-2" style={{ color: 'hsl(var(--text))' }}>
-                <span>💻</span> Resumen de Stack Académico
+                <span><ContentIcon name="terminal" /></span> Herramientas y tecnologías
               </h3>
               <div className="space-y-4">
                 {STACK_SUMMARY.map(st => (
@@ -248,7 +249,7 @@ export default function AboutMe() {
             {/* Cisco Certifications Card */}
             <div className="premium-card p-6 md:p-8 rounded-3xl">
               <h3 className="text-lg font-semibold mb-5 flex items-center gap-2" style={{ color: 'hsl(var(--text))' }}>
-                <span>🏆</span> Certificaciones Cisco
+                <span><ContentIcon name="trophy" /></span> Certificaciones Cisco
               </h3>
 
               <div className="flex flex-col gap-4">
@@ -307,7 +308,7 @@ export default function AboutMe() {
             {/* Academic Competencies & Lab Projects */}
             <div className="premium-card p-6 md:p-8 rounded-3xl">
               <h3 className="text-lg font-semibold mb-5 flex items-center gap-2" style={{ color: 'hsl(var(--text))' }}>
-                <span>📚</span> Competencias Académicas & Proyectos de Laboratorio
+                <span><ContentIcon name="book" /></span> Áreas técnicas y laboratorios
               </h3>
 
               <div className="space-y-6">
@@ -321,7 +322,7 @@ export default function AboutMe() {
                     }}
                   >
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xl">{comp.icon}</span>
+                      <span className="text-xl"><ContentIcon name={comp.icon} /></span>
                       <h4 className="text-sm font-semibold" style={{ color: 'hsl(var(--text))' }}>
                         {comp.title}
                       </h4>

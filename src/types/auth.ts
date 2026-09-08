@@ -19,7 +19,7 @@ export const RANKS: Record<RankTier, RankInfo> = {
     badgeColor: 'text-slate-400',
     badgeBg: 'bg-slate-500/10',
     badgeBorder: 'border-slate-500/30',
-    icon: '🌱',
+    icon: 'compass',
   },
   'Byte Hunter': {
     tier: 'Byte Hunter',
@@ -28,7 +28,7 @@ export const RANKS: Record<RankTier, RankInfo> = {
     badgeColor: 'text-emerald-400',
     badgeBg: 'bg-emerald-500/10',
     badgeBorder: 'border-emerald-500/30',
-    icon: '⚡',
+    icon: 'zap',
   },
   'Cyber Specialist': {
     tier: 'Cyber Specialist',
@@ -37,7 +37,7 @@ export const RANKS: Record<RankTier, RankInfo> = {
     badgeColor: 'text-cyan-400',
     badgeBg: 'bg-cyan-500/10',
     badgeBorder: 'border-cyan-500/30',
-    icon: '🛡️',
+    icon: 'shield',
   },
   'Root Operator': {
     tier: 'Root Operator',
@@ -46,7 +46,7 @@ export const RANKS: Record<RankTier, RankInfo> = {
     badgeColor: 'text-purple-400',
     badgeBg: 'bg-purple-500/10',
     badgeBorder: 'border-purple-500/30',
-    icon: '💎',
+    icon: 'award',
   },
   'Shadow Master': {
     tier: 'Shadow Master',
@@ -55,7 +55,7 @@ export const RANKS: Record<RankTier, RankInfo> = {
     badgeColor: 'text-amber-400',
     badgeBg: 'bg-amber-500/10',
     badgeBorder: 'border-amber-500/30',
-    icon: '👑',
+    icon: 'trophy',
   },
 };
 
@@ -112,6 +112,7 @@ export interface LeaderboardEntry {
 }
 
 export interface LearningModule {
+  knowledgeCheck?: { question: string; choices: string[]; correctIndex: number; explanation: string };
   id: string;
   title: string;
   description: string;

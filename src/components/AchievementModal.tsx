@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Award, Sparkles, ArrowRight, X, CheckCircle2 } from 'lucide-react';
@@ -71,7 +72,7 @@ export const AchievementModal: React.FC<AchievementModalProps> = ({
             className="w-20 h-20 mx-auto mb-4 rounded-3xl bg-gradient-to-tr from-purple-600 to-cyan-500 p-0.5 shadow-xl shadow-purple-500/25 flex items-center justify-center text-4xl"
           >
             <div className="w-full h-full bg-slate-950 rounded-[22px] flex items-center justify-center">
-              🏆
+              <ContentIcon name="trophy" />
             </div>
           </motion.div>
 
@@ -104,7 +105,7 @@ export const AchievementModal: React.FC<AchievementModalProps> = ({
               <div className="flex items-center justify-between pt-3">
                 <span className="text-xs font-mono text-slate-400">Puntuación Total:</span>
                 <span className="text-sm font-mono font-bold text-purple-400">
-                  {user.points.toLocaleString()} PTS ({currentRank.icon} {user.rank})
+                  {user.points.toLocaleString()} PTS (<ContentIcon name={currentRank.icon} /> {user.rank})
                 </span>
               </div>
             )}
@@ -132,7 +133,7 @@ export const AchievementModal: React.FC<AchievementModalProps> = ({
                     }`}
                   >
                     <div className="flex items-center gap-3 text-left">
-                      <span className="text-2xl">{b.icon}</span>
+                      <span className="text-2xl"><ContentIcon name={b.icon} /></span>
                       <div>
                         <p className="text-xs font-bold font-mono">{b.title}</p>
                         <p className="text-[10px] text-slate-400">{b.description}</p>

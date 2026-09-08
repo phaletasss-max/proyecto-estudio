@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Search, Users, Sparkles, Award, ArrowRight, Shield, UserPlus } from 'lucide-react';
@@ -43,7 +44,7 @@ export const Leaderboard: React.FC = () => {
               rankPosition: idx + 1,
               userId: p.user_id,
               username: p.username || 'anon',
-              fullName: p.full_name || p.username || 'Estudiante',
+              fullName: p.full_name || p.username || 'Participante',
               avatarUrl: p.avatar_url || '/logo-shadowbytes.webp',
               points: p.points || 0,
               rank: (p.rank as RankTier) || 'Script Kiddie',
@@ -132,7 +133,7 @@ export const Leaderboard: React.FC = () => {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
               type="text"
-              placeholder="Buscar estudiante..."
+              placeholder="Buscar participante..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className={`w-full pl-10 pr-4 py-2.5 rounded-2xl text-xs font-mono border focus:outline-none transition-colors ${
@@ -164,7 +165,7 @@ export const Leaderboard: React.FC = () => {
                     : isDark ? 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white' : 'bg-slate-100 text-slate-600 border border-slate-200 hover:text-slate-900'
                 }`}
               >
-                {RANKS[rank as keyof typeof RANKS].icon} {rank}
+                <ContentIcon name={RANKS[rank as keyof typeof RANKS].icon} /> {rank}
               </button>
             ))}
           </div>
@@ -181,7 +182,7 @@ export const Leaderboard: React.FC = () => {
           ) : filteredList.length === 0 ? (
             <div className="p-12 text-center">
               <Users className="w-12 h-12 mx-auto mb-3 opacity-30 text-purple-400" />
-              <h3 className="text-base font-bold font-mono mb-1">Aún no hay estudiantes en la clasificación</h3>
+              <h3 className="text-base font-bold font-mono mb-1">Aún no hay participantes en la clasificación</h3>
               <p className="text-xs font-mono text-slate-400 max-w-sm mx-auto mb-4">
                 Conecta Supabase o resuelve tu primer laboratorio para figurar en la tabla de posiciones.
               </p>
@@ -197,7 +198,7 @@ export const Leaderboard: React.FC = () => {
                     isDark ? 'border-slate-800 bg-slate-900/60 text-slate-400' : 'border-slate-200 bg-slate-50 text-slate-500'
                   }`}>
                     <th className="py-3.5 px-4 text-center w-16">#</th>
-                    <th className="py-3.5 px-4">Estudiante / Alias</th>
+                    <th className="py-3.5 px-4">Participante / Alias</th>
                     <th className="py-3.5 px-4 hidden md:table-cell">Especialidad</th>
                     <th className="py-3.5 px-4 hidden sm:table-cell">Rango</th>
                     <th className="py-3.5 px-4 text-center">Labs Resueltos</th>
@@ -221,11 +222,11 @@ export const Leaderboard: React.FC = () => {
                         {/* Rank Position */}
                         <td className="py-3.5 px-4 text-center font-bold">
                           {entry.rankPosition === 1 ? (
-                            <span className="text-amber-400">🥇</span>
+                            <span className="text-amber-400"><ContentIcon name="award" /></span>
                           ) : entry.rankPosition === 2 ? (
-                            <span className="text-slate-300">🥈</span>
+                            <span className="text-slate-300"><ContentIcon name="award" /></span>
                           ) : entry.rankPosition === 3 ? (
-                            <span className="text-amber-600">🥉</span>
+                            <span className="text-amber-600"><ContentIcon name="award" /></span>
                           ) : (
                             <span className="text-slate-500">#{entry.rankPosition}</span>
                           )}
@@ -259,7 +260,7 @@ export const Leaderboard: React.FC = () => {
                         {/* Rank Tier */}
                         <td className="py-3.5 px-4 hidden sm:table-cell">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${rankConfig.badgeBg} ${rankConfig.badgeColor} ${rankConfig.badgeBorder}`}>
-                            <span>{rankConfig.icon}</span>
+                            <span><ContentIcon name={rankConfig.icon} /></span>
                             <span>{entry.rank}</span>
                           </span>
                         </td>

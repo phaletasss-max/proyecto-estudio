@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -85,7 +86,7 @@ export const LabCard: React.FC<LabCardProps> = ({ lab }) => {
         {lab.framework && (
           <div className="mb-2 relative z-10">
             <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-red-500/15 text-red-400 border border-red-500/30">
-              <span>⚡</span>
+              <span><ContentIcon name="zap" /></span>
               <span>{lab.framework}</span>
             </span>
           </div>

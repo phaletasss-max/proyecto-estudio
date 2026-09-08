@@ -8,7 +8,12 @@ create extension if not exists pgcrypto;
 
 do $$
 begin
-  if not exists (select 1 from pg_type where typname = 'membership_status') then
+  if not exists (
+    select 1
+    from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where n.nspname = 'public' and t.typname = 'membership_status'
+  ) then
     create type public.membership_status as enum ('applicant', 'member', 'admin', 'suspended');
   end if;
 end;
@@ -41,12 +46,20 @@ create table if not exists public.challenge_secrets (
 );
 
 do $$
+declare
+  v_has_writeup boolean;
 begin
   if exists (
     select 1 from information_schema.columns
     where table_schema = 'public' and table_name = 'labs' and column_name = 'flag_hash'
   ) then
-    execute $copy$
+    select exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = 'labs' and column_name = 'writeup_markdown'
+    ) into v_has_writeup;
+
+    if v_has_writeup then
+      execute $copy$
       insert into public.challenge_secrets (lab_id, flag_hash, writeup_markdown)
       select
         id,
@@ -69,10 +82,23 @@ begin
       on conflict (lab_id) do update
         set flag_hash = excluded.flag_hash,
             writeup_markdown = excluded.writeup_markdown
-    $copy$;
+      $copy$;
+    else
+      execute $copy$
+        insert into public.challenge_secrets (lab_id, flag_hash)
+        select
+          id,
+          case
+            when flag_hash ~ '^[0-9a-f]{64}$' then flag_hash
+            else encode(digest(lower(btrim(flag_hash)), 'sha256'), 'hex')
+          end
+        from public.labs
+        on conflict (lab_id) do update set flag_hash = excluded.flag_hash
+      $copy$;
+    end if;
 
     alter table public.labs drop column flag_hash;
-    alter table public.labs drop column writeup_markdown;
+    alter table public.labs drop column if exists writeup_markdown;
   end if;
 end;
 $$;
@@ -126,16 +152,41 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  v_base_username text;
+  v_username text;
 begin
-  insert into public.profiles (id, username, full_name, avatar_url, access_status)
-  values (
-    new.id,
-    coalesce(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
-    coalesce(new.raw_user_meta_data->>'full_name', 'Hacker ShadowBytes'),
-    coalesce(new.raw_user_meta_data->>'avatar_url', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80'),
-    'applicant'
-  )
-  on conflict (id) do nothing;
+  v_base_username := regexp_replace(
+    lower(coalesce(
+      nullif(btrim(new.raw_user_meta_data->>'username'), ''),
+      nullif(split_part(coalesce(new.email, ''), '@', 1), ''),
+      'estudiante'
+    )),
+    '[^a-z0-9_]+', '', 'g'
+  );
+  v_base_username := left(coalesce(nullif(v_base_username, ''), 'estudiante'), 28);
+  v_username := v_base_username;
+
+  begin
+    insert into public.profiles (id, username, full_name, avatar_url, access_status)
+    values (
+      new.id,
+      v_username,
+      coalesce(nullif(btrim(new.raw_user_meta_data->>'full_name'), ''), 'Estudiante ShadowBytes'),
+      coalesce(nullif(btrim(new.raw_user_meta_data->>'avatar_url'), ''), ''),
+      'applicant'
+    ) on conflict (id) do nothing;
+  exception when unique_violation then
+    v_username := left(v_base_username, 19) || '_' || left(replace(new.id::text, '-', ''), 8);
+    insert into public.profiles (id, username, full_name, avatar_url, access_status)
+    values (
+      new.id,
+      v_username,
+      coalesce(nullif(btrim(new.raw_user_meta_data->>'full_name'), ''), 'Estudiante ShadowBytes'),
+      coalesce(nullif(btrim(new.raw_user_meta_data->>'avatar_url'), ''), ''),
+      'applicant'
+    ) on conflict (id) do nothing;
+  end;
   return new;
 end;
 $$;
@@ -151,6 +202,7 @@ alter table public.user_badges enable row level security;
 
 drop policy if exists "Profiles are viewable by everyone" on public.profiles;
 drop policy if exists "Users can update own profile" on public.profiles;
+drop policy if exists "Users can update own safe profile fields" on public.profiles;
 create policy "Profiles are viewable by everyone"
   on public.profiles for select using (true);
 create policy "Users can update own safe profile fields"
@@ -158,6 +210,7 @@ create policy "Users can update own safe profile fields"
 
 drop policy if exists "Published labs are viewable by everyone" on public.labs;
 drop policy if exists "Users can insert labs for review" on public.labs;
+drop policy if exists "Published admission and member labs are readable" on public.labs;
 create policy "Published admission and member labs are readable"
   on public.labs for select using (
     is_published
@@ -170,21 +223,23 @@ create policy "Published admission and member labs are readable"
 
 drop policy if exists "Solves are viewable by everyone" on public.user_solves;
 drop policy if exists "Users can record own solves" on public.user_solves;
+drop policy if exists "Users can view their own solves" on public.user_solves;
 create policy "Users can view their own solves"
   on public.user_solves for select using (auth.uid() = user_id);
 
 drop policy if exists "Badges are viewable by everyone" on public.badges;
 drop policy if exists "User badges are viewable by everyone" on public.user_badges;
 drop policy if exists "Users can insert own badges" on public.user_badges;
+drop policy if exists "Users can view their own badges" on public.user_badges;
 create policy "Badges are viewable by everyone"
   on public.badges for select using (true);
 create policy "Users can view their own badges"
   on public.user_badges for select using (auth.uid() = user_id);
 
 revoke all on public.challenge_secrets from anon, authenticated;
-revoke insert, update, delete on public.user_solves from anon, authenticated;
-revoke insert, update, delete on public.user_badges from anon, authenticated;
-revoke insert, update, delete on public.labs from anon, authenticated;
+revoke insert, update, delete, truncate, references, trigger on public.user_solves from anon, authenticated;
+revoke insert, update, delete, truncate, references, trigger on public.user_badges from anon, authenticated;
+revoke insert, update, delete, truncate, references, trigger on public.labs from anon, authenticated;
 revoke update on public.profiles from authenticated;
 grant update (full_name, avatar_url, bio, specialty, github_url, discord_tag, linkedin_url)
   on public.profiles to authenticated;
@@ -214,8 +269,8 @@ begin
     raise exception 'Debes iniciar sesión para enviar una flag';
   end if;
 
-  select l.*, s.flag_hash
-    into v_lab, v_expected_hash
+  select l.*
+    into v_lab
   from public.labs l
   join public.challenge_secrets s on s.lab_id = l.id
   where l.id = p_lab_id and l.is_published;
@@ -223,6 +278,10 @@ begin
   if not found then
     raise exception 'Reto no disponible';
   end if;
+
+  select s.flag_hash into v_expected_hash
+  from public.challenge_secrets s
+  where s.lab_id = v_lab.id;
 
   select * into v_profile from public.profiles where id = auth.uid() for update;
   if not found or v_profile.access_status = 'suspended' then

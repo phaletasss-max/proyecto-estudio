@@ -36,19 +36,19 @@ export interface SiteContent {
 
 const DEFAULT_CONTENT: SiteContent = {
   heroVideoUrl: 'https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8',
-  heroEyebrow: 'SENATI • RUC 1073140317',
-  heroTitle: 'Portafolio',
-  heroDescription: 'Estudiante de Ciberseguridad en SENATI, enfocado en la administración de infraestructura de red, automatización y desarrollo web seguro. Apasionado por la seguridad informática, la configuración de redes empresariales y el despliegue de soluciones integrales.',
+  heroEyebrow: 'SHADOWBYTES · CIBERSEGURIDAD',
+  heroTitle: 'ShadowBytes',
+  heroDescription: 'Comunidad independiente de ciberseguridad orientada a la práctica, la investigación y el conocimiento compartido.',
   heroRoles: ['Ciberseguridad', 'Redes y Conectividad', 'Infraestructura', 'Desarrollo Seguro'],
 
-  aboutName: 'Estudiante de Ciberseguridad',
+  aboutName: 'ShadowBytes',
   aboutSubtitle: 'Administración de Redes e Infraestructura',
-  aboutInstitution: 'SENATI',
+  aboutInstitution: 'Comunidad independiente',
   aboutLocation: 'Perú',
-  aboutRuc: '1073140317',
+  aboutRuc: '',
   aboutStatus: 'Disponible',
 
-  footerEmail: 'tu-correo@senati.pe',
+  footerEmail: '',
   footerCta: '¿Listo para asegurar y automatizar tu infraestructura?',
   footerLinkedin: 'https://linkedin.com/in/tu-perfil',
   footerGithub: 'https://github.com/tu-usuario',

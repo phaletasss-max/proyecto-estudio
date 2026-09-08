@@ -71,7 +71,7 @@ export const Projects: React.FC = () => {
               : 'bg-blue-100 border border-blue-300 text-blue-700'
           }`}>
             <Layers className="w-3.5 h-3.5" />
-            <span>4.º CICLO SENATI</span>
+            <span>LABORATORIOS DE CIBERSEGURIDAD</span>
           </div>
           <h2 className={`text-3xl sm:text-5xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Nuestros <span className="gradient-text-blue">Proyectos Clave</span>

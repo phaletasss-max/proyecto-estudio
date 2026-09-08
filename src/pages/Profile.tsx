@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -138,7 +139,7 @@ export const Profile: React.FC = () => {
                   <img src={targetUser.avatarUrl} alt={targetUser.username} className="w-full h-full object-cover rounded-2xl" />
                 </div>
                 <div className="absolute -bottom-2 -right-2 p-1.5 rounded-xl bg-slate-950 border border-slate-800 text-lg shadow">
-                  {rankInfo.icon}
+                  <ContentIcon name={rankInfo.icon} />
                 </div>
               </div>
 
@@ -231,7 +232,7 @@ export const Profile: React.FC = () => {
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold transition-all shadow-md shadow-purple-600/20 active:scale-95"
                 >
                   <Award className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Certificado</span>
+                  <span>Resumen de actividad</span>
                 </button>
               </div>
             </div>
@@ -249,7 +250,7 @@ export const Profile: React.FC = () => {
                   Próximo Rango: <strong className="text-cyan-400">{nextRank.tier}</strong> ({nextRank.minPoints} pts)
                 </span>
               ) : (
-                <span className="text-amber-400 font-bold">¡RANGO MÁXIMO ALCANZADO! 👑</span>
+                <span className="text-amber-400 font-bold">¡RANGO MÁXIMO ALCANZADO! </span>
               )}
             </div>
 
@@ -274,7 +275,7 @@ export const Profile: React.FC = () => {
                 : 'border-transparent text-slate-400 hover:text-white'
             }`}
           >
-            🎯 Labs Resueltos ({targetUser.solvedLabs.length})
+             Labs Resueltos ({targetUser.solvedLabs.length})
           </button>
           <button
             onClick={() => setActiveTab('badges')}
@@ -284,7 +285,7 @@ export const Profile: React.FC = () => {
                 : 'border-transparent text-slate-400 hover:text-white'
             }`}
           >
-            🏆 Insignias & Logros ({targetUser.unlockedBadges.length})
+             Insignias & Logros ({targetUser.unlockedBadges.length})
           </button>
           <button
             onClick={() => setActiveTab('skills')}
@@ -294,7 +295,7 @@ export const Profile: React.FC = () => {
                 : 'border-transparent text-slate-400 hover:text-white'
             }`}
           >
-            📊 Matriz de Habilidades
+             Matriz de Habilidades
           </button>
         </div>
 
@@ -400,7 +401,7 @@ export const Profile: React.FC = () => {
                   Resumen de Carrera Hacker
                 </h3>
                 <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                  Tu perfil evoluciona conforme resuelves retos y aportas soluciones a la comunidad de SENATI.
+                  Tu perfil evoluciona conforme resuelves retos y aportas soluciones a la comunidad ShadowBytes.
                 </p>
                 <div className="grid grid-cols-2 gap-3 font-mono text-xs">
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">

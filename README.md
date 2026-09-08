@@ -1,6 +1,6 @@
 # ShadowBytes
 
-Plataforma de aprendizaje para el grupo de estudio de ciberseguridad. Aquí una persona puede crear su cuenta, resolver el CTF de admisión, guardar sus avances y, al convertirse en miembro, acceder a laboratorios privados.
+ShadowBytes es una comunidad independiente de ciberseguridad con rutas formativas, laboratorios y desafíos CTF. Aquí una persona puede crear su cuenta, resolver el CTF de admisión, guardar sus avances y, al convertirse en miembro, acceder a laboratorios privados.
 
 ## Para empezar
 
@@ -8,7 +8,7 @@ Plataforma de aprendizaje para el grupo de estudio de ciberseguridad. Aquí una 
 2. Copia `.env.example` como `.env.local`.
 3. Añade la URL de Supabase y su **Publishable key**. Estas dos variables empiezan con `VITE_` porque se usan en el navegador.
 4. Inicia el proyecto: `pnpm dev`.
-5. Abre la URL que muestre Vite y sigue **Admisión**.
+5. Abre la URL que muestre Vite y explora **Labs** o **Rutas**. El CTF de acceso habilita laboratorios de miembros.
 
 ```env
 VITE_SUPABASE_URL=https://TU_PROYECTO.supabase.co

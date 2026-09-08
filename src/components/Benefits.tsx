@@ -43,13 +43,13 @@ const benefitsList: BenefitItem[] = [
   },
   {
     title: 'Apoyo constante',
-    subtitle: 'Acompañamiento entre compañeros durante el ciclo académico para evitar el rezago en cualquier materia.',
+    subtitle: 'Intercambio técnico para revisar enfoques, resolver dudas y mejorar la metodología de investigación.',
     icon: HeartHandshake,
     badge: 'Mentoría Mutua',
   },
   {
     title: 'Noticias recientes',
-    subtitle: 'Actualizaciones sobre vulnerabilidades, tendencias tecnológicas, eventos y novedades de SENATI.',
+    subtitle: 'Actualizaciones sobre vulnerabilidades, investigación y eventos de ciberseguridad.',
     icon: Newspaper,
     badge: 'Tendencias Tech',
   },
@@ -88,7 +88,7 @@ export const Benefits: React.FC = () => {
             ¿Por qué <span className="gradient-text-blue">estudiar con nosotros</span>?
           </h2>
           <p className={`mt-4 text-base sm:text-lg ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-            Formar parte del grupo de estudio ShadowBytes te abre puertas a mejores proyectos, apoyo constante y trabajo colaborativo real.
+            Participa en ShadowBytes para practicar, contrastar enfoques técnicos y colaborar en retos de ciberseguridad.
           </p>
         </div>
 

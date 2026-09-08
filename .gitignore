@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Local security experiments may contain temporary tokens or challenge answers.
+/scratch/*.js
+/discord-mcp-node/.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

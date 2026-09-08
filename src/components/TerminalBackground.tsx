@@ -4,16 +4,16 @@ const staticCodeLines = [
   'python3 -m ctf.forensics --target 10.0.4.10 --output-json',
   'import socket, sys, ssl',
   's = socket.socket(socket.AF_INET, socket.SOCK_STREAM)',
-  's.connect(("senati.local", 443))',
+  's.connect(("shadowbytes.test", 443))',
   '# [OK] Connected to Windows Server 2022 IIS Web Service',
   'Get-ADDomainController -Filter * | Select Name, IPAddress',
-  '# DC-SENATI-LAB -> 10.0.4.10 [Active Directory Integrated]',
+  '# DC-SHADOWBYTES-LAB -> 10.0.4.10 [Active Directory Integrated]',
   'iptables -t nat -A POSTROUTING -o eth1_WAN -j MASQUERADE',
   '# Route established: 10.0.4.0/24 -> documentation network',
   'nmap -sV --script=banner 10.0.4.10 -p 53,80,443,3389',
-  '# 53/tcp open domain Microsoft DNS (senati.local)',
+  '# 53/tcp open domain Microsoft DNS (shadowbytes.test)',
   'git commit -m "feat: deploy to Vercel production"',
-  '# Vercel Deployment SUCCESS -> https://4tociclo.vercel.app',
+  '# Vercel Deployment SUCCESS -> https://shadowbytes.vercel.app',
 ];
 
 export const TerminalBackground: React.FC = memo(() => {

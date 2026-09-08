@@ -3,22 +3,24 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { LEARNING_PATHS } from '@/data/learningPaths';
 
+import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { moduleHref, pathProgress } from '@/lib/learningProgress';
+
 export default function Dashboard() {
   const { user } = useAuth();
-  const starterPath = LEARNING_PATHS[0];
-  const solved = new Set(user?.solvedLabs.map((item) => item.labSlug) ?? []);
-  const availableModules = starterPath.modules.filter((module) => module.status !== 'coming_soon');
-  const completed = availableModules.filter((module) => module.labSlug && solved.has(module.labSlug)).length;
-  const nextModule = availableModules.find((module) => !module.labSlug || !solved.has(module.labSlug)) ?? availableModules[0];
-  const nextHref = nextModule.labSlug ? `/lab/${nextModule.labSlug}` : `/learn/${starterPath.slug}/${nextModule.id}`;
-  const progress = availableModules.length ? Math.round((completed / availableModules.length) * 100) : 0;
+  const learning = useLearningProgress();
+  const starterPath = LEARNING_PATHS.find((path) => path.slug === learning.activePath) ?? LEARNING_PATHS[0];
+  const state = pathProgress(starterPath, learning.completedLessons, user?.solvedLabs.map((item) => item.labSlug) ?? []);
+  const nextModule = state.next;
+  const nextHref = nextModule ? moduleHref(starterPath, nextModule)! : '/paths';
+  const progress = state.percent;
 
   return (
     <section className="min-h-screen bg-[#07090f] pb-20 pt-28 text-slate-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <header className="border-b border-[#222a39] pb-8">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Panel de aprendizaje</p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Continúa, {user?.fullName || user?.username || 'estudiante'}.</h1>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Continúa, {user?.fullName || user?.username || 'participante'}.</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">Tu siguiente objetivo, progreso reciente y preparación del entorno en un solo lugar.</p>
         </header>
 
@@ -27,16 +29,16 @@ export default function Dashboard() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-purple-300"><BookOpen className="h-4 w-4" /> Continuar aprendiendo</span>
-                <h2 className="mt-4 text-2xl font-bold">{nextModule.title}</h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">{nextModule.description}</p>
+                <h2 className="mt-4 text-2xl font-bold">{nextModule?.title ?? 'Módulos disponibles completados'}</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">{nextModule?.description ?? 'Explora otra ruta para continuar aprendiendo.'}</p>
               </div>
-              <span className="inline-flex items-center gap-1 text-xs text-slate-400"><Clock3 className="h-4 w-4" /> {nextModule.durationMinutes} min</span>
+              <span className="inline-flex items-center gap-1 text-xs text-slate-400"><Clock3 className="h-4 w-4" /> {nextModule ? `${nextModule.durationMinutes} min` : 'Ruta al día'}</span>
             </div>
-            <div className="mt-7" aria-label={`Progreso de la ruta: ${progress}%`}>
+            <p className="mt-4 text-xs text-slate-400">Lecturas y ruta guardadas en este navegador. Solves y puntos sincronizados con tu cuenta.</p><div className="mt-7" aria-label={`Progreso de la ruta: ${progress}%`}>
               <div className="mb-2 flex justify-between text-xs"><span className="text-slate-400">{starterPath.title}</span><strong>{progress}%</strong></div>
               <div className="h-2 overflow-hidden bg-slate-800"><div className="h-full bg-purple-500" style={{ width: `${progress}%` }} /></div>
             </div>
-            <Link to={nextHref} className="mt-7 inline-flex min-h-11 items-center gap-2 bg-purple-600 px-5 text-sm font-bold text-white hover:bg-purple-500">Abrir siguiente módulo <ArrowRight className="h-4 w-4" /></Link>
+            <Link to={nextHref} className="mt-7 inline-flex min-h-11 items-center gap-2 bg-purple-600 px-5 text-sm font-bold text-white hover:bg-purple-500">{nextModule ? 'Abrir siguiente módulo' : 'Explorar rutas'} <ArrowRight className="h-4 w-4" /></Link>
           </article>
 
           <aside className="border border-[#222a39] bg-[#0d111a] p-6">

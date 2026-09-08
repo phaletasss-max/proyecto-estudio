@@ -75,11 +75,11 @@ export const DIFFICULTY_COLORS: Record<Difficulty, { bg: string; text: string; b
 };
 
 export const CATEGORY_ICONS: Record<CTFCategory, string> = {
-  Web: '🌐',
-  Forensics: '🔍',
-  Pwn: '💥',
-  Crypto: '🔐',
-  Reversing: '⚙️',
-  Network: '🖧',
-  Misc: '🧩',
+  Web: 'globe',
+  Forensics: 'search',
+  Pwn: 'target',
+  Crypto: 'lock',
+  Reversing: 'settings',
+  Network: 'network',
+  Misc: 'compass',
 };

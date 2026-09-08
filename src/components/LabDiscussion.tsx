@@ -58,7 +58,7 @@ export const LabDiscussion: React.FC<LabDiscussionProps> = ({ labSlug, initialCo
       >
         <label className="block text-xs font-mono font-bold mb-2 flex items-center gap-1.5 text-purple-400">
           <MessageSquare className="w-3.5 h-3.5" />
-          <span>Discusión de la Comunidad (SENATI 4.º Ciclo)</span>
+          <span>Discusión técnica</span>
         </label>
 
         <textarea
@@ -80,7 +80,7 @@ export const LabDiscussion: React.FC<LabDiscussionProps> = ({ labSlug, initialCo
 
         <div className="flex justify-between items-center mt-3">
           <span className="text-[10px] font-mono text-slate-500">
-            {comments.length} comentarios de estudiantes
+            {comments.length} comentarios de la comunidad
           </span>
 
           <button

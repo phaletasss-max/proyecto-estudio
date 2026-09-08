@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React, { lazy, Suspense, useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { User, LogOut, Trophy, Award, Sparkles, ChevronDown, Compass, ShieldCheck, LayoutDashboard, Settings } from 'lucide-react';
@@ -69,7 +70,7 @@ export const UserNavbarBadge: React.FC = () => {
               {user.username}
             </span>
             <span className={`text-[10px] font-mono font-semibold px-1.5 py-0.2 rounded ${rankInfo.badgeBg} ${rankInfo.badgeColor}`}>
-              {rankInfo.icon} {user.rank}
+              <ContentIcon name={rankInfo.icon} /> {user.rank}
             </span>
           </div>
           <span className="text-[10px] font-mono text-purple-400 font-bold mt-0.5 flex items-center gap-1">

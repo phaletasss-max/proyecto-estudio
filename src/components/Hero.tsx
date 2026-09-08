@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronRight, CheckCircle2, Globe, Server, Trophy } from 'lucide-react';
-import { DomainCTFModal } from '@/components/DomainCTFModal';
+import { Link } from 'react-router-dom';
 import { TerminalBackground } from '@/components/TerminalBackground';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -34,9 +34,9 @@ export const Hero: React.FC = () => {
             }`}
           >
             <span className={`text-xs sm:text-sm font-mono ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-              SENATI 4.º Ciclo • Instructor:{' '}
+              Comunidad de ciberseguridad ·{' '}
               <span className={`font-semibold ${isDark ? 'text-cyan-400' : 'text-blue-600'}`}>
-                Victor Kenky Rodriguez Lopez
+                Comunidad ShadowBytes
               </span>
             </span>
           </motion.div>
@@ -68,8 +68,8 @@ export const Hero: React.FC = () => {
               isDark ? 'text-white' : 'text-slate-900'
             }`}
           >
-            Construyamos el mejor grupo de estudio del{' '}
-            <span className="gradient-text-blue inline-block">4.º ciclo</span>
+            Investiga, practica y comparte en{' '}
+            <span className="gradient-text-blue inline-block">ShadowBytes</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -81,7 +81,7 @@ export const Hero: React.FC = () => {
               isDark ? 'text-slate-300' : 'text-slate-600'
             }`}
           >
-            No solo buscamos terminar los proyectos del curso. Queremos crear una comunidad donde todos aprendamos, compartamos conocimientos y ayudemos a otros estudiantes de SENATI.
+            Una comunidad para desarrollar habilidades técnicas, investigar en entornos controlados y compartir métodos de trabajo en ciberseguridad.
           </motion.p>
 
           {/* Action Buttons */}
@@ -93,7 +93,7 @@ export const Hero: React.FC = () => {
           >
             {/* Primary Button */}
             <a
-              href="https://wa.me/51921378349?text=Hola,%20quisiera%20unirme%20a%20ShadowBytes%20SENATI."
+              href="https://wa.me/51921378349?text=Hola,%20quisiera%20unirme%20a%20ShadowBytes."
               target="_blank"
               rel="noopener noreferrer"
               className={`w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-semibold text-base shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group ${
@@ -120,10 +120,12 @@ export const Hero: React.FC = () => {
             </a>
           </motion.div>
 
-          {/* CTA Interactive Button */}
-          <div className="mt-4">
-            <DomainCTFModal />
-          </div>
+          <Link
+            to="/admission"
+            className="mt-4 inline-flex min-h-11 items-center gap-2 border border-purple-500/40 bg-purple-500/10 px-5 text-sm font-semibold text-purple-200 transition-colors hover:border-purple-400 hover:bg-purple-500/20"
+          >
+            Conocer el CTF de admisión <ArrowRight className="h-4 w-4" />
+          </Link>
 
           {/* Key Features Quick Bar */}
           <motion.div
@@ -179,7 +181,7 @@ export const Hero: React.FC = () => {
                       : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
-                  🌐 Web & Dominio
+                   Web & Dominio
                 </button>
                 <button
                   onClick={() => setActiveTab('infra')}
@@ -189,7 +191,7 @@ export const Hero: React.FC = () => {
                       : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
-                  🖥️ Windows Server
+                   Windows Server
                 </button>
                 <button
                   onClick={() => setActiveTab('ctf')}
@@ -199,13 +201,13 @@ export const Hero: React.FC = () => {
                       : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
-                  🏆 CTFs & Hackatones
+                   CTFs & Hackatones
                 </button>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                ShadowBytes • 4.º Ciclo
+                ShadowBytes • Ciberseguridad
               </div>
             </div>
 
@@ -232,7 +234,7 @@ export const Hero: React.FC = () => {
                     <div className="text-cyan-500">"rewrites": [</div>
                     <div className={`pl-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>&#123; "source": "/(.*)" &#125;</div>
                     <div className="text-cyan-500">]</div>
-                    <div className="mt-2 text-emerald-500">✓ Domain SSL Active</div>
+                    <div className="mt-2 text-emerald-500"> Domain SSL Active</div>
                   </div>
                 </div>
               )}
@@ -245,7 +247,7 @@ export const Hero: React.FC = () => {
                       Infraestructura Enterprise en Windows Server 2022
                     </h3>
                     <p className={`text-sm leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                      Configuración práctica de DNS, DHCP, Active Directory, Roles de Usuario, File Server y máquinas virtuales en VirtualBox para laboratorios reales del ciclo.
+                      Configuración práctica de DNS, DHCP, Active Directory, Roles de Usuario, File Server y máquinas virtuales en VirtualBox para laboratorios controlados.
                     </p>
                     <div className="flex flex-wrap gap-2 pt-2">
                       <span className={`px-2.5 py-1 rounded-lg text-xs font-mono border ${isDark ? 'bg-slate-900 border-slate-800 text-cyan-300' : 'bg-slate-100 border-slate-200 text-cyan-700'}`}>Active Directory</span>
@@ -256,7 +258,7 @@ export const Hero: React.FC = () => {
                   <div className={`p-4 rounded-2xl border font-mono text-xs ${isDark ? 'bg-slate-900 border-slate-800 text-cyan-200' : 'bg-slate-100 border-slate-200 text-cyan-800'}`}>
                     <div className={`mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>// Domain Controller</div>
                     <div className="text-emerald-500">Status: ONLINE</div>
-                    <div className={isDark ? 'text-slate-300' : 'text-slate-700'}>Domain: senati.local</div>
+                    <div className={isDark ? 'text-slate-300' : 'text-slate-700'}>Domain: shadowbytes.test</div>
                     <div className={isDark ? 'text-slate-300' : 'text-slate-700'}>IP: 192.168.1.100</div>
                   </div>
                 </div>
@@ -270,7 +272,7 @@ export const Hero: React.FC = () => {
                       Entrenamiento para CTFs & Hackatones
                     </h3>
                     <p className={`text-sm leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                      Resolver desafíos de Capture The Flag (CTF), análisis de vulnerabilidades en Kali Linux, pentesting ético y trabajo en equipo para hackatones académicas.
+                      Resolver desafíos de Capture The Flag (CTF), análisis de vulnerabilidades en Kali Linux, pentesting ético y trabajo en equipo para desafíos de ciberseguridad.
                     </p>
                     <div className="flex flex-wrap gap-2 pt-2">
                       <span className={`px-2.5 py-1 rounded-lg text-xs font-mono border ${isDark ? 'bg-slate-900 border-slate-800 text-amber-300' : 'bg-slate-100 border-slate-200 text-amber-700'}`}>Hackatones</span>

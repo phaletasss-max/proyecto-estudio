@@ -18,7 +18,7 @@ export const CHEATSHEETS: CheatSheetSection[] = [
   {
     id: 'wsl2-linux',
     title: 'WSL 2 & Linux Nativo en Windows',
-    icon: '🐧',
+    icon: 'terminal',
     badge: 'Alternativa Ligera a VMs',
     description: 'Comandos para instalar, gestionar, limitar recursos y clonar entornos Linux (Ubuntu, Kali, Arch) con WSL 2 sin usar VirtualBox/VMware.',
     commands: [
@@ -81,7 +81,7 @@ export const CHEATSHEETS: CheatSheetSection[] = [
   {
     id: 'laravel-php',
     title: 'Laravel & PHP Security Cheatsheet',
-    icon: '⚡',
+    icon: 'zap',
     badge: 'Frameworks Web',
     description: 'Guía rápida de auditoría y comandos para aplicaciones Laravel 9/10/11, APIs con Sanctum y motores de plantillas Blade.',
     commands: [
@@ -126,9 +126,9 @@ export const CHEATSHEETS: CheatSheetSection[] = [
   {
     id: 'active-directory',
     title: 'Windows Server 2022 & Active Directory',
-    icon: '🏢',
+    icon: 'building',
     badge: 'SysAdmin & Redes',
-    description: 'Comandos esenciales de PowerShell y auditoría de controladores de dominio Windows Server 2022 en SENATI.',
+    description: 'Comandos esenciales de PowerShell y auditoría de controladores de dominio Windows Server 2022 en entornos de laboratorio.',
     commands: [
       {
         command: 'Get-ADDomain | Select-Object Name, Forest, DomainControllersContainer',
@@ -149,13 +149,13 @@ export const CHEATSHEETS: CheatSheetSection[] = [
         framework: 'Windows Server',
       },
       {
-        command: 'nltest /dclist:senati.local',
+        command: 'nltest /dclist:shadowbytes.test',
         description: 'Lista los Domain Controllers autoritativos para el dominio especificado.',
         category: 'CMD / Redes',
         framework: 'Active Directory',
       },
       {
-        command: 'setspn -T senati.local -Q */*',
+        command: 'setspn -T shadowbytes.test -Q */*',
         description: 'Busca Service Principal Names (SPNs) registrados para identificar objetivos de Kerberoasting.',
         category: 'Kerberoasting',
         framework: 'Active Directory',
@@ -165,7 +165,7 @@ export const CHEATSHEETS: CheatSheetSection[] = [
   {
     id: 'nmap-kali',
     title: 'Kali Linux, Nmap & Web Enumeration',
-    icon: '🔍',
+    icon: 'search',
     badge: 'Pentesting Ofensivo',
     description: 'Comandos de escaneo de red, fuzzing de directorios y pruebas de intrusión en máquinas CTF.',
     commands: [
@@ -194,7 +194,7 @@ export const CHEATSHEETS: CheatSheetSection[] = [
   {
     id: 'network-forensics',
     title: 'Forense de Redes & Wireshark',
-    icon: '🌐',
+    icon: 'globe',
     badge: 'Análisis Forense',
     description: 'Filtros avanzados de Wireshark y comandos Tshark para analizar tráfico malicioso y capturas pcap.',
     commands: [

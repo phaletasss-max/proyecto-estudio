@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Search, Copy, Check, Terminal, Sparkles, Filter } from 'lucide-react';
@@ -96,7 +97,7 @@ export const CheatSheets: React.FC = () => {
                     : isDark ? 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <span>{s.icon}</span>
+                <span><ContentIcon name={s.icon} /></span>
                 <span>{s.title.split(' ')[0]}</span>
               </button>
             ))}
@@ -119,7 +120,7 @@ export const CheatSheets: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
                 <div className="flex items-center gap-3">
                   <div className="text-3xl p-2.5 rounded-2xl bg-slate-900 border border-slate-800 shrink-0">
-                    {section.icon}
+                    <ContentIcon name={section.icon} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">

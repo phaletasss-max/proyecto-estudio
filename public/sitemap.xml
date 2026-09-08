@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://shadowbyt3s.vercel.app/</loc></url>
-  <url><loc>https://shadowbyt3s.vercel.app/paths</loc></url>
-  <url><loc>https://shadowbyt3s.vercel.app/labs</loc></url>
-  <url><loc>https://shadowbyt3s.vercel.app/setup/wsl</loc></url>
-  <url><loc>https://shadowbyt3s.vercel.app/cheatsheets</loc></url>
-  <url><loc>https://shadowbyt3s.vercel.app/admission</loc></url>
+  <url><loc>https://shadowbytes.vercel.app/</loc></url>
+  <url><loc>https://shadowbytes.vercel.app/paths</loc></url>
+  <url><loc>https://shadowbytes.vercel.app/labs</loc></url>
+  <url><loc>https://shadowbytes.vercel.app/setup/wsl</loc></url>
+  <url><loc>https://shadowbytes.vercel.app/cheatsheets</loc></url>
+  <url><loc>https://shadowbytes.vercel.app/admission</loc></url>
 </urlset>

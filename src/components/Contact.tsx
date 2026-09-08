@@ -87,10 +87,10 @@ export const Contact: React.FC = () => {
                   Comunidad Oficial 24/7
                 </div>
                 <h3 className={`text-2xl sm:text-3xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  ShadowBytes SENATI
+                  ShadowBytes
                 </h3>
                 <p className={`text-sm mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Grupo de Estudio Abierto & Ciberseguridad
+                  Comunidad abierta de ciberseguridad
                 </p>
               </div>
             </div>

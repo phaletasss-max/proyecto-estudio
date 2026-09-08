@@ -1,11 +1,15 @@
 import React from 'react';
+import { KnowledgeCheck } from '@/components/KnowledgeCheck';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, Clock3, Lightbulb, Target } from 'lucide-react';
 import { LEARNING_PATHS } from '@/data/learningPaths';
+import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { lessonKey, moduleHref } from '@/lib/learningProgress';
 import { useTheme } from '@/context/ThemeContext';
 
 export const LearningLesson: React.FC = () => {
   const { pathSlug, moduleId } = useParams<{ pathSlug: string; moduleId: string }>();
+  const learning = useLearningProgress();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const path = LEARNING_PATHS.find((item) => item.slug === pathSlug);
@@ -25,6 +29,11 @@ export const LearningLesson: React.FC = () => {
   }
 
   const { guide } = module;
+  const available = path.modules.filter((item) => moduleHref(path, item));
+  const index = available.findIndex((item) => item.id === module.id);
+  const previous = available[index - 1];
+  const next = available[index + 1];
+  const completed = learning.completedLessons.includes(lessonKey(path, module));
 
   return (
     <section className="min-h-screen pt-28 pb-20">
@@ -72,6 +81,16 @@ export const LearningLesson: React.FC = () => {
             ))}
           </ol>
         </article>
+        {module.knowledgeCheck && <KnowledgeCheck key={`${path.slug}/${module.id}`} check={module.knowledgeCheck} />}
+        <footer className="mt-6 border border-slate-700 p-6">
+          <p className="text-sm text-slate-400">Marca la lectura después de realizar la práctica. Se guarda en este navegador y no otorga puntos CTF.</p>
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <button type="button" disabled={completed} onClick={() => learning.completeLesson(path, module)} className="min-h-11 bg-purple-600 px-4 text-sm font-bold text-white disabled:bg-emerald-800">{completed ? 'Lectura completada' : 'Marcar lectura completada'}</button>
+            {previous && <Link className="inline-flex min-h-11 items-center text-sm text-cyan-500" to={moduleHref(path, previous)!}>Anterior: {previous.title}</Link>}
+            <Link className="inline-flex min-h-11 items-center text-sm text-cyan-500" to={next ? moduleHref(path, next)! : `/paths/${path.slug}`}>{next ? `Siguiente: ${next.title}` : 'Volver a la ruta'}</Link>
+          </div>
+          <p role="status" className="mt-3 text-sm text-slate-400">{learning.error || (completed ? 'Avance guardado en este navegador.' : '')}</p>
+        </footer>
       </div>
     </section>
   );

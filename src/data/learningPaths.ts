@@ -1,12 +1,14 @@
 import type { LearningPath } from '@/types/auth';
+import { PROGRAMMING_PATH } from './programmingPath';
 
 export const LEARNING_PATHS: LearningPath[] = [
+  PROGRAMMING_PATH,
   {
     id: 'intro-ctf',
     slug: 'iniciacion-ctf',
     title: 'Iniciación en CTFs & Seguridad Ofensiva',
     description: 'Aprende los fundamentos para resolver retos tipo Capture The Flag. Domina la terminal Linux, comandos de red y análisis básico.',
-    icon: '🎯',
+    icon: 'target',
     level: 'Fundamental',
     estimatedHours: 8,
     tags: ['Linux', 'Networking', 'Flags', 'Herramientas'],
@@ -59,15 +61,15 @@ export const LEARNING_PATHS: LearningPath[] = [
     slug: 'infraestructura-windows-server',
     title: 'Infraestructura Windows Server 2022 & AD DS',
     description: 'Diseño, configuración y auditoría de seguridad en entornos empresariales con Active Directory, DNS, DHCP y File Servers.',
-    icon: '🏢',
+    icon: 'building',
     level: 'Intermedio',
     estimatedHours: 14,
-    tags: ['Active Directory', 'DNS', 'DHCP', 'SysAdmin', 'SENATI'],
+    tags: ['Active Directory', 'DNS', 'DHCP', 'SysAdmin', 'Hardening'],
     modules: [
       {
         id: 'w1',
         title: 'Instalación y Promoción de Domain Controller',
-        description: 'Despliegue de un bosque y dominio local `senati.local` con zonas directas e inversas de DNS.',
+        description: 'Despliegue de un bosque y dominio local `shadowbytes.test` con zonas directas e inversas de DNS.',
         type: 'theory',
         durationMinutes: 90,
         points: 75,
@@ -127,7 +129,7 @@ export const LEARNING_PATHS: LearningPath[] = [
     slug: 'seguridad-web-owasp',
     title: 'Seguridad y Explotación de Aplicaciones Web',
     description: 'Aprende a identificar y explotar las principales vulnerabilidades del OWASP Top 10: Inyecciones SQL, Cross-Site Scripting y Autenticación Rota.',
-    icon: '🌐',
+    icon: 'globe',
     level: 'Intermedio',
     estimatedHours: 12,
     tags: ['SQLi', 'XSS', 'Burp Suite', 'OWASP'],
@@ -195,7 +197,7 @@ export const LEARNING_PATHS: LearningPath[] = [
     slug: 'reversing-y-explotacion-binaria',
     title: 'Ingeniería Inversa & Explotación Binaria',
     description: 'Desensambla binarios en Linux x86/x64, comprende la memoria (Stack & Heap) y explota Buffer Overflows.',
-    icon: '⚙️',
+    icon: 'settings',
     level: 'Avanzado',
     estimatedHours: 16,
     tags: ['Ghidra', 'Buffer Overflow', 'GDB', 'Pwn'],

@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -171,13 +172,13 @@ export const LabDetail: React.FC = () => {
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono border ${
                 isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-600'
               }`}>
-                <span>{CATEGORY_ICONS[lab.category]}</span>
+                <span><ContentIcon name={CATEGORY_ICONS[lab.category]} /></span>
                 {lab.category}
               </span>
 
               {lab.framework && (
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-red-500/15 text-red-400 border border-red-500/30">
-                  <span>⚡</span>
+                  <span><ContentIcon name="zap" /></span>
                   <span>{lab.framework}</span>
                 </span>
               )}
@@ -291,7 +292,7 @@ export const LabDetail: React.FC = () => {
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Guía {canViewWriteup ? '🔓' : '🔒'}</span>
+            <span>Guía {canViewWriteup ? "disponible" : "bloqueada"}</span>
           </button>
 
           <button

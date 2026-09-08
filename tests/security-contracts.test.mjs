@@ -33,7 +33,8 @@ test('las rutas críticas y la pantalla 404 existen', () => {
 
 test('la migración protege secretos y hace idempotente el solve', () => {
   const migration = read('supabase/migrations/20260904_guided_learning_mvp.sql');
-  assert.match(migration, /revoke all on public\.lab_step_secrets/);
+  const revocations = [...migration.matchAll(/revoke all on ([^;]+?) from anon, authenticated;/g)];
+  assert.ok(revocations.some((match) => match[1].split(',').map((name) => name.trim()).includes('public.lab_step_secrets')), 'las tablas privadas deben revocar acceso directo');
   assert.match(migration, /on conflict \(user_id, lab_id\) do nothing/);
   assert.match(migration, /Demasiados intentos/);
   assert.match(migration, /Resuelve el reto para desbloquear el writeup|submit_flag/);

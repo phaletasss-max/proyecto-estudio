@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React, { useState } from 'react';
 import { Terminal, Copy, Check, Sparkles, Monitor, Shield, Cpu, Code2 } from 'lucide-react';
 
@@ -21,8 +22,8 @@ const terminalConfigs: Record<TerminalType, TerminalInfo> = {
     id: 'cmd',
     name: 'Windows CMD',
     badge: 'Server 2022',
-    icon: '🪟',
-    titleBar: 'Símbolo del sistema — Windows Server 2022 (DC-SENATI-LAB)',
+    icon: 'terminal',
+    titleBar: 'Símbolo del sistema — Windows Server 2022 (DC-SHADOWBYTES-LAB)',
     bgColor: 'bg-black',
     headerColor: 'bg-slate-800 text-slate-200 border-slate-700',
     fontColor: 'text-slate-200 font-mono',
@@ -30,8 +31,8 @@ const terminalConfigs: Record<TerminalType, TerminalInfo> = {
     output: [
       { text: 'Windows IP Configuration', color: 'text-white font-bold' },
       { text: '' },
-      { text: '   Host Name . . . . . . . . . . . . : DC-SENATI-LAB', color: 'text-slate-300' },
-      { text: '   Primary Dns Suffix  . . . . . . . : senati.local', color: 'text-slate-300' },
+      { text: '   Host Name . . . . . . . . . . . . : DC-SHADOWBYTES-LAB', color: 'text-slate-300' },
+      { text: '   Primary Dns Suffix  . . . . . . . : shadowbytes.test', color: 'text-slate-300' },
       { text: '   IPv4 Address. . . . . . . . . . . : 10.0.4.10 (Preferred)', color: 'text-cyan-400 font-bold' },
       { text: '   Subnet Mask . . . . . . . . . . . : 255.255.255.0', color: 'text-slate-300' },
       { text: '   Default Gateway . . . . . . . . . : 10.0.4.1', color: 'text-slate-300' },
@@ -39,7 +40,7 @@ const terminalConfigs: Record<TerminalType, TerminalInfo> = {
       { text: '' },
       { text: 'Share name   Resource                        Remark', color: 'text-amber-400 font-bold' },
       { text: '---------------------------------------------------------', color: 'text-slate-600' },
-      { text: 'ProyectosWeb C:\\Shares\\ProyectosWeb          Proyectos 4to ciclo', color: 'text-slate-200' },
+      { text: 'ProyectosWeb C:\\Shares\\ProyectosWeb          Laboratorios ShadowBytes', color: 'text-slate-200' },
       { text: 'MaterialCTF  C:\\Shares\\MaterialCTF           Archivos de Ciberseguridad', color: 'text-slate-200' },
       { text: '' },
       { text: 'The command completed successfully.', color: 'text-emerald-400' },
@@ -49,8 +50,8 @@ const terminalConfigs: Record<TerminalType, TerminalInfo> = {
     id: 'powershell',
     name: 'PowerShell',
     badge: 'Active Directory',
-    icon: '⚡',
-    titleBar: 'Administrator: Windows PowerShell 7.4 (senati.local)',
+    icon: 'zap',
+    titleBar: 'Administrator: Windows PowerShell 7.4 (shadowbytes.test)',
     bgColor: 'bg-[#012456]',
     headerColor: 'bg-[#001737] text-cyan-200 border-blue-900',
     fontColor: 'text-white font-mono',
@@ -61,10 +62,10 @@ const terminalConfigs: Record<TerminalType, TerminalInfo> = {
       { text: '' },
       { text: 'Name                 UserPrincipalName                  Enabled', color: 'text-yellow-300 font-bold' },
       { text: '----                 -----------------                  -------', color: 'text-blue-300' },
-      { text: 'Administrator        admin@senati.local                 True', color: 'text-emerald-400' },
-      { text: 'Victor Kenky         v.rodriguez@senati.local           True', color: 'text-cyan-300 font-bold' },
-      { text: 'Estudiante-01        estudiante1@senati.local           True', color: 'text-white' },
-      { text: 'ShadowBytes-Lab      lab@senati.local                   True', color: 'text-emerald-400 font-bold' },
+      { text: 'Administrator        admin@shadowbytes.test                 True', color: 'text-emerald-400' },
+      { text: 'Victor Kenky         v.rodriguez@shadowbytes.test           True', color: 'text-cyan-300 font-bold' },
+      { text: 'Estudiante-01        estudiante1@shadowbytes.test           True', color: 'text-white' },
+      { text: 'ShadowBytes-Lab      lab@shadowbytes.test                   True', color: 'text-emerald-400 font-bold' },
       { text: '' },
       { text: 'PS C:\\> Get-Service -Name "DNS","DHCP" | Select-Object Status, DisplayName', color: 'text-yellow-300' },
       { text: 'Status   DisplayName', color: 'text-yellow-300 font-bold' },
@@ -76,15 +77,15 @@ const terminalConfigs: Record<TerminalType, TerminalInfo> = {
     id: 'kali',
     name: 'Kali Linux',
     badge: 'Pentesting & CTF',
-    icon: '🐉',
-    titleBar: '┌──(kali㉿shadowbytes-senati)-[~/pentesting/ctf-labs]',
+    icon: 'terminal',
+    titleBar: '┌──(kali㉿shadowbytes)-[~/pentesting/ctf-labs]',
     bgColor: 'bg-[#0f141d]',
     headerColor: 'bg-[#18202c] text-blue-300 border-slate-700',
     fontColor: 'text-slate-200 font-mono',
     command: '┌──(kali㉿shadowbytes)-[~]\n└─$ nmap -p 80,443,53,3389 -sV 10.0.4.10',
     output: [
       { text: 'Starting Nmap 7.94 ( https://nmap.org ) at 2026-07-26 09:00 EST', color: 'text-slate-400' },
-      { text: 'Nmap scan report for DC-SENATI-LAB (10.0.4.10)', color: 'text-cyan-400 font-bold' },
+      { text: 'Nmap scan report for DC-SHADOWBYTES-LAB (10.0.4.10)', color: 'text-cyan-400 font-bold' },
       { text: 'Host is up (0.00042s latency).', color: 'text-slate-300' },
       { text: '' },
       { text: 'PORT     STATE SERVICE       VERSION', color: 'text-blue-400 font-bold' },
@@ -101,24 +102,24 @@ const terminalConfigs: Record<TerminalType, TerminalInfo> = {
     id: 'arch',
     name: 'Arch Linux',
     badge: 'Dev & Vercel',
-    icon: '🏹',
-    titleBar: 'senati@archlinux: ~/projects/shadowbytes (zsh)',
+    icon: 'code',
+    titleBar: 'operator@archlinux: ~/projects/shadowbytes (zsh)',
     bgColor: 'bg-[#0a0f18]',
     headerColor: 'bg-[#111927] text-cyan-300 border-cyan-900/50',
     fontColor: 'text-slate-100 font-mono',
-    command: '[senati@archlinux shadowbytes]$ git status && vercel --prod',
+    command: '[operator@archlinux shadowbytes]$ git status && vercel --prod',
     output: [
       { text: 'On branch main', color: 'text-slate-300' },
       { text: 'Your branch is up to date with \'origin/main\'.', color: 'text-slate-400' },
       { text: 'nothing to commit, working tree clean', color: 'text-emerald-400' },
       { text: '' },
       { text: 'Vercel CLI 33.5.0 — Deploying to Production', color: 'text-cyan-400 font-bold' },
-      { text: '🔍 Inspecting build outputs...', color: 'text-slate-300' },
-      { text: '✅ Building React 19 + TypeScript frontend', color: 'text-emerald-400' },
-      { text: '🔒 AES-256-GCM Zero-Knowledge encryption verified', color: 'text-purple-400 font-bold' },
-      { text: '🚀 Production: https://proyecto-estudio-twvd.vercel.app [1.2s]', color: 'text-cyan-300 font-bold underline' },
+      { text: ' Inspecting build outputs...', color: 'text-slate-300' },
+      { text: ' Building React 19 + TypeScript frontend', color: 'text-emerald-400' },
+      { text: ' AES-256-GCM Zero-Knowledge encryption verified', color: 'text-purple-400 font-bold' },
+      { text: ' Production: https://proyecto-estudio-twvd.vercel.app [1.2s]', color: 'text-cyan-300 font-bold underline' },
       { text: '' },
-      { text: '[senati@archlinux shadowbytes]$ _', color: 'text-slate-200 animate-pulse' },
+      { text: '[operator@archlinux shadowbytes]$ _', color: 'text-slate-200 animate-pulse' },
     ],
   },
 };
@@ -159,7 +160,7 @@ export const TerminalShowcase: React.FC = () => {
                       : 'bg-slate-950/60 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
                   }`}
                 >
-                  <span>{term.icon}</span>
+                  <span><ContentIcon name={term.icon} /></span>
                   <span>{term.name}</span>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded ${isActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
                     {term.badge}
@@ -171,7 +172,7 @@ export const TerminalShowcase: React.FC = () => {
 
           <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>Terminal Interactiva SENATI</span>
+            <span>Demostración de terminal</span>
           </div>
         </div>
 
@@ -230,7 +231,7 @@ export const TerminalShowcase: React.FC = () => {
             </span>
           </div>
           <div className="text-cyan-400 font-semibold">
-            ShadowBytes SENATI • 4.º Ciclo
+            ShadowBytes • Ciberseguridad
           </div>
         </div>
 

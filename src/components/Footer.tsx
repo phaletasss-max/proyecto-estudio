@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp, UserCheck } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
 export const Footer: React.FC = () => {
@@ -36,35 +36,13 @@ export const Footer: React.FC = () => {
               <span className={`text-2xl font-bold tracking-tight font-[Orbitron] ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 SHADOW<span className="text-purple-500">BYTES</span>
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-500 text-xs font-mono border border-purple-500/30">
-                4.º ciclo
-              </span>
             </div>
             <p className="text-xs font-mono text-purple-500 tracking-wider font-semibold">
               APRENDER • COMPARTIR • CREAR • PROTEGER
             </p>
             <p className={`text-xs max-w-md ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Hub de CTF writeups y labs. Resuelve retos, sube tus resoluciones y aprende ciberseguridad con la comunidad.
+              Comunidad de ciberseguridad. Laboratorios, CTF y conocimiento técnico compartido.
             </p>
-          </div>
-
-          {/* Instructor Credit */}
-          <div className={`flex items-center gap-3 px-5 py-3 rounded-2xl border shadow-inner ${
-            isDark
-              ? 'bg-slate-900 border-slate-800'
-              : 'bg-white border-slate-200'
-          }`}>
-            <div className="p-2 rounded-xl bg-blue-500/20 text-blue-500">
-              <UserCheck className="w-5 h-5" />
-            </div>
-            <div className="text-left">
-              <span className={`text-[10px] font-mono uppercase tracking-widest block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Instructor del Curso
-              </span>
-              <span className={`text-sm font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                Victor Kenky Rodriguez Lopez
-              </span>
-            </div>
           </div>
 
           {/* Social Links & Back to top */}
@@ -105,15 +83,14 @@ export const Footer: React.FC = () => {
           isDark ? 'text-slate-400' : 'text-slate-500'
         }`}>
           <p className="flex items-center gap-2">
-            <span>© {new Date().getFullYear()} ShadowBytes SENATI. Todos los derechos reservados.</span>
+            <span>© {new Date().getFullYear()} ShadowBytes. Todos los derechos reservados.</span>
             <span className="hidden md:inline-block px-2 py-0.5 rounded bg-purple-500/10 text-purple-500 text-[10px] border border-purple-500/20">
               Hub de CTF Writeups & Labs
             </span>
           </p>
           <p className={`flex items-center justify-center gap-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            <span>Desarrollado con</span>
-            <span className="text-rose-500">♥</span>
-            <span>por la comunidad ShadowBytes • SENATI</span>
+            <span>Seguridad · Práctica · Comunidad</span>
+
           </p>
         </div>
 

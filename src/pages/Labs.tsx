@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Trophy, ArrowLeft } from 'lucide-react';
@@ -133,7 +134,7 @@ export const Labs: React.FC = () => {
                     : isDark ? 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800' : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                 }`}
               >
-                {CATEGORY_ICONS[c]} {c}
+                <ContentIcon name={CATEGORY_ICONS[c]} /> {c}
               </button>
             ))}
           </div>

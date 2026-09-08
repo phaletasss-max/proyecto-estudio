@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import { useState } from 'react'
 import { useSiteContent, type SiteContent } from '../context/SiteContent'
 
@@ -87,7 +88,7 @@ function Section({ title, icon, children }: { title: string; icon: string; child
         className="w-full flex items-center justify-between p-5 text-left hover:bg-white/5 transition-colors"
       >
         <span className="flex items-center gap-3">
-          <span className="text-lg">{icon}</span>
+          <span className="text-lg"><ContentIcon name={icon} /></span>
           <span className="text-sm font-semibold text-white">{title}</span>
         </span>
         <span className="text-white/40 text-sm transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }}>
@@ -125,7 +126,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'linear-gradient(135deg, #89AACC, #4E85BF)', color: 'white' }}>
-              ⚙
+              <ContentIcon name="settings" />
             </div>
             <div>
               <h1 className="text-sm font-bold text-white">Panel de Administración</h1>
@@ -135,7 +136,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
 
           <div className="flex items-center gap-3">
             {saved && (
-              <span className="text-xs text-green-400 animate-pulse">✓ Aplicado</span>
+              <span className="text-xs text-green-400 animate-pulse"> Aplicado</span>
             )}
             <button
               onClick={reset}
@@ -158,7 +159,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
       <div className="max-w-3xl mx-auto px-6 py-8 flex flex-col gap-4">
 
         {/* Hero Section */}
-        <Section title="Hero (Página Principal)" icon="🏠">
+        <Section title="Hero (Página Principal)" icon="home">
           <Field
             label="URL del Video HLS"
             value={content.heroVideoUrl}
@@ -189,7 +190,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
         </Section>
 
         {/* About Section */}
-        <Section title="Sobre Mí (Perfil Profesional)" icon="👤">
+        <Section title="Sobre Mí (Perfil Profesional)" icon="user">
           <Field
             label="Nombre / Título"
             value={content.aboutName}
@@ -223,7 +224,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
         </Section>
 
         {/* Images */}
-        <Section title="Imágenes de Habilidades" icon="🖼️">
+        <Section title="Imágenes de Habilidades" icon="image">
           <p className="text-xs text-white/40 -mt-1">
             URLs de las imágenes de fondo del Bento Grid (4 tarjetas).
           </p>
@@ -236,7 +237,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
         </Section>
 
         {/* Journal */}
-        <Section title="Bitácora (Títulos de Artículos)" icon="📝">
+        <Section title="Bitácora (Títulos de Artículos)" icon="file">
           <ArrayField
             label="Títulos de entradas"
             values={content.journalTitles}
@@ -246,7 +247,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
         </Section>
 
         {/* Explorations */}
-        <Section title="Laboratorios (Galería de Imágenes)" icon="🔬">
+        <Section title="Laboratorios (Galería de Imágenes)" icon="flask">
           <p className="text-xs text-white/40 -mt-1">
             URLs de las 6 imágenes del carrusel parallax.
           </p>
@@ -259,7 +260,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
         </Section>
 
         {/* Footer / Contact */}
-        <Section title="Contacto y Redes Sociales" icon="📬">
+        <Section title="Contacto y Redes Sociales" icon="mail">
           <Field
             label="Email de contacto"
             value={content.footerEmail}
@@ -290,7 +291,7 @@ export default function AdminPanel({ onClose }: { onClose: () => void }) {
         {/* Info box */}
         <div className="mt-4 p-5 rounded-2xl border border-yellow-500/20 bg-yellow-500/5">
           <p className="text-xs text-yellow-200/80 leading-relaxed">
-            <strong className="text-yellow-300">⚠ Importante:</strong> Todos los cambios realizados aquí son temporales
+            <strong className="text-yellow-300"> Importante:</strong> Todos los cambios realizados aquí son temporales
             y solo se aplican en esta sesión del navegador. Al recargar la página, se restaurarán los valores originales.
             Para cambios permanentes, edita directamente los archivos del código fuente.
           </p>

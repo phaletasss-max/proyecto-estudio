@@ -1,3 +1,4 @@
+import { ContentIcon } from '@/components/ContentIcon';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Lock, CheckCircle2, Sparkles } from 'lucide-react';
@@ -24,7 +25,7 @@ export const BadgeCard: React.FC<BadgeCardProps> = ({ badge, isUnlocked, unlocke
   return (
     <motion.div
       whileHover={{ scale: isUnlocked ? 1.02 : 1 }}
-      className={`relative rounded-2xl border p-5 transition-all duration-300 overflow-hidden flex flex-col justify-between ${
+      className={`relative rounded-lg border p-5 transition-all duration-300 overflow-hidden flex flex-col justify-between ${
         isUnlocked
           ? isDark
             ? 'bg-slate-900/80 border-purple-500/30 shadow-lg shadow-purple-900/10'
@@ -62,12 +63,12 @@ export const BadgeCard: React.FC<BadgeCardProps> = ({ badge, isUnlocked, unlocke
 
         {/* Icon & Title */}
         <div className="flex items-center gap-3 mb-2">
-          <div className={`text-3xl p-2.5 rounded-2xl border ${
+          <div className={`text-3xl p-2.5 rounded-lg border ${
             isUnlocked
               ? isDark ? 'bg-slate-800 border-purple-500/40 shadow-inner' : 'bg-purple-50 border-purple-200'
               : isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200'
           }`}>
-            {badge.icon}
+            <ContentIcon name={badge.icon} />
           </div>
           <div>
             <h3 className={`font-bold text-base font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>

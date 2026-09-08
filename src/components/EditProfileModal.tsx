@@ -118,7 +118,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onCl
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
-                placeholder="Describe tus intereses en ciberseguridad, experiencia en SENATI..."
+                placeholder="Describe tus intereses en ciberseguridad, experiencia en entornos de laboratorio..."
                 className={`${inputClass} resize-none`}
               />
             </div>

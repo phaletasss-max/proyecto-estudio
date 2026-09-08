@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect, type ReactNode } from 'react';
 import { supabase, isDemoModeEnabled, isSupabaseConfigured } from '@/lib/supabase';
 import type { AccessStatus, UserProfile, UserSolve, RankTier, Badge } from '@/types/auth';
-import { BADGES_CATALOG } from '@/data/badges';
 
 const calculateRank = (points: number): RankTier => {
   if (points >= 5000) return 'Shadow Master';
@@ -61,12 +60,6 @@ const DEFAULT_GUEST_USER: UserProfile = {
   createdAt: new Date().toISOString(),
 };
 
-interface SolveResult {
-  alreadySolved: boolean;
-  pointsEarned: number;
-  newBadges: Badge[];
-}
-
 interface FlagSubmission {
   accepted: boolean;
   alreadySolved: boolean;
@@ -75,6 +68,21 @@ interface FlagSubmission {
   message?: string;
 }
 
+type EditableProfileData = Partial<
+  Pick<UserProfile, 'fullName' | 'avatarUrl' | 'bio' | 'specialty' | 'githubUrl' | 'discordTag' | 'linkedinUrl'>
+>;
+
+type AuthActionResult = { error?: string };
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === 'string' && message.trim()) return message;
+  }
+  return fallback;
+};
+
 interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
@@ -82,8 +90,8 @@ interface AuthContextType {
   login: (usernameOrEmail: string, password?: string) => Promise<{ error?: string }>;
   register: (username: string, email: string, password?: string, fullName?: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
-  updateProfile: (updatedData: Partial<UserProfile>) => Promise<{ error?: string }>;
-  recordSolve: (lab: { id: string; slug: string; title: string; category: string; difficulty: string }) => Promise<SolveResult>;
+  refreshUser: () => Promise<AuthActionResult>;
+  updateProfile: (updatedData: EditableProfileData) => Promise<AuthActionResult>;
   submitFlag: (lab: { id: string; slug: string; title: string; category: string; difficulty: string }, flag: string) => Promise<FlagSubmission>;
 }
 
@@ -106,7 +114,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return DEFAULT_GUEST_USER;
   });
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(() => isSupabaseConfigured());
 
   // Sync to localStorage
   useEffect(() => {
@@ -121,57 +129,90 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [user]);
 
-  // Check Supabase session if configured
+  const refreshUser = useCallback(async (): Promise<AuthActionResult> => {
+    if (!isSupabaseConfigured()) return {};
+
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) return { error: sessionError.message };
+
+      if (!session?.user) {
+        setUser(null);
+        return {};
+      }
+
+      const [profileResult, solvesResult, badgesResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('id, username, full_name, avatar_url, bio, specialty, points, rank, access_status, github_url, discord_tag, linkedin_url, created_at')
+          .eq('id', session.user.id)
+          .single(),
+        supabase
+          .from('user_solves')
+          .select('lab_id, points_earned, solved_at, labs(slug, title, category, difficulty)')
+          .eq('user_id', session.user.id),
+        supabase
+          .from('user_badges')
+          .select('badge_code')
+          .eq('user_id', session.user.id),
+      ]);
+
+      const queryError = profileResult.error || solvesResult.error || badgesResult.error;
+      if (queryError) return { error: queryError.message };
+
+      const profile = profileResult.data;
+      if (!profile) {
+        setUser(null);
+        return { error: 'No se encontró el perfil asociado a esta cuenta.' };
+      }
+
+      setUser({
+        id: profile.id,
+        username: profile.username,
+        email: session.user.email,
+        fullName: profile.full_name,
+        avatarUrl: profile.avatar_url,
+        bio: profile.bio || '',
+        specialty: profile.specialty || '',
+        points: profile.points || 0,
+        rank: profile.rank || calculateRank(profile.points || 0),
+        accessStatus: (profile.access_status as AccessStatus) || 'applicant',
+        githubUrl: profile.github_url || '',
+        discordTag: profile.discord_tag || '',
+        linkedinUrl: profile.linkedin_url || '',
+        solvedLabs: toUserSolves(solvesResult.data),
+        unlockedBadges: (badgesResult.data || []).map((badge) => badge.badge_code),
+        createdAt: profile.created_at,
+      });
+
+      return {};
+    } catch (error) {
+      return { error: getErrorMessage(error, 'No se pudo actualizar la sesión.') };
+    }
+  }, []);
+
+  // Resolve the initial Supabase session before rendering protected content.
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
+    if (!isSupabaseConfigured()) {
+      setLoading(false);
+      return;
+    }
+
+    let isActive = true;
 
     const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('id, username, full_name, avatar_url, bio, specialty, points, rank, access_status, github_url, discord_tag, linkedin_url, created_at')
-            .eq('id', session.user.id)
-            .single();
-
-          const { data: solves } = await supabase
-            .from('user_solves')
-            .select('lab_id, points_earned, solved_at, labs(slug, title, category, difficulty)')
-            .eq('user_id', session.user.id);
-
-          const { data: badges } = await supabase
-            .from('user_badges')
-            .select('badge_code')
-            .eq('user_id', session.user.id);
-
-          if (profile) {
-            setUser({
-              id: profile.id,
-              username: profile.username,
-              fullName: profile.full_name,
-              avatarUrl: profile.avatar_url,
-              bio: profile.bio || '',
-              specialty: profile.specialty || '',
-              points: profile.points || 0,
-              rank: profile.rank || calculateRank(profile.points || 0),
-              accessStatus: (profile.access_status as AccessStatus) || 'applicant',
-              githubUrl: profile.github_url || '',
-              discordTag: profile.discord_tag || '',
-              linkedinUrl: profile.linkedin_url || '',
-              solvedLabs: toUserSolves(solves),
-              unlockedBadges: (badges || []).map((badge) => badge.badge_code),
-              createdAt: profile.created_at,
-            });
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching Supabase auth session:', err);
+      const result = await refreshUser();
+      if (isActive) {
+        if (result.error) console.error('Error fetching Supabase auth session:', result.error);
+        setLoading(false);
       }
     };
 
-    checkSession();
-  }, []);
+    void checkSession();
+    return () => {
+      isActive = false;
+    };
+  }, [refreshUser]);
 
   const login = async (usernameOrEmail: string, password?: string) => {
     setLoading(true);
@@ -187,7 +228,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         id: `user_${Date.now()}`,
         username: cleanUsername || 'shadow_operative',
         fullName: cleanUsername.toUpperCase(),
-        email: usernameOrEmail.includes('@') ? usernameOrEmail : `${cleanUsername}@senati.pe`,
+        email: usernameOrEmail.includes('@') ? usernameOrEmail : `${cleanUsername}@example.com`,
       };
       setUser(demoUser);
       setLoading(false);
@@ -200,53 +241,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: usernameOrEmail,
         password,
       });
 
       if (error) throw error;
 
-      if (data.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id, username, full_name, avatar_url, bio, specialty, points, rank, access_status, github_url, discord_tag, linkedin_url, created_at')
-          .eq('id', data.user.id)
-          .single();
-
-        const { data: solves } = await supabase
-          .from('user_solves')
-          .select('lab_id, points_earned, solved_at, labs(slug, title, category, difficulty)')
-          .eq('user_id', data.user.id);
-
-        const { data: badges } = await supabase
-          .from('user_badges')
-          .select('badge_code')
-          .eq('user_id', data.user.id);
-
-        if (profile) {
-          setUser({
-            id: profile.id,
-            username: profile.username,
-            fullName: profile.full_name,
-            avatarUrl: profile.avatar_url,
-            bio: profile.bio || '',
-            specialty: profile.specialty || '',
-            points: profile.points || 0,
-            rank: profile.rank || calculateRank(profile.points || 0),
-            accessStatus: (profile.access_status as AccessStatus) || 'applicant',
-            githubUrl: profile.github_url || '',
-            discordTag: profile.discord_tag || '',
-            linkedinUrl: profile.linkedin_url || '',
-            solvedLabs: toUserSolves(solves),
-            unlockedBadges: (badges || []).map((badge) => badge.badge_code),
-            createdAt: profile.created_at,
-          });
-        }
-      }
+      const refreshResult = await refreshUser();
+      if (refreshResult.error) return refreshResult;
       return {};
     } catch (err) {
-      return { error: err instanceof Error ? err.message : 'Error al iniciar sesión' };
+      return { error: getErrorMessage(err, 'Error al iniciar sesión') };
     } finally {
       setLoading(false);
     }
@@ -267,13 +273,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         fullName: fullName || cleanUsername,
         email,
         avatarUrl: '/logo-shadowbytes.webp',
-        bio: 'Nuevo recluta de ShadowBytes SENATI.',
+        bio: 'Integrante de la comunidad ShadowBytes.',
         specialty: 'Ciberseguridad',
-        points: 100,
+        points: 0,
         rank: 'Script Kiddie',
-        accessStatus: 'member',
+        accessStatus: 'applicant',
         solvedLabs: [],
-        unlockedBadges: ['SENATI_VETERAN'],
+        unlockedBadges: [],
         createdAt: new Date().toISOString(),
       };
       setUser(newUser);
@@ -300,26 +306,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (error) throw error;
 
-      if (data.user) {
-        setUser({
-          id: data.user.id,
-          username: cleanUsername,
-          fullName: fullName || cleanUsername,
-          email,
-          avatarUrl: '/logo-shadowbytes.webp',
-          bio: 'Nuevo recluta de ShadowBytes SENATI.',
-          specialty: 'Ciberseguridad',
-          points: 0,
-          rank: 'Script Kiddie',
-          accessStatus: 'applicant',
-          solvedLabs: [],
-          unlockedBadges: [],
-          createdAt: new Date().toISOString(),
-        });
+      if (data.session?.user) {
+        const refreshResult = await refreshUser();
+        if (refreshResult.error) return refreshResult;
+      } else {
+        // With email confirmation enabled, signUp returns a user but no authenticated session.
+        setUser(null);
       }
       return {};
     } catch (err) {
-      return { error: err instanceof Error ? err.message : 'Error al registrar usuario' };
+      return { error: getErrorMessage(err, 'Error al registrar usuario') };
     } finally {
       setLoading(false);
     }
@@ -336,19 +332,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(null);
   };
 
-  const updateProfile = async (updatedData: Partial<UserProfile>) => {
+  const updateProfile = async (updatedData: EditableProfileData): Promise<AuthActionResult> => {
     if (!user) return { error: 'No hay usuario autenticado' };
 
     const newProfile: UserProfile = {
       ...user,
-      ...updatedData,
+      fullName: updatedData.fullName ?? user.fullName,
+      avatarUrl: updatedData.avatarUrl ?? user.avatarUrl,
+      bio: updatedData.bio ?? user.bio,
+      specialty: updatedData.specialty ?? user.specialty,
+      githubUrl: updatedData.githubUrl ?? user.githubUrl,
+      discordTag: updatedData.discordTag ?? user.discordTag,
+      linkedinUrl: updatedData.linkedinUrl ?? user.linkedinUrl,
     };
-
-    setUser(newProfile);
 
     if (isSupabaseConfigured()) {
       try {
-        await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .update({
             full_name: newProfile.fullName,
@@ -359,116 +359,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             discord_tag: newProfile.discordTag,
             linkedin_url: newProfile.linkedinUrl,
           })
-          .eq('id', user.id);
-      } catch (err) {
-        console.error('Error updating profile in Supabase:', err);
+          .eq('id', user.id)
+          .select('id')
+          .single();
+
+        if (error) return { error: error.message };
+        if (!data) return { error: 'Supabase no confirmó la actualización del perfil.' };
+      } catch (error) {
+        return { error: getErrorMessage(error, 'No se pudo actualizar el perfil.') };
       }
     }
 
+    setUser(newProfile);
     return {};
-  };
-
-  const recordSolve = async (lab: { id: string; slug: string; title: string; category: string; difficulty: string }): Promise<SolveResult> => {
-    if (!user) {
-      return { alreadySolved: false, pointsEarned: 0, newBadges: [] };
-    }
-
-    // Check if already solved
-    const already = user.solvedLabs.some((s) => s.labSlug === lab.slug || s.labId === lab.id);
-    if (already) {
-      return { alreadySolved: true, pointsEarned: 0, newBadges: [] };
-    }
-
-    // Calculate points by difficulty
-    const pointsMap: Record<string, number> = {
-      Easy: 100,
-      Medium: 250,
-      Hard: 500,
-      Insane: 1000,
-    };
-    const earned = pointsMap[lab.difficulty] || 100;
-
-    const newSolve: UserSolve = {
-      labId: lab.id,
-      labSlug: lab.slug,
-      labTitle: lab.title,
-      category: lab.category,
-      difficulty: lab.difficulty,
-      pointsEarned: earned,
-      solvedAt: new Date().toISOString(),
-    };
-
-    const updatedSolves = [newSolve, ...user.solvedLabs];
-    const totalPoints = user.points + earned;
-    const newRank = calculateRank(totalPoints);
-
-    // Evaluate badges
-    const newBadges: Badge[] = [];
-    const unlockedCodes = new Set(user.unlockedBadges);
-
-    // Badge 1: First Blood
-    if (!unlockedCodes.has('FIRST_BLOOD')) {
-      const b = BADGES_CATALOG.find((x) => x.code === 'FIRST_BLOOD');
-      if (b) {
-        newBadges.push(b);
-        unlockedCodes.add('FIRST_BLOOD');
-      }
-    }
-
-    // Badge 2: Packet Detective (2 forensics/network)
-    const forensicsCount = updatedSolves.filter((s) => s.category === 'Forensics' || s.category === 'Network').length;
-    if (forensicsCount >= 2 && !unlockedCodes.has('PACKET_DETECTIVE')) {
-      const b = BADGES_CATALOG.find((x) => x.code === 'PACKET_DETECTIVE');
-      if (b) {
-        newBadges.push(b);
-        unlockedCodes.add('PACKET_DETECTIVE');
-      }
-    }
-
-    // Badge 3: Web Slayer
-    if (lab.category === 'Web' && !unlockedCodes.has('WEB_SLAYER')) {
-      const b = BADGES_CATALOG.find((x) => x.code === 'WEB_SLAYER');
-      if (b) {
-        newBadges.push(b);
-        unlockedCodes.add('WEB_SLAYER');
-      }
-    }
-
-    // Badge 4: Insane Root
-    if (lab.difficulty === 'Insane' && !unlockedCodes.has('INSANE_ROOT')) {
-      const b = BADGES_CATALOG.find((x) => x.code === 'INSANE_ROOT');
-      if (b) {
-        newBadges.push(b);
-        unlockedCodes.add('INSANE_ROOT');
-      }
-    }
-
-    // Badge 5: Speed Demon
-    if (totalPoints >= 1000 && !unlockedCodes.has('SPEED_DEMON')) {
-      const b = BADGES_CATALOG.find((x) => x.code === 'SPEED_DEMON');
-      if (b) {
-        newBadges.push(b);
-        unlockedCodes.add('SPEED_DEMON');
-      }
-    }
-
-    const finalPoints = totalPoints + newBadges.reduce((acc, b) => acc + b.pointsBonus, 0);
-
-    const updatedUser: UserProfile = {
-      ...user,
-      points: finalPoints,
-      rank: newRank,
-      solvedLabs: updatedSolves,
-      unlockedBadges: Array.from(unlockedCodes),
-    };
-
-    setUser(updatedUser);
-
-    return {
-      alreadySolved: false,
-      pointsEarned: earned,
-      newBadges,
-    };
   };
 
   const submitFlag = async (
@@ -547,8 +450,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         login,
         register,
         logout,
+        refreshUser,
         updateProfile,
-        recordSolve,
         submitFlag,
       }}
     >

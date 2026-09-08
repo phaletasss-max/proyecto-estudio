@@ -20,7 +20,7 @@ const stats: StatCard[] = [
   {
     label: 'Discord',
     value: 'VOZ & CODE',
-    subtitle: 'Salas de estudio por las noches',
+    subtitle: 'Conversación y colaboración técnica',
     icon: MessageSquare,
   },
   {
@@ -30,9 +30,9 @@ const stats: StatCard[] = [
     icon: MessageCircle,
   },
   {
-    label: 'Estudio colaborativo',
+    label: 'Colaboración técnica',
     value: '100%',
-    subtitle: 'Enfocados en el 4.º ciclo de SENATI',
+    subtitle: 'Investigación y práctica responsable',
     icon: HeartHandshake,
   },
 ];
@@ -52,10 +52,10 @@ export const Community: React.FC = () => {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className={`text-3xl sm:text-5xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            Comunidad de <span className="gradient-text-blue">Estudio Activa</span>
+            Comunidad de <span className="gradient-text-blue">Ciberseguridad</span>
           </h2>
           <p className={`mt-4 text-base sm:text-lg ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-            Compartimos recursos, resolvemos dudas y organizamos reuniones de código para avanzar juntos en el ciclo.
+            Compartimos recursos, contrastamos técnicas y colaboramos en laboratorios y desafíos autorizados.
           </p>
         </div>
 

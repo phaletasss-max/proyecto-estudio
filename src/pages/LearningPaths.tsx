@@ -17,6 +17,8 @@ import {
   Terminal,
 } from 'lucide-react';
 import { LEARNING_PATHS } from '@/data/learningPaths';
+import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { pathProgress } from '@/lib/learningProgress';
 import { useAuth } from '@/context/AuthContext';
 import type { LearningModule, LearningPath } from '@/types/auth';
 
@@ -43,12 +45,13 @@ const moduleDestination = (path: LearningPath, module: LearningModule) =>
   module.status === 'coming_soon' ? null : module.labSlug ? `/lab/${module.labSlug}` : module.guide ? `/learn/${path.slug}/${module.id}` : null;
 
 export const LearningPaths: React.FC = () => {
+  const learning = useLearningProgress();
   const { user, isAuthenticated } = useAuth();
   const [expandedPath, setExpandedPath] = useState<string | null>(LEARNING_PATHS[0].id);
   const solvedSlugs = useMemo(() => new Set(user?.solvedLabs.map((solve) => solve.labSlug) || []), [user?.solvedLabs]);
 
   const academyStats = useMemo(() => {
-    const modules = LEARNING_PATHS.flatMap((path) => path.modules);
+    const modules = LEARNING_PATHS.flatMap((path) => path.modules.filter((module) => moduleDestination(path, module)));
     const labs = modules.filter((module) => module.labSlug);
     return {
       totalLabs: labs.length,
@@ -62,7 +65,7 @@ export const LearningPaths: React.FC = () => {
   return (
     <section className="academy-grid min-h-screen bg-[#0a0f19] pb-20 pt-24 text-slate-100 sm:pt-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <header className="overflow-hidden rounded-3xl border border-slate-700/70 bg-slate-900 shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
+        <header className="overflow-hidden rounded-xl border border-slate-700/70 bg-slate-900 shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
           <div className="grid gap-8 p-6 sm:p-9 lg:grid-cols-[minmax(0,1fr)_290px] lg:items-center lg:p-11">
             <div>
               <span className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-[11px] font-bold tracking-[0.14em] text-slate-300">
@@ -83,7 +86,7 @@ export const LearningPaths: React.FC = () => {
               </div>
             </div>
 
-            <aside className="rounded-2xl border border-slate-700 bg-slate-950/50 p-5">
+            <aside className="rounded-lg border border-slate-700 bg-slate-950/50 p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.13em] text-slate-500">Tu progreso</p>
@@ -134,16 +137,17 @@ export const LearningPaths: React.FC = () => {
               const isExpanded = expandedPath === path.id;
               const visual = pathVisuals[pathIndex % pathVisuals.length];
               const PathIcon = visual.icon;
-              const labModules = path.modules.filter((module) => module.labSlug);
-              const completedLabs = labModules.filter((module) => module.labSlug && solvedSlugs.has(module.labSlug)).length;
-              const progress = labModules.length ? Math.round((completedLabs / labModules.length) * 100) : 0;
-              const nextModuleIndex = path.modules.findIndex((module) => !module.labSlug || !solvedSlugs.has(module.labSlug));
-              const currentModuleIndex = nextModuleIndex === -1 ? path.modules.length - 1 : nextModuleIndex;
-              const currentModule = path.modules[currentModuleIndex];
-              const currentDestination = moduleDestination(path, currentModule);
+              const state = pathProgress(path, learning.completedLessons, [...solvedSlugs]);
+              const progress = state.percent;
+              const completedLabs = state.completed;
+              const labModules = state.available;
+              const currentModule = state.next ?? state.available[0] ?? path.modules[0];
+              const currentModuleIndex = state.next ? path.modules.indexOf(state.next) : -1;
+              const currentDestination = state.next ? moduleDestination(path, state.next) : null;
+
 
               return (
-                <article key={path.id} className="overflow-hidden rounded-3xl border border-slate-700/70 bg-slate-900/80 transition-colors hover:border-slate-600">
+                <article key={path.id} className="overflow-hidden rounded-xl border border-slate-700/70 bg-slate-900/80 transition-colors hover:border-slate-600">
                   <button
                     type="button"
                     onClick={() => setExpandedPath((current) => current === path.id ? null : path.id)}
@@ -152,7 +156,7 @@ export const LearningPaths: React.FC = () => {
                   >
                     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_236px] lg:items-center">
                       <div className="flex items-start gap-4 sm:gap-5">
-                        <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${visual.surface} ${visual.tone}`}><PathIcon className="h-6 w-6" /></span>
+                        <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-lg ${visual.surface} ${visual.tone}`}><PathIcon className="h-6 w-6" /></span>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-[11px] font-bold tracking-[0.13em] text-slate-500">RUTA {String(pathIndex + 1).padStart(2, '0')}</span>
@@ -168,12 +172,12 @@ export const LearningPaths: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="rounded-2xl border border-slate-700 bg-slate-950/45 p-4 lg:text-right">
+                      <div className="rounded-lg border border-slate-700 bg-slate-950/45 p-4 lg:text-right">
                         <div className="flex items-center justify-between gap-3 lg:justify-end">
                           <span className="text-[10px] font-bold tracking-[0.13em] text-slate-500">PROGRESO</span>
                           <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                         </div>
-                        <p className="mt-2 text-xl font-black text-white">{progress}% <span className="text-xs font-medium text-slate-500">· {completedLabs}/{labModules.length} labs</span></p>
+                        <p className="mt-2 text-xl font-black text-white">{progress}% <span className="text-xs font-medium text-slate-500">· {completedLabs}/{labModules.length} módulos</span></p>
                         <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-800"><span className="block h-full rounded-full bg-cyan-300" style={{ width: `${progress}%` }} /></div>
                         <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300">{isExpanded ? 'Ocultar módulos' : 'Ver módulos'} <ArrowRight className={`h-3.5 w-3.5 transition-transform ${isExpanded ? 'rotate-90' : ''}`} /></span>
                       </div>
@@ -182,7 +186,7 @@ export const LearningPaths: React.FC = () => {
 
                   {isExpanded && (
                     <div className="border-t border-slate-800 bg-slate-950/35 px-5 py-6 sm:px-7">
-                      <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="mb-6 flex flex-col gap-4 rounded-lg border border-slate-800 bg-slate-900/50 p-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <p className="text-[10px] font-bold tracking-[0.14em] text-slate-500">RECOMENDADO PARA CONTINUAR</p>
                           <p className="mt-1 text-sm font-bold text-white">{currentModule.title}</p>
@@ -197,7 +201,7 @@ export const LearningPaths: React.FC = () => {
                         {path.modules.map((module, moduleIndex) => {
                           const kind = moduleType(module);
                           const destination = moduleDestination(path, module);
-                          const solved = Boolean(module.labSlug && solvedSlugs.has(module.labSlug));
+                          const solved = state.isComplete(module);
                           const current = moduleIndex === currentModuleIndex && !solved;
                           const Icon = kind.icon;
                           const actionText = solved ? 'Revisar' : module.status === 'coming_soon' ? 'Próximamente' : module.labSlug ? 'Abrir lab' : module.guide ? 'Leer' : 'Abrir';
@@ -215,13 +219,13 @@ export const LearningPaths: React.FC = () => {
                                 </div>
                                 <h4 className="mt-2 text-sm font-bold text-white sm:text-base">{module.title}</h4>
                                 <p className="mt-1 text-sm leading-6 text-slate-400">{module.description}</p>
-                                <div className="mt-3 flex flex-wrap gap-3 text-xs font-medium text-slate-500"><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" /> {module.durationMinutes} min</span><span className="text-amber-200">+{module.points} puntos</span></div>
+                                <div className="mt-3 flex flex-wrap gap-3 text-xs font-medium text-slate-500"><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" /> {module.durationMinutes} min</span><span className="text-amber-200">{module.labSlug ? `+${module.points} puntos` : "Lectura sin puntos"}</span></div>
                               </div>
                               {destination ? <span className={`hidden min-h-10 shrink-0 items-center gap-1.5 self-center rounded-lg border px-3 text-xs font-bold sm:inline-flex ${solved ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200' : 'border-slate-700 bg-slate-900 text-slate-200'}`}>{actionText} <ArrowRight className="h-3.5 w-3.5" /></span> : <span className="hidden self-center text-slate-600 sm:inline-flex"><LockKeyhole className="h-4 w-4" /></span>}
                             </>
                           );
 
-                          return <li key={module.id} className={`relative rounded-2xl ${current ? 'bg-slate-900/60' : 'hover:bg-white/[0.02]'}`}>{destination ? <Link to={destination} className="flex gap-4 p-3.5 sm:gap-5 sm:p-4">{item}</Link> : <div className="flex gap-4 p-3.5 sm:gap-5 sm:p-4">{item}</div>}</li>;
+                          return <li key={module.id} className={`relative rounded-lg ${current ? 'bg-slate-900/60' : 'hover:bg-white/[0.02]'}`}>{destination ? <Link to={destination} className="flex gap-4 p-3.5 sm:gap-5 sm:p-4">{item}</Link> : <div className="flex gap-4 p-3.5 sm:gap-5 sm:p-4">{item}</div>}</li>;
                         })}
                       </ol>
                     </div>
@@ -232,12 +236,12 @@ export const LearningPaths: React.FC = () => {
           </div>
         </section>
 
-        <aside className="mt-7 flex flex-col gap-4 rounded-2xl border border-slate-700 bg-slate-900/70 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <aside className="mt-7 flex flex-col gap-4 rounded-lg border border-slate-700 bg-slate-900/70 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div className="flex gap-4">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-cyan-300"><ShieldCheck className="h-5 w-5" /></span>
             <div><p className="text-sm font-bold text-white">Aprendizaje seguro y responsable.</p><p className="mt-1 text-sm leading-6 text-slate-400">Practica únicamente en laboratorios propios o autorizados. La prioridad es comprender, documentar y aplicar buenas decisiones técnicas.</p></div>
           </div>
-          {isAuthenticated ? <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-200"><Check className="h-4 w-4" /> Progreso sincronizado</span> : <Link to="/admission" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-600 px-4 text-sm font-bold text-slate-200 transition-colors hover:border-slate-400 hover:bg-slate-800">Conocer admisión <ArrowRight className="h-4 w-4" /></Link>}
+          {isAuthenticated ? <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-200"><Check className="h-4 w-4" /> Solves sincronizados · lecturas locales</span> : <Link to="/admission" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-600 px-4 text-sm font-bold text-slate-200 transition-colors hover:border-slate-400 hover:bg-slate-800">Conocer admisión <ArrowRight className="h-4 w-4" /></Link>}
         </aside>
       </div>
     </section>
