@@ -2,7 +2,7 @@
 
 ## Aplicación segura
 
-1. Si es una base nueva, ejecuta [`schema.sql`](./schema.sql), [`migrations/20260831_secure_ctf_admission.sql`](./migrations/20260831_secure_ctf_admission.sql) y [`migrations/20260904_guided_learning_mvp.sql`](./migrations/20260904_guided_learning_mvp.sql), en ese orden. Si la base ya tiene las tablas originales, aplica ambas migraciones en orden.
+1. Si es una base nueva, ejecuta [`schema.sql`](./schema.sql) y después todos los archivos de `migrations/` en orden de fecha, incluido [`20260908_crypto_function_search_path.sql`](./migrations/20260908_crypto_function_search_path.sql). Si la base ya tiene las tablas originales, aplica únicamente las migraciones pendientes en ese orden.
 2. Crea o inicia sesión con la cuenta de la persona administradora. Copia su UUID desde **Authentication → Users** y ejecuta la última sentencia `update` comentada en la migración para promoverla a `admin`.
 3. En el proyecto web crea `.env.local` a partir de `.env.example` y agrega solo la URL del proyecto y la **Publishable key**. No pongas jamás una `service_role` ni una `sb_secret_` en Vite, Git o Vercel.
 4. La migración crea o corrige `ctf-zips` como bucket **privado**. Los miembros descargan mediante una URL firmada de 60 segundos y solo administradores pueden subir archivos. Nunca incluyas flags o soluciones dentro de esos ZIPs.
