@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect, useRef, type ReactNode } from 'react';
 import { supabase, isDemoModeEnabled, isSupabaseConfigured } from '@/lib/supabase';
 import type { AccessStatus, UserProfile, UserSolve, RankTier, Badge } from '@/types/auth';
 
@@ -72,7 +72,7 @@ type EditableProfileData = Partial<
   Pick<UserProfile, 'fullName' | 'avatarUrl' | 'bio' | 'specialty' | 'githubUrl' | 'discordTag' | 'linkedinUrl'>
 >;
 
-type AuthActionResult = { error?: string };
+type AuthActionResult = { error?: string; requiresEmailConfirmation?: boolean };
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (error instanceof Error) return error.message;
@@ -88,7 +88,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   login: (usernameOrEmail: string, password?: string) => Promise<{ error?: string }>;
-  register: (username: string, email: string, password?: string, fullName?: string) => Promise<{ error?: string }>;
+  register: (username: string, email: string, password?: string, fullName?: string) => Promise<AuthActionResult>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<AuthActionResult>;
   updateProfile: (updatedData: EditableProfileData) => Promise<AuthActionResult>;
@@ -115,6 +115,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   });
 
   const [loading, setLoading] = useState<boolean>(() => isSupabaseConfigured());
+  const refreshVersion = useRef(0);
 
   // Sync to localStorage
   useEffect(() => {
@@ -131,6 +132,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshUser = useCallback(async (): Promise<AuthActionResult> => {
     if (!isSupabaseConfigured()) return {};
+    const version = ++refreshVersion.current;
 
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -161,6 +163,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (queryError) return { error: queryError.message };
 
       const profile = profileResult.data;
+      if (version !== refreshVersion.current) return {};
       if (!profile) {
         setUser(null);
         return { error: 'No se encontró el perfil asociado a esta cuenta.' };
@@ -209,8 +212,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     void checkSession();
+    let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') return;
+      clearTimeout(refreshTimer);
+      if (!session) {
+        refreshVersion.current += 1;
+        setUser(null);
+        setLoading(false);
+      } else {
+        // Supabase calls must run after the synchronous auth callback releases its lock.
+        refreshTimer = setTimeout(() => { if (isActive) void checkSession(); }, 0);
+      }
+    });
     return () => {
       isActive = false;
+      clearTimeout(refreshTimer);
+      subscription.unsubscribe();
     };
   }, [refreshUser]);
 
@@ -297,6 +315,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
             username: cleanUsername,
             full_name: fullName || cleanUsername,
@@ -312,6 +331,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } else {
         // With email confirmation enabled, signUp returns a user but no authenticated session.
         setUser(null);
+        return { requiresEmailConfirmation: true };
       }
       return {};
     } catch (err) {

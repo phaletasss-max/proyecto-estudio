@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Lock, Mail, User, Shield, Terminal, ArrowRight, AlertCircle } from 'lucide-react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { createPortal } from 'react-dom';
+import { ArrowRight, CheckCircle2, Mail, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { isDemoModeEnabled, isSupabaseConfigured, supabase } from '@/lib/supabase';
+import { authErrorMessage } from '@/lib/authErrors';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,259 +12,92 @@ interface AuthModalProps {
   initialMode?: 'login' | 'register';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'login' }) => {
-  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
+  const [mode, setMode] = useState(initialMode);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { login, register } = useAuth();
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState('');
+  const [resendAfter, setResendAfter] = useState(0);
+  const [notice, setNotice] = useState('');
+  const dialog = useRef<HTMLDialogElement>(null);
+  const close = useRef(onClose);
+  close.current = onClose;
+  const { login, register, isAuthenticated } = useAuth();
   const { theme } = useTheme();
-  const isDark = theme === 'dark';
-  const isOnline = isSupabaseConfigured();
+  const online = isSupabaseConfigured();
+  const demo = isDemoModeEnabled();
+  const enabled = online || demo;
+  const dark = theme === 'dark';
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    dialog.current?.showModal();
+    return () => { dialog.current?.close(); previous?.focus(); };
+  }, [isOpen]);
+  useEffect(() => { if (isOpen && isAuthenticated) close.current(); }, [isOpen, isAuthenticated]);
+  useEffect(() => {
+    if (resendAfter <= 0) return;
+    const timer = setTimeout(() => setResendAfter(resendAfter - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendAfter]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg(null);
-    setIsSubmitting(true);
-
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setError(''); setNotice(''); setSubmitting(true);
     try {
-      if (mode === 'login') {
-        const res = await login(username || email, password);
-        if (res.error) {
-          setErrorMsg(res.error);
-        } else {
-          onClose();
-        }
-      } else {
-        if (!username || !email) {
-          setErrorMsg('Por favor ingresa tu usuario y correo');
-          setIsSubmitting(false);
-          return;
-        }
-        if (isOnline && !password) {
-          setErrorMsg('Ingresa una contraseña para crear tu cuenta.');
-          setIsSubmitting(false);
-          return;
-        }
-        const res = await register(username, email, password, fullName);
-        if (res.error) {
-          setErrorMsg(res.error);
-        } else {
-          onClose();
-        }
-      }
-    } catch {
-      setErrorMsg('Ocurrió un error inesperado');
-    } finally {
-      setIsSubmitting(false);
-    }
+      const result = mode === 'login'
+        ? await login(email.trim(), password)
+        : await register(username, email.trim(), password, fullName.trim());
+      if (result.error) setError(authErrorMessage(result.error));
+      else if ('requiresEmailConfirmation' in result && result.requiresEmailConfirmation) {
+        setConfirmationEmail(email.trim()); setPassword(''); setResendAfter(60);
+      } else onClose();
+    } catch { setError('No pudimos conectar. Comprueba tu conexión e inténtalo de nuevo.'); }
+    finally { setSubmitting(false); }
   };
 
-  const handleQuickGuest = async (demoName: string) => {
-    setIsSubmitting(true);
-    await login(demoName);
-    setIsSubmitting(false);
-    onClose();
+  const resend = async () => {
+    if (resendAfter || submitting) return;
+    setSubmitting(true); setError(''); setNotice('');
+    try {
+      const { error: resendError } = await supabase.auth.resend({ type: 'signup', email: confirmationEmail, options: { emailRedirectTo: `${window.location.origin}/dashboard` } });
+      if (resendError) setError(authErrorMessage(resendError.message));
+      else { setNotice('Solicitud enviada. Revisa también Spam y Promociones.'); setResendAfter(60); }
+    } catch { setError('No se pudo reenviar el correo. Inténtalo de nuevo.'); }
+    finally { setSubmitting(false); }
   };
 
-  return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={onClose}>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ duration: 0.2 }}
-          onClick={(e) => e.stopPropagation()}
-          className={`relative w-full max-w-md rounded-3xl border p-6 sm:p-8 shadow-2xl overflow-hidden ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
-          }`}
-        >
-          {/* Ambient Top Glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-2 bg-gradient-to-r from-purple-500 via-cyan-500 to-indigo-500 rounded-b-full blur-sm" />
-
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className={`absolute top-4 right-4 p-2 rounded-xl border transition-colors ${
-              isDark ? 'border-slate-800 text-slate-400 hover:text-white bg-slate-900' : 'border-slate-200 text-slate-500 hover:text-slate-900 bg-slate-100'
-            }`}
-          >
-            <X className="w-4 h-4" />
-          </button>
-
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 rounded-2xl bg-purple-500/15 text-purple-400 border border-purple-500/20">
-              <Shield className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold font-[Orbitron] tracking-wide flex items-center gap-2">
-                SHADOW<span className="text-purple-500">AUTH</span>
-              </h2>
-              <p className="text-xs font-mono text-slate-400">
-                {mode === 'login' ? 'Acceso al Hub de Ciberseguridad' : 'Registro de Nuevo Hacker'}
-              </p>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className={`grid grid-cols-2 p-1 rounded-2xl border mb-6 ${
-            isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200'
-          }`}>
-            <button
-              type="button"
-              onClick={() => { setMode('login'); setErrorMsg(null); }}
-              className={`py-2 rounded-xl text-xs font-mono font-semibold transition-all ${
-                mode === 'login'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Iniciar Sesión
-            </button>
-            <button
-              type="button"
-              onClick={() => { setMode('register'); setErrorMsg(null); }}
-              className={`py-2 rounded-xl text-xs font-mono font-semibold transition-all ${
-                mode === 'register'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Crear Cuenta
-            </button>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'register' && (
-              <div>
-                <label className="block text-xs font-mono mb-1 text-slate-400">Nombre Completo</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Ej: Manuel Phaletass"
-                    className={`w-full pl-9 pr-4 py-2.5 rounded-xl text-sm border font-mono focus:outline-none transition-colors ${
-                      isDark ? 'bg-slate-900 border-slate-800 text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-purple-500'
-                    }`}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-mono mb-1 text-slate-400">
-                {mode === 'login' ? 'Usuario o Correo' : 'Username / Alias Hacker *'}
-              </label>
-              <div className="relative">
-                <Terminal className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder={mode === 'login' ? 'phaletas_max o tu@correo.pe' : 'ej: cyber_hacker_22'}
-                  required
-                  className={`w-full pl-9 pr-4 py-2.5 rounded-xl text-sm border font-mono focus:outline-none transition-colors ${
-                    isDark ? 'bg-slate-900 border-slate-800 text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-purple-500'
-                  }`}
-                />
-              </div>
-            </div>
-
-            {mode === 'register' && (
-              <div>
-                <label className="block text-xs font-mono mb-1 text-slate-400">Correo Electrónico *</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="alumno@example.com"
-                    required
-                    className={`w-full pl-9 pr-4 py-2.5 rounded-xl text-sm border font-mono focus:outline-none transition-colors ${
-                      isDark ? 'bg-slate-900 border-slate-800 text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-purple-500'
-                    }`}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-mono mb-1 text-slate-400">
-                Contraseña {isOnline ? '*' : '(opcional en demo)'}
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required={isOnline}
-                  className={`w-full pl-9 pr-4 py-2.5 rounded-xl text-sm border font-mono focus:outline-none transition-colors ${
-                    isDark ? 'bg-slate-900 border-slate-800 text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-purple-500'
-                  }`}
-                />
-              </div>
-            </div>
-
-            {errorMsg && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all shadow-lg shadow-purple-600/25 active:scale-98 disabled:opacity-50"
-            >
-              {isSubmitting ? (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>{mode === 'login' ? 'Entrar a ShadowBytes' : 'Crear mi Perfil Hacker'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          {!isOnline && (
-            <div className="mt-6 pt-4 border-t border-slate-800 text-center">
-              <p className="text-[11px] font-mono text-slate-500 mb-2"> Acceso rápido para la demo local:</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickGuest('phaletas_max')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-mono bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border border-purple-500/20"
-                >
-                   Manuel (demo)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickGuest('mrpacay')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-mono bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20"
-                >
-                   mrpacay
-                </button>
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </div>
-    </AnimatePresence>
-  );
-};
+  const field = `mt-1 min-h-11 w-full rounded-lg border px-3 text-sm outline-none focus:ring-2 focus:ring-violet-400 ${dark ? 'border-slate-700 bg-slate-900 text-white' : 'border-slate-300 bg-white text-slate-900'}`;
+  if (!isOpen) return null;
+  return createPortal(<dialog ref={dialog} aria-labelledby="auth-title" onCancel={() => close.current()} className={`m-auto w-[calc(100%_-_2rem)] max-w-md max-h-[90dvh] overflow-y-auto rounded-2xl border p-6 shadow-2xl backdrop:bg-black/75 ${dark ? 'border-slate-700 bg-slate-950 text-white' : 'border-slate-200 bg-white text-slate-900'}`}>
+    <button type="button" aria-label="Cerrar acceso" onClick={onClose} className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-lg hover:bg-slate-500/15"><X size={20} /></button>
+    <p className="mb-3 text-xs font-bold tracking-widest text-violet-400">SHADOWBYTES</p>
+    <h2 id="auth-title" className="pr-8 text-2xl font-bold">{confirmationEmail ? 'Confirma tu correo' : mode === 'login' ? 'Bienvenido de nuevo' : 'Crea tu cuenta'}</h2>
+    {confirmationEmail ? <div className="mt-5 space-y-4">
+      <Mail className="h-9 w-9 text-violet-400" />
+      <p className="text-sm leading-6">Revisa <strong className="break-all">{confirmationEmail}</strong> y abre el enlace de confirmación de ShadowBytes. Después podrás guardar tus laboratorios resueltos.</p>
+      <ol className="list-decimal space-y-2 pl-5 text-sm leading-6"><li>Busca el correo de confirmación; revisa también Spam.</li><li>Abre el enlace una sola vez. Volverás a tu panel.</li><li>Si lo abres en otro navegador, regresa aquí e inicia sesión.</li></ol>
+      <button type="button" onClick={() => { setMode('login'); setConfirmationEmail(''); setError(''); setNotice(''); }} className="min-h-11 w-full rounded-lg bg-violet-600 px-4 text-sm font-semibold text-white">Ya confirmé: iniciar sesión</button>
+      <button type="button" onClick={resend} disabled={submitting || resendAfter > 0} className="min-h-11 w-full rounded-lg border border-slate-500 text-sm disabled:opacity-50">{submitting ? 'Enviando…' : resendAfter ? `Reenviar en ${resendAfter} s` : 'Reenviar confirmación'}</button>
+      <button type="button" onClick={() => { setConfirmationEmail(''); setError(''); }} className="min-h-11 w-full text-sm underline">Corregir dirección de correo</button>
+    </div> : <>
+      <p className="mt-2 text-sm leading-6 text-slate-400">{mode === 'login' ? 'Accede con el correo que usaste al registrarte.' : 'Empieza con las rutas abiertas. Tus puntos CTF se guardan al validar respuestas.'}</p>
+      <div className="my-5 grid grid-cols-2 gap-2" aria-label="Tipo de acceso">{(['login','register'] as const).map(value => <button type="button" key={value} aria-pressed={mode === value} onClick={() => { setMode(value); setError(''); }} className={`min-h-10 rounded-lg text-sm ${mode === value ? 'bg-violet-600 text-white' : 'border border-slate-500'}`}>{value === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}</button>)}</div>
+      {!enabled && <p role="alert" className="mb-4 rounded-lg border border-amber-500/40 p-3 text-sm">El acceso no está disponible temporalmente. Puedes seguir leyendo las rutas abiertas.</p>}
+      <form onSubmit={submit} className="space-y-4">
+        {mode === 'register' && <><div><label htmlFor="auth-name" className="text-sm">Nombre para mostrar <span className="text-slate-400">(opcional)</span></label><input id="auth-name" value={fullName} onChange={e=>setFullName(e.target.value)} maxLength={80} autoComplete="nickname" className={field} /></div>
+        <div><label htmlFor="auth-username" className="text-sm">Nombre de usuario</label><input id="auth-username" value={username} onChange={e=>setUsername(e.target.value)} pattern="[a-zA-Z0-9_]{3,28}" minLength={3} maxLength={28} required autoComplete="username" aria-describedby="username-help" className={field} /><p id="username-help" className="mt-1 text-xs text-slate-400">Entre 3 y 28 letras, números o guion bajo. Será público.</p></div></>}
+        <div><label htmlFor="auth-email" className="text-sm">Correo electrónico</label><input autoFocus id="auth-email" type="email" value={email} onChange={e=>setEmail(e.target.value)} required autoComplete="email" className={field} /></div>
+        <div><label htmlFor="auth-password" className="text-sm">Contraseña</label><input id="auth-password" type="password" value={password} onChange={e=>setPassword(e.target.value)} required={online} minLength={mode === 'register' && online ? 8 : undefined} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} aria-describedby={mode === 'register' ? 'password-help' : undefined} className={field} />{mode === 'register' && <p id="password-help" className="mt-1 text-xs text-slate-400">Usa al menos 8 caracteres y una contraseña exclusiva para esta cuenta.</p>}</div>
+        <button type="submit" disabled={submitting || !enabled} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 text-sm font-bold text-white disabled:opacity-50">{submitting ? 'Procesando…' : mode === 'login' ? 'Entrar' : 'Crear cuenta y confirmar correo'}<ArrowRight size={16} /></button>
+      </form>
+    </>}
+    {error && <p role="alert" className="mt-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-400">{error}</p>}
+    {notice && <p role="status" className="mt-4 flex gap-2 text-sm"><CheckCircle2 size={18} />{notice}</p>}
+  </dialog>, document.body);
+}
