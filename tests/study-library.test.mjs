@@ -45,5 +45,6 @@ test('la biblioteca mantiene RLS y los archivos privados', () => {
   assert.match(sql, /study_progress enable row level security/);
   assert.match(sql, /user_id = auth.uid\(\) and public.has_member_access\(\)/);
   assert.match(sql, /'study-library', 'study-library', false/);
+  assert.match(sql, /application\/x-zip-compressed/);
   assert.doesNotMatch(sql, /update public.profiles|insert into public.solves/i);
 });

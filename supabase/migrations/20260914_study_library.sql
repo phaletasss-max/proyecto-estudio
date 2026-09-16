@@ -48,8 +48,11 @@ using (user_id = auth.uid() and public.has_member_access())
 with check (user_id = auth.uid() and public.has_member_access() and exists (select 1 from public.study_resources r where r.id = resource_id and r.is_published));
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('study-library', 'study-library', false, 52428800, array['application/zip','application/octet-stream','text/markdown','text/plain'])
-on conflict (id) do nothing;
+values ('study-library', 'study-library', false, 52428800, array['application/zip','application/x-zip-compressed','application/octet-stream','text/markdown','text/plain'])
+on conflict (id) do update set
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types,
+  public = false;
 create policy "Study files readers" on storage.objects for select to authenticated
 using (bucket_id = 'study-library' and public.has_member_access() and exists (
   select 1 from public.study_resources r where r.is_published and (r.archive_path = name or r.writeup_path = name or exists (
