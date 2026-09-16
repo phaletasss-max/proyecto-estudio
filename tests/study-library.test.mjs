@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 const source = readFileSync(new URL('../src/lib/study.ts', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
-const { addStudyDays, emptyStudyProgress, studyCompletion, studyMilestones, studyProgressError, studyWriteupTemplate, suggestedStudyAction, prioritizeStudy, isReviewDue, exportStudyWriteup, restoreStudyDraft } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+const { addStudyDays, completedFocusMinutes, emptyStudyProgress, focusRemainingSeconds, formatFocusTime, studyCompletion, studyMilestones, studyProgressError, studyWriteupTemplate, suggestedStudyAction, prioritizeStudy, isReviewDue, exportStudyWriteup, restoreStudyDraft } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 
 test('recupera un borrador local sin mezclar recursos ni aceptar datos corruptos', () => {
   const saved = emptyStudyProgress('one');
@@ -56,6 +56,14 @@ test('convierte un material pendiente en una sesión concreta y medible', () => 
   assert.equal(studyCompletion(progress), 100);
   assert.equal(studyMilestones(progress).every(item => item.complete), true);
 });
+test('mide una sesión de enfoque sin registrar tiempos negativos o excesivos', () => {
+  const started = Date.UTC(2026, 8, 16, 12, 0, 0);
+  assert.equal(focusRemainingSeconds(started, 25, started + 90_000), 1410);
+  assert.equal(focusRemainingSeconds(started, 25, started + 30 * 60_000), 0);
+  assert.equal(completedFocusMinutes(started, 25, started + 61_000), 2);
+  assert.equal(completedFocusMinutes(started, 25, started + 60 * 60_000), 25);
+  assert.equal(formatFocusTime(1410), '23:30');
+});
 test('la biblioteca mantiene RLS y los archivos privados', () => {
   const sql = readFileSync(new URL('../supabase/migrations/20260914_study_library.sql', import.meta.url), 'utf8');
   assert.match(sql, /study_progress enable row level security/);
@@ -63,4 +71,13 @@ test('la biblioteca mantiene RLS y los archivos privados', () => {
   assert.match(sql, /'study-library', 'study-library', false/);
   assert.match(sql, /application\/x-zip-compressed/);
   assert.doesNotMatch(sql, /update public.profiles|insert into public.solves/i);
+});
+test('las sesiones de estudio son privadas, inmutables y limitadas', () => {
+  const sql = readFileSync(new URL('../supabase/migrations/20260916_study_sessions.sql', import.meta.url), 'utf8');
+  assert.match(sql, /study_sessions enable row level security/);
+  assert.match(sql, /user_id = auth.uid\(\) and public.has_member_access\(\)/);
+  assert.match(sql, /duration_minutes between 1 and 240/);
+  assert.match(sql, /revoke all on public\.study_sessions from anon, authenticated/);
+  assert.match(sql, /grant select, insert on public.study_sessions to authenticated/);
+  assert.doesNotMatch(sql, /grant delete|grant update/i);
 });

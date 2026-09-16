@@ -4,6 +4,8 @@ La sección `/library` reúne archivos de práctica y writeups de referencia par
 
 La biblioteca coloca primero **tu mejor siguiente paso**: un repaso vencido, una práctica en curso o un laboratorio guiado antes que material nuevo. Al abrir un recurso, la sección **Sesión enfocada** muestra cuatro hitos y permite preparar una acción concreta, crear la estructura del writeup y programar un repaso en siete días. Estas acciones preparan un borrador; pulsa **Guardar mi progreso** para sincronizarlo con tu cuenta.
 
+Cada recurso incluye además bloques de enfoque de 25, 45 o 60 minutos. Al finalizar, registra qué probaste y qué evidencia obtuviste. Las últimas cinco sesiones aparecen en el mismo recurso y son privadas: RLS limita su lectura e inserción al dueño de la cuenta con acceso de miembro.
+
 ## Una sesión de aprendizaje
 
 1. Elige un material y escribe una **siguiente acción concreta**.

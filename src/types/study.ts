@@ -13,3 +13,7 @@ export interface StudyProgress {
   resource_id: string; status: StudyStatus; next_action: string; personal_writeup: string; review_on: string | null; updated_at?: string;
 }
 export type StudyProgressSummary = Omit<StudyProgress, 'personal_writeup'>;
+export interface StudySession {
+  id: string; resource_id: string; started_at: string; ended_at: string;
+  duration_minutes: number; outcome: string; next_action: string; created_at: string;
+}

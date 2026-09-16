@@ -73,6 +73,17 @@ export function studyCompletion(progress: Pick<StudyProgress, 'status' | 'next_a
 export function studyWriteupTemplate(title: string) {
   return `## Objetivo\n\n¿Qué quiero entender de ${title}?\n\n## Hipótesis\n\n¿Qué creo que ocurre y cómo puedo comprobarlo?\n\n## Intentos y evidencias\n\n- Comando o acción:\n- Resultado observado:\n- Interpretación:\n\n## Método reproducible\n\n1. \n2. \n3. \n\n## Lo que aprendí\n\n¿Qué podría explicar ahora sin consultar una guía?`;
 }
+export function focusRemainingSeconds(startedAt: number, durationMinutes: number, now = Date.now()) {
+  return Math.max(0, durationMinutes * 60 - Math.floor((now - startedAt) / 1000));
+}
+export function completedFocusMinutes(startedAt: number, durationMinutes: number, endedAt = Date.now()) {
+  const elapsed = Math.ceil((endedAt - startedAt) / 60000);
+  return Math.max(1, Math.min(240, durationMinutes, elapsed));
+}
+export function formatFocusTime(seconds: number) {
+  const safe = Math.max(0, Math.floor(seconds));
+  return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`;
+}
 export function exportStudyWriteup(title: string, progress: StudyProgress) {
   return `# ${title}\n\nWriteup personal de ShadowBytes. No acredita un solve ni puntos.\n\n${progress.personal_writeup}\n\n## Siguiente acción\n\n${progress.next_action || 'Por definir'}\n\nRepaso: ${progress.review_on || 'Sin fecha'}\n`;
 }
