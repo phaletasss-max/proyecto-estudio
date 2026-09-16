@@ -1,3 +1,5 @@
+import type { LabWorkspaceDefinition } from './labWorkspace';
+
 export type Difficulty = 'Easy' | 'Medium' | 'Hard' | 'Insane';
 
 export type CTFCategory = 'Web' | 'Forensics' | 'Pwn' | 'Crypto' | 'Reversing' | 'Network' | 'Misc';
@@ -50,6 +52,7 @@ export interface CTFLab {
   is_admission_challenge?: boolean;
   is_members_only?: boolean;
   estimatedMinutes?: number;
+  workspace?: LabWorkspaceDefinition;
 }
 
 export interface LabFormData {

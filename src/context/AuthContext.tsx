@@ -139,7 +139,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (sessionError) return { error: sessionError.message };
 
       if (!session?.user) {
-        setUser(null);
+        if (version === refreshVersion.current) setUser(null);
         return {};
       }
 
@@ -435,14 +435,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           solvedAt: new Date().toISOString(),
         };
 
-        setUser((current) => current ? {
+        setUser((current) => current?.id === user.id ? {
           ...current,
           points: result.total_points,
           rank: calculateRank(result.total_points),
           accessStatus: result.access_status as AccessStatus,
-          solvedLabs: [newSolve, ...current.solvedLabs],
+          solvedLabs: [newSolve, ...current.solvedLabs.filter(solve => solve.labId !== lab.id)],
         } : current);
-      }
+      } else { await refreshUser(); }
 
       return {
         accepted: true,
@@ -456,7 +456,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         alreadySolved: false,
         pointsEarned: 0,
         newBadges: [],
-        message: err instanceof Error ? err.message : 'No se pudo validar la flag.',
+        message: /^(Completa|Debes iniciar|Demasiados|Tu cuenta|Reto no disponible|Flag inválida)/.test(getErrorMessage(err, '')) ? getErrorMessage(err, '') : 'No se pudo validar la flag. Inténtalo de nuevo.',
       };
     }
   };

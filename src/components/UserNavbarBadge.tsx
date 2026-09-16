@@ -33,7 +33,7 @@ export const UserNavbarBadge: React.FC = () => {
       <>
         <button
           onClick={() => setAuthModalOpen(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-semibold transition-all shadow-md active:scale-95"
+          className="sb-primary-button inline-flex min-h-11 items-center gap-1.5 rounded-control px-4 py-2 text-xs font-semibold transition-colors"
         >
           <User className="w-3.5 h-3.5" />
           <span>Ingresar</span>

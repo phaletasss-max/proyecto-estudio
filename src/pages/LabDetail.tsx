@@ -1,81 +1,102 @@
-import { ContentIcon } from '@/components/ContentIcon';
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  ArrowLeft,
-  Download,
-  Lock,
-  Unlock,
-  User,
-  Calendar,
-  Tag,
-  Sparkles,
-  CheckCircle2,
-  Terminal,
-  FileText,
-  MessageSquare,
-  Layers,
-  Clock,
-} from 'lucide-react';
-import { DifficultyBadge } from '@/components/DifficultyBadge';
-import { FlagInput } from '@/components/FlagInput';
-import { WriteupRenderer } from '@/components/WriteupRenderer';
-import { AchievementModal } from '@/components/AchievementModal';
-import { CyberTerminal } from '@/components/CyberTerminal';
-import { TaskSection } from '@/components/TaskSection';
-import { LabDiscussion } from '@/components/LabDiscussion';
-import { useTheme } from '@/context/ThemeContext';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, FileText, Lock, MessageSquare, Terminal, Unlock } from 'lucide-react';
+import { LabHeader } from '@/components/lab/LabHeader';
+import { LabSidebar } from '@/components/lab/LabSidebar';
+import { LabBriefing, LabTopology } from '@/components/lab/LabBriefing';
+import { EvidencePanel, ChainOfCustody } from '@/components/lab/EvidencePanel';
+import { LabIndicators, LabReportForm, LabCompletion, downloadNotebookReport } from '@/components/lab/LabNotebookPanels';
 import { useAuth } from '@/context/AuthContext';
 import { useLabDetail } from '@/hooks/useLabDetail';
+import { useLabNotebook } from '@/hooks/useLabNotebook';
+import { getLabWorkspace } from '@/data/labWorkspaces';
+import { reportChecklist } from '@/lib/labNotebook';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { CATEGORY_ICONS } from '@/types/ctf';
 import type { Badge } from '@/types/auth';
+import type { CTFLab } from '@/types/ctf';
+import type { LabSection } from '@/types/labWorkspace';
+import '@/components/lab/lab.css';
 
-export const LabDetail: React.FC = () => {
+const FlagInput = lazy(() => import('@/components/FlagInput').then(module => ({ default: module.FlagInput })));
+const WriteupRenderer = lazy(() => import('@/components/WriteupRenderer').then(module => ({ default: module.WriteupRenderer })));
+const AchievementModal = lazy(() => import('@/components/AchievementModal').then(module => ({ default: module.AchievementModal })));
+const CyberTerminal = lazy(() => import('@/components/CyberTerminal').then(module => ({ default: module.CyberTerminal })));
+const TaskSection = lazy(() => import('@/components/TaskSection').then(module => ({ default: module.TaskSection })));
+const LabDiscussion = lazy(() => import('@/components/LabDiscussion').then(module => ({ default: module.LabDiscussion })));
+const panelLoading = <p role="status" className="lab-panel text-sm text-muted">Preparando contenido…</p>;
+
+type SupportPanel = 'writeup' | 'terminal' | 'discussion';
+
+export function LabDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-  const { user, submitFlag } = useAuth();
-  const { lab, loading, error } = useLabDetail(slug || '');
+  const { user } = useAuth();
+  // A different lab or account must never inherit the previous lab's private content.
+  return <LabDetailContent key={`${slug}:${user?.id || 'guest'}:${user?.accessStatus || ''}`} />;
+}
 
-  const [activeTab, setActiveTab] = useState<'tasks' | 'terminal' | 'writeup' | 'discussion'>('tasks');
+function LabDetailContent() {
+  const { slug } = useParams<{ slug: string }>();
+  const { lab, loading, error } = useLabDetail(slug || '');
+  if (loading) return <div className="flex min-h-[50vh] items-center justify-center gap-3 text-sm text-muted" role="status"><div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" /> Cargando laboratorio…</div>;
+  if (error || !lab) return <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-5"><p className="text-sm text-danger" role="alert">{error || 'Laboratorio no encontrado'}</p><Link to="/labs" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text"><ArrowLeft size={16} /> Volver al catálogo</Link></div>;
+  return <LabWorkspace key={lab.id} lab={lab} />;
+}
+
+function LabWorkspace({ lab }: { lab: CTFLab }) {
+  const { user, submitFlag } = useAuth();
+  const workspace = lab.workspace || getLabWorkspace(lab.slug);
+  const evidence = workspace?.evidence || [];
+  const { notebook, setNotebook, storageError } = useLabNotebook(lab.id, user?.id);
+  const [activeSection, setActiveSection] = useState<LabSection>('briefing');
+  const [supportPanel, setSupportPanel] = useState<SupportPanel | null>(null);
+  const [selectedEvidence, setSelectedEvidence] = useState(evidence[0]?.id || '');
   const [writeupUnlocked, setWriteupUnlocked] = useState(false);
   const [achievementModalOpen, setAchievementModalOpen] = useState(false);
   const [pointsAwarded, setPointsAwarded] = useState(0);
   const [awardedBadges, setAwardedBadges] = useState<Badge[]>([]);
   const [secureWriteup, setSecureWriteup] = useState<string | null>(null);
+  const [writeupError, setWriteupError] = useState(false);
+  const [writeupRetry, setWriteupRetry] = useState(0);
   const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'error'>('idle');
-
-  const isAlreadySolved = user?.solvedLabs.some((s) => s.labSlug === slug || (lab && s.labId === lab.id)) || false;
+  const [exportError, setExportError] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const previousSection = useRef(activeSection);
+  const solve = user?.solvedLabs.find(item => item.labId === lab.id || item.labSlug === lab.slug);
+  const isAlreadySolved = !!solve;
   const canViewWriteup = writeupUnlocked || isAlreadySolved;
+  const available: LabSection[] = ['briefing', ...(workspace ? ['topology', 'evidence'] as LabSection[] : []), 'questions', 'indicators', 'report', 'completion'];
+
+  const selectSection = (section: LabSection) => { setSupportPanel(null); setActiveSection(section); };
+  const continueFrom = (from: LabSection, to: LabSection) => {
+    setNotebook(previous => ({ ...previous, reviewed: [...new Set([...previous.reviewed, from])] }));
+    selectSection(to);
+  };
+  const openEvidence = (id: string) => { setSelectedEvidence(id); selectSection('evidence'); };
+  const exportReport = () => {
+    try { downloadNotebookReport(lab.title, lab.slug, notebook, evidence, canViewWriteup); setExportError(false); }
+    catch { setExportError(true); }
+  };
 
   useEffect(() => {
-    if (!lab || !canViewWriteup || !isSupabaseConfigured() || secureWriteup !== null) return;
+    if (previousSection.current !== activeSection) contentRef.current?.focus({ preventScroll: false });
+    previousSection.current = activeSection;
+  }, [activeSection]);
 
+  useEffect(() => {
+    if (!canViewWriteup || !isSupabaseConfigured() || secureWriteup !== null || supportPanel !== 'writeup') return;
+    let active = true;
+    setWriteupError(false);
     supabase.rpc('get_challenge_writeup', { p_lab_id: lab.id })
-      .then(({ data, error: writeupError }) => {
-        if (writeupError) {
-          console.error('No se pudo cargar el writeup protegido:', writeupError.message);
-          return;
-        }
-        setSecureWriteup(data || '');
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error) { setWriteupError(true); return; }
+        setSecureWriteup(typeof data === 'string' ? data : '');
       });
-  }, [lab, canViewWriteup, secureWriteup]);
+    return () => { active = false; };
+  }, [lab.id, canViewWriteup, secureWriteup, writeupRetry, supportPanel]);
 
   const handleFlagSubmission = async (flag: string) => {
-    if (!lab) {
-      return { accepted: false, alreadySolved: false, message: 'Reto no disponible.' };
-    }
-
-    const result = await submitFlag({
-        id: lab.id,
-        slug: lab.slug,
-        title: lab.title,
-        category: lab.category,
-        difficulty: lab.difficulty,
-      }, flag);
-
+    const result = await submitFlag({ id: lab.id, slug: lab.slug, title: lab.title, category: lab.category, difficulty: lab.difficulty }, flag);
     if (result.accepted) {
       setWriteupUnlocked(true);
       if (!result.alreadySolved) {
@@ -84,311 +105,60 @@ export const LabDetail: React.FC = () => {
         setAchievementModalOpen(true);
       }
     }
-
     return result;
   };
 
-  const handleQuestionSolved = (_questionId: string, _points: number) => {
-    // When an individual task question is solved
-  };
-
   const handleSecureDownload = async () => {
-    const storagePath = lab?.zip_url;
-    if (!storagePath || !isSupabaseConfigured()) return;
+    if (!lab.zip_url || !user || !isSupabaseConfigured()) return;
     setDownloadState('loading');
-    const { data, error: signedUrlError } = await supabase.storage.from('ctf-zips').createSignedUrl(storagePath, 60);
-    if (signedUrlError || !data?.signedUrl) {
-      setDownloadState('error');
-      return;
-    }
-    window.location.assign(data.signedUrl);
-    setDownloadState('idle');
+    try {
+      const { data, error } = await supabase.storage.from('ctf-zips').createSignedUrl(lab.zip_url, 60, { download: true });
+      if (error || !data?.signedUrl) throw new Error('Download unavailable');
+      window.location.assign(data.signedUrl);
+      setDownloadState('idle');
+    } catch { setDownloadState('error'); }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+  const reportReady = reportChecklist(notebook, evidence.map(item => item.id)).every(item => item.complete);
+  const reviewed: LabSection[] = notebook.reviewed.filter(section => section !== 'report');
+  if (reportReady) reviewed.push('report');
+
+  return <section className="lab-workspace mx-auto w-full max-w-[1500px] px-4 py-6 text-foreground sm:px-6 sm:py-8">
+    <LabHeader lab={lab} solved={canViewWriteup} authenticated={!!user} downloadState={downloadState} onDownload={handleSecureDownload} />
+    <div className="lab-layout mt-5">
+      <div className="lab-navigation-column"><LabSidebar active={activeSection} available={available} reviewed={reviewed} solved={canViewWriteup} onSelect={selectSection} />
+        <aside className="mt-4 rounded-xl border border-border bg-panel p-4"><h2 className="text-xs font-semibold uppercase tracking-wider text-muted">Tu cuaderno</h2><p className="mt-2 text-xs leading-6 text-muted">Notas e informe guardados en este navegador{user ? ', separados por cuenta' : ' como visitante'}. Exporta una copia antes de cambiar de dispositivo.</p><button type="button" onClick={exportReport} className="mt-2 min-h-11 text-sm font-semibold text-accent-text">Exportar informe</button></aside>
       </div>
-    );
-  }
-
-  if (error || !lab) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center pt-20 gap-4">
-        <p className={`font-mono text-sm ${isDark ? 'text-red-400' : 'text-red-600'}`}>
-          {error || 'Lab no encontrado'}
-        </p>
-        <Link to="/labs" className="text-purple-500 hover:text-purple-400 text-sm font-medium">
-          ← Volver a Labs
-        </Link>
-      </div>
-    );
-  }
-
-  const formattedDate = new Date(lab.created_at).toLocaleDateString('es-PE', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-
-  return (
-    <section className="pt-28 pb-20 min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Back Link */}
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link
-            to="/labs"
-            className={`inline-flex items-center gap-1.5 text-xs font-mono font-medium mb-6 transition-colors ${
-              isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al Catálogo de Labs
-          </Link>
-        </motion.div>
-
-        {/* Header Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className={`rounded-3xl border p-6 sm:p-8 mb-6 shadow-xl relative overflow-hidden ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
-          }`}
-        >
-          {/* Header Ambient Glow */}
-          <div className="absolute top-0 right-0 w-80 h-32 bg-gradient-to-bl from-purple-600/15 via-cyan-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4 relative z-10">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <DifficultyBadge difficulty={lab.difficulty} />
-
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono border ${
-                isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-600'
-              }`}>
-                <span><ContentIcon name={CATEGORY_ICONS[lab.category]} /></span>
-                {lab.category}
-              </span>
-
-              {lab.framework && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-red-500/15 text-red-400 border border-red-500/30">
-                  <span><ContentIcon name="zap" /></span>
-                  <span>{lab.framework}</span>
-                </span>
-              )}
-            </div>
-
-            {isAlreadySolved && (
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                PWNED / RESUELTO
-              </span>
-            )}
-          </div>
-
-          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight font-[Orbitron] mb-3 relative z-10">
-            {lab.title}
-          </h1>
-
-          <p className={`text-xs sm:text-sm leading-relaxed mb-5 relative z-10 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-            {lab.description}
-          </p>
-
-          {/* Tags */}
-          {lab.tags && (
-            <div className="flex flex-wrap gap-1.5 mb-5 relative z-10">
-              {lab.tags.map((t) => (
-                <span
-                  key={t}
-                  className={`px-2.5 py-0.5 rounded-md text-[10px] font-mono ${
-                    isDark ? 'bg-slate-900 border border-slate-800 text-slate-400' : 'bg-slate-100 border border-slate-200 text-slate-600'
-                  }`}
-                >
-                  #{t}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Metadata info */}
-          <div className={`flex flex-wrap items-center gap-4 text-xs font-mono pt-4 border-t border-slate-800/80 relative z-10 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            <span className="inline-flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-purple-400" />
-              {lab.author}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-cyan-400" />
-              ~{lab.estimatedMinutes || 60} min
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-amber-400" />
-              {formattedDate}
-            </span>
-          </div>
-
-          {/* ZIP Download Link */}
-          {lab.zip_url && (
-            <div className="mt-5 relative z-10">
-              <button
-                type="button"
-                onClick={handleSecureDownload}
-                disabled={downloadState === 'loading'}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold transition-all shadow-md shadow-blue-600/25 active:scale-95"
-              >
-                <Download className="w-4 h-4" />
-                <span>{downloadState === 'loading' ? 'Preparando enlace…' : 'Descargar archivos (enlace privado)'}</span>
-              </button>
-              {downloadState === 'error' && <p className="mt-2 text-xs text-red-400" role="alert">No se pudo autorizar la descarga. Comprueba tu sesión o membresía.</p>}
-            </div>
-          )}
-        </motion.div>
-
-        {/* Navigation Tabs (TryHackMe Style) */}
-        <div role="tablist" aria-label="Secciones del reto" className={`flex items-center gap-2 p-1.5 rounded-2xl border mb-6 overflow-x-auto ${
-          isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
-        }`}>
-          <button
-            onClick={() => setActiveTab('tasks')}
-            role="tab"
-            aria-selected={activeTab === 'tasks'}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 ${
-              activeTab === 'tasks'
-                ? 'bg-purple-600 text-white shadow-md'
-                : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Tareas ({lab.tasks?.length || 1})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('terminal')}
-            role="tab"
-            aria-selected={activeTab === 'terminal'}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 ${
-              activeTab === 'terminal'
-                ? 'bg-purple-600 text-white shadow-md'
-                : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Terminal className="w-3.5 h-3.5" />
-            <span>Terminal guiada</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('writeup')}
-            role="tab"
-            aria-selected={activeTab === 'writeup'}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 ${
-              activeTab === 'writeup'
-                ? 'bg-purple-600 text-white shadow-md'
-                : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Guía {canViewWriteup ? "disponible" : "bloqueada"}</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('discussion')}
-            role="tab"
-            aria-selected={activeTab === 'discussion'}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all shrink-0 ${
-              activeTab === 'discussion'
-                ? 'bg-purple-600 text-white shadow-md'
-                : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>Comunidad</span>
-          </button>
-        </div>
-
-        {/* Tab 1: Tasks & Questions */}
-        {activeTab === 'tasks' && (
-          <div className="space-y-6">
-            {lab.tasks && lab.tasks.length > 0 ? (
-              <TaskSection tasks={lab.tasks} onQuestionSolved={handleQuestionSolved} />
-            ) : (
-              <div className={`p-6 rounded-2xl border ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}`}>
-                <p className="text-xs font-mono text-slate-400">
-                  Este laboratorio cuenta con validación directa de flag a continuación.
-                </p>
-              </div>
-            )}
-
-            {/* Root Flag Submission Box */}
-            <div className={`rounded-2xl border p-6 ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div className="flex items-center gap-2">
-                  {canViewWriteup ? <Unlock className="w-4 h-4 text-emerald-500" /> : <Lock className="w-4 h-4 text-amber-500" />}
-                  <h3 className="text-sm font-bold font-mono">Flag principal del reto</h3>
-                </div>
-                <span className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  +{lab.difficulty === 'Insane' ? 1000 : lab.difficulty === 'Hard' ? 500 : lab.difficulty === 'Medium' ? 250 : 100} pts
-                </span>
-              </div>
-
-              <FlagInput onSubmit={handleFlagSubmission} disabled={canViewWriteup} />
-            </div>
-          </div>
-        )}
-
-        {/* Tab 2: AttackBox Terminal */}
-        {activeTab === 'terminal' && (
-          <div className="space-y-4">
-            <CyberTerminal labSlug={lab.slug} />
-          </div>
-        )}
-
-        {/* Tab 3: Writeup Guide */}
-        {activeTab === 'writeup' && (
-          <div className={`rounded-3xl border p-6 sm:p-8 shadow-xl ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white border-slate-200'}`}>
-            {canViewWriteup ? (
-              <WriteupRenderer content={secureWriteup ?? 'Cargando writeup protegido…'} />
-            ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <Lock className="w-12 h-12 text-slate-600 mb-3" />
-                <h4 className="text-base font-bold font-mono mb-1">Writeup Protegido con Cifrado</h4>
-                <p className="text-xs font-mono text-slate-400 max-w-md mb-6">
-                  Resuelve las tareas o ingresa la Flag del laboratorio en la pestaña "Tareas" para desbloquear la guía completa de resolución.
-                </p>
-                <button
-                  onClick={() => setActiveTab('tasks')}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 text-white text-xs font-mono font-bold"
-                >
-                  Ir a Tareas & Flag
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Tab 4: Discussion */}
-        {activeTab === 'discussion' && (
-          <div className="space-y-4">
-            <LabDiscussion labSlug={lab.slug} initialComments={lab.comments} />
-          </div>
-        )}
-
-        {/* Achievement Modal */}
-        <AchievementModal
-          isOpen={achievementModalOpen}
-          onClose={() => setAchievementModalOpen(false)}
-          labTitle={lab.title}
-          pointsEarned={pointsAwarded}
-          newBadges={awardedBadges}
-        />
-      </div>
-    </section>
-  );
-};
+      <div className="min-w-0" ref={contentRef} tabIndex={-1}><Suspense fallback={panelLoading}>
+        {storageError && <p role="alert" className="mb-4 rounded-lg border border-warning/40 bg-panel p-4 text-sm leading-6 text-warning">Este navegador no permite guardar el cuaderno. Puedes trabajar durante esta sesión; exporta el informe para conservarlo.</p>}
+        {exportError && <p role="alert" className="mb-4 rounded-lg border border-danger/40 p-4 text-sm text-danger">No se pudo exportar. Copia tu informe antes de cerrar esta página o vuelve a intentar la descarga.</p>}
+        {activeSection === 'briefing' && <LabBriefing lab={lab} workspace={workspace} onContinue={() => continueFrom('briefing', workspace ? 'topology' : 'questions')} />}
+        {activeSection === 'topology' && workspace && <LabTopology workspace={workspace} onEvidence={openEvidence} onContinue={() => continueFrom('topology', 'evidence')} />}
+        {activeSection === 'evidence' && workspace && <>
+          <EvidencePanel workspace={workspace} authenticated={!!user} selectedId={selectedEvidence} onSelect={setSelectedEvidence}
+            onVerified={event => setNotebook(previous => ({ ...previous, custody: [...previous.custody, event].slice(-50) }))}
+            onCite={(item, line, content) => setNotebook(previous => ({ ...previous, notes: `${previous.notes}${previous.notes ? '\n\n' : ''}${item.filename}, línea ${line}:\n${content}`.slice(0, 10000) }))} />
+          <ChainOfCustody evidence={evidence} events={notebook.custody} />
+          <div className="mt-5 flex flex-wrap gap-3"><button type="button" className="lab-button" onClick={() => continueFrom('evidence', 'questions')}>Continuar al reto <ArrowRight size={16} /></button><button type="button" className="lab-button lab-button-secondary" onClick={() => selectSection('indicators')}>Ver notas y hallazgos</button></div>
+        </>}
+        {activeSection === 'questions' && <div className="space-y-5">
+          <div className="lab-panel"><p className="lab-eyebrow">Comprueba tu análisis</p><h2 className="lab-title">Resolver el reto</h2><p className="mt-3 text-sm leading-7 text-muted">Lee cada pregunta, localiza la evidencia y responde en el formato indicado. Las pistas muestran su coste antes de revelarse.</p>{workspace && <button type="button" className="mt-3 min-h-11 text-sm font-semibold text-accent-text" onClick={() => selectSection('evidence')}>Volver a los registros</button>}</div>
+          {lab.tasks && lab.tasks.length > 0 ? <TaskSection tasks={lab.tasks} /> : <div className="lab-panel"><p className="text-sm leading-7 text-muted">Este laboratorio utiliza una validación directa de flag. Sigue el objetivo y las instrucciones de su paquete de archivos para obtenerla.</p></div>}
+          <section className="lab-panel" aria-labelledby="flag-title"><div className="flex flex-wrap items-center justify-between gap-3"><h3 id="flag-title" className="inline-flex items-center gap-2 text-base font-semibold">{canViewWriteup ? <Unlock size={18} className="text-success" /> : <Lock size={18} className="text-muted" />} Flag principal del reto</h3><span className="text-sm font-semibold text-warning">Hasta {lab.points ?? 100} puntos</span></div><p className="my-4 text-sm leading-7 text-muted">Completa las preguntas en orden y envía la flag encontrada. Los puntos se acreditan una sola vez al completar el laboratorio. Las pistas con coste reducen esa recompensa.</p><FlagInput onSubmit={handleFlagSubmission} disabled={canViewWriteup} /></section>
+          <button type="button" className="lab-button lab-button-secondary" onClick={() => selectSection('indicators')}>Documentar mis hallazgos <ArrowRight size={16} /></button>
+        </div>}
+        {activeSection === 'indicators' && <LabIndicators notebook={notebook} evidence={evidence} onChange={setNotebook} onContinue={() => continueFrom('indicators', 'report')} />}
+        {activeSection === 'report' && <LabReportForm notebook={notebook} evidence={evidence} onChange={setNotebook} onContinue={() => selectSection('completion')} onExport={exportReport} />}
+        {activeSection === 'completion' && <LabCompletion notebook={notebook} evidence={evidence} solved={canViewWriteup} points={solve?.pointsEarned ?? (writeupUnlocked ? pointsAwarded : undefined)} onSelect={selectSection} onExport={exportReport} />}
+        <section className="lab-panel mt-5" aria-label="Recursos de apoyo"><h2 className="text-sm font-semibold">Recursos de apoyo</h2><div className="mt-3 flex flex-wrap gap-2">{([{ id: 'terminal', label: 'Terminal de práctica', icon: Terminal }, { id: 'writeup', label: `Solución ${canViewWriteup ? 'disponible' : 'bloqueada'}`, icon: FileText }, { id: 'discussion', label: 'Comunidad', icon: MessageSquare }] as const).map(item => <button type="button" key={item.id} aria-expanded={supportPanel === item.id} aria-controls={`lab-support-${item.id}`} className="lab-button lab-button-secondary" onClick={() => setSupportPanel(previous => previous === item.id ? null : item.id)}><item.icon size={16} /> {item.label}</button>)}</div>
+          {supportPanel === 'terminal' && <div id="lab-support-terminal" className="mt-5"><CyberTerminal labSlug={lab.slug} /></div>}
+          {supportPanel === 'discussion' && <div id="lab-support-discussion" className="mt-5"><LabDiscussion labSlug={lab.slug} initialComments={lab.comments} /></div>}
+          {supportPanel === 'writeup' && <div id="lab-support-writeup" className="mt-5 border-t border-border pt-5">{canViewWriteup ? writeupError ? <div role="alert"><p className="text-sm text-danger">No se pudo cargar la solución.</p><button type="button" className="lab-button lab-button-secondary mt-3" onClick={() => setWriteupRetry(value => value + 1)}>Reintentar</button></div> : secureWriteup === null ? <p className="text-sm text-muted" role="status">Cargando solución…</p> : secureWriteup ? <WriteupRenderer content={secureWriteup} /> : <p className="text-sm text-muted">La flag está validada. La solución editorial todavía no está disponible.</p> : <div><h3 className="flex items-center gap-2 text-base font-semibold"><Lock size={18} /> Solución bloqueada</h3><p className="mt-2 text-sm leading-7 text-muted">Envía la flag correcta para desbloquear la guía completa. Las pistas de cada pregunta están disponibles mientras resuelves el reto.</p><button type="button" className="lab-button mt-4" onClick={() => selectSection('questions')}>Ir al reto</button></div>}</div>}
+        </section>
+      </Suspense></div>
+    </div>
+    {achievementModalOpen && <Suspense fallback={<p role="status">Cargando resultado…</p>}><AchievementModal isOpen onClose={() => setAchievementModalOpen(false)} labTitle={lab.title} pointsEarned={pointsAwarded} newBadges={awardedBadges} /></Suspense>}
+  </section>;
+}
 
 export default LabDetail;

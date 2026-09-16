@@ -33,8 +33,8 @@ export const Footer: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span className={`text-2xl font-bold tracking-tight font-[Orbitron] ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                SHADOW<span className="text-purple-500">BYTES</span>
+              <span className="sb-wordmark text-foreground">
+                Shadow<span className="text-accent-text">bytes</span>
               </span>
             </div>
             <p className="text-xs font-mono text-purple-500 tracking-wider font-semibold">

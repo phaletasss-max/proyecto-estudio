@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "attribution": "Retos originales de Hack The Box. Guías en español elaboradas por ShadowBytes para los archivos aportados por el propietario del proyecto.",
+  "labs": [
+    {
+      "slug": "htb-dynastic",
+      "title": "Dynastic: recupera un mensaje cifrado",
+      "source_zip": "crypto_dynastic.zip",
+      "storage_object": "htb-dynastic.zip",
+      "difficulty": "Easy",
+      "category": "Crypto",
+      "points": 100,
+      "estimated_minutes": 30,
+      "description": "Aprende a leer un cifrado de sustitución y a invertirlo con Python. Tres pasos guiados, pistas gratuitas y archivos locales. No requiere máquina virtual ni conexión a un servidor.",
+      "tags": [
+        "HTB",
+        "Python",
+        "Criptografía",
+        "Sin VM",
+        "Principiante"
+      ],
+      "steps": [
+        {
+          "title": "Prepara la evidencia",
+          "description": "## Tu objetivo\nRecuperar el mensaje de `output.txt` y entregarlo dentro de `HTB{...}`. Una flag es el texto que demuestra que completaste el reto. Conserva los guiones bajos y signos del mensaje.\n\n**Tiempo:** unos 30 minutos. **Necesitas:** un editor de texto y Python 3. No necesitas una máquina virtual, una IP de destino ni experiencia previa con terminales. Las pistas son gratuitas. Las preguntas guardan tu avance; los 100 puntos se conceden una sola vez al validar la flag final.\n\n1. Inicia sesión y usa **Descargar archivos**.\n2. Extrae el ZIP con **Extraer todo** en Windows, con doble clic en macOS o con tu gestor de archivos en Linux. Abre la carpeta `crypto_dynastic`.\n3. Abre `source.py` y `output.txt` con tu editor. Lee `source.py` como texto; no hace falta ejecutarlo. Depende de un archivo secreto que no está incluido.\n4. `output.txt` tiene una instrucción y después el mensaje cifrado. Identifica esa segunda línea.\n\n## Abre una terminal en esa carpeta\nEn Windows, abre la carpeta en el Explorador, escribe `powershell` en su barra de direcciones y pulsa Entrar. Comprueba Python con `py --version`. En macOS o Linux, abre Terminal, escribe `cd `, arrastra la carpeta a la terminal y pulsa Entrar; comprueba `python3 --version`. Si tu instalación reconoce `python` en lugar de `py` o `python3`, usa ese nombre en los comandos de esta guía. Si no tienes Python, instálalo desde [python.org](https://www.python.org/downloads/) antes de continuar.\n\n**Resultado esperado:** puedes leer los dos archivos y la terminal muestra una versión de Python 3. No se ha ejecutado ningún archivo del reto.",
+          "question": "¿Qué archivo contiene el mensaje cifrado? Escribe su nombre con extensión.",
+          "answer_format": "nombre.extensión",
+          "hints": [
+            "El archivo Python describe la transformación. El otro archivo contiene su resultado.",
+            "Busca el archivo de texto cuyo nombre significa salida en inglés."
+          ]
+        },
+        {
+          "title": "Entiende la posición de cada carácter",
+          "description": "## Un alfabeto que da vueltas\nEn `source.py`, `ord(a) - 0x41` convierte A en 0, B en 1 y así sucesivamente. `0x41` es 65, el código de A. La operación `% 26` mantiene el resultado dentro del alfabeto inglés: después de Z se vuelve a A.\n\nLa función recorre **todas las posiciones** con `i`, empezando por 0. Si el carácter es una letra, suma `i` a su número. Si es un guion bajo o un signo, lo conserva, pero esa posición también cuenta.\n\nPuedes seguir el ejemplo `AB_C`: A está en la posición 0, B en la 1, el guion en la 2 y C en la 3. Al cifrarlo se obtiene `AC_F`. El guion no se cifra; la siguiente letra sigue estando en la posición 3.\n\n**Comprueba tu comprensión:** en `range(len(m))`, Python empieza en cero. Mira la expresión `chi + i` y piensa qué operación la deshace.",
+          "question": "¿Cuál es el valor de i para el primer carácter del mensaje?",
+          "answer_format": "Un número entero",
+          "hints": [
+            "En Python, las posiciones de una cadena no empiezan en uno.",
+            "La primera letra no cambia al sumarle su posición."
+          ]
+        },
+        {
+          "title": "Invierte la regla y verifica tu resultado",
+          "description": "## Primero una prueba pequeña\nSi el cifrado suma la posición, el descifrado debe restarla. El módulo mantiene los números negativos dentro del alfabeto.\n\nCrea un archivo nuevo llamado `resolver.py` en la carpeta que contiene `output.txt`. En Bloc de notas de Windows, usa **Guardar como**, elige **Todos los archivos** y escribe ese nombre completo; comprueba que no termine en `.py.txt`. Copia este código propio de la guía. Cambia el `+` marcado por la operación inversa que acabas de identificar. No edites ni ejecutes el archivo original del reto.\n\n```python\nfrom pathlib import Path\n\ndef recuperar(texto):\n    resultado = []\n    for i, letra in enumerate(texto):\n        if 'A' <= letra <= 'Z':\n            numero = ord(letra) - ord('A')\n            original = (numero + i) % 26  # cambia + por la operación inversa\n            resultado.append(chr(original + ord('A')))\n        else:\n            resultado.append(letra)\n    return ''.join(resultado)\n\nprint('Prueba:', recuperar('AC_F'))\ncifrado = Path('output.txt').read_text(encoding='utf-8').splitlines()[-1]\nprint('HTB{' + recuperar(cifrado) + '}')\n```\n\nGuarda el archivo y ejecuta **tu nuevo archivo** con `py resolver.py` en Windows o `python3 resolver.py` en macOS/Linux. Primero verifica la línea `Prueba:` con el ejemplo del paso anterior. Si no coincide, revisa la operación y conserva `enumerate(texto)` sobre el texto completo, incluidos los signos.\n\n**Después de responder esta pregunta:** copia la segunda línea que imprime tu script en el campo de flag final y valídala. Se desbloqueará una explicación completa. Si aparece `FileNotFoundError`, comprueba que `resolver.py` y `output.txt` están en la misma carpeta y que la terminal está abierta allí.",
+          "question": "Al invertir correctamente el ejemplo AC_F, ¿qué texto recuperas?",
+          "answer_format": "Dos letras, guion bajo y una letra; sin comillas",
+          "hints": [
+            "Conserva el guion y resta 1 a la segunda letra y 3 a la última.",
+            "El ejemplo debe volver al texto original presentado en el paso anterior."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "htb-lootstash",
+      "title": "LootStash: encuentra evidencia dentro de un archivo",
+      "source_zip": "rev_lootstash.zip",
+      "storage_object": "htb-lootstash.zip",
+      "difficulty": "Easy",
+      "category": "Reversing",
+      "points": 100,
+      "estimated_minutes": 25,
+      "description": "Inspecciona un archivo binario como datos y descubre el texto que contiene. Tres pasos guiados con Python y pistas gratuitas. No requiere ejecutar el programa ni usar una máquina virtual.",
+      "tags": [
+        "HTB",
+        "Análisis estático",
+        "Python",
+        "Sin VM",
+        "Principiante"
+      ],
+      "steps": [
+        {
+          "title": "Identifica el archivo sin ejecutarlo",
+          "description": "## Tu objetivo\nEncontrar una cadena con formato `HTB{...}` dentro de `stash`. Esa cadena será la flag: la evidencia que presentarás al completar el reto.\n\n**Tiempo:** unos 25 minutos. **Necesitas:** un editor de texto y Python 3. No necesitas Linux, una IP de destino ni una máquina virtual. Todas las pistas son gratuitas. Las preguntas guardan tu avance; los 100 puntos se conceden al validar la flag final, una sola vez.\n\n1. Inicia sesión, usa **Descargar archivos** y extrae el ZIP. En Windows puedes usar **Extraer todo**; en macOS, doble clic; en Linux, tu gestor de archivos. Abre la carpeta `rev_lootstash`.\n2. Encontrarás `stash`, sin extensión. No lo abras con doble clic ni lo ejecutes. Solo leeremos sus bytes como datos.\n3. Abre una terminal en esa carpeta. En Windows escribe `powershell` en la barra de direcciones del Explorador y comprueba `py --version`. En macOS/Linux usa Terminal, `cd ` y arrastra la carpeta; después comprueba `python3 --version`. Puedes usar `python` si ese es el comando de tu instalación. Si falta Python 3, instálalo desde [python.org](https://www.python.org/downloads/).\n4. Crea un archivo nuevo, `inspeccionar.py`, con este código propio de la guía. En Bloc de notas de Windows, usa **Guardar como**, elige **Todos los archivos** y escribe ese nombre completo; comprueba que no termine en `.py.txt`:\n\n```python\nfrom pathlib import Path\n\ndatos = Path('stash').read_bytes()\nprint('Firma:', datos[:4].hex(' '))\nprint('Formato:', datos[1:4].decode('ascii'))\n```\n\nEjecuta **tu script** con `py inspeccionar.py` en Windows o `python3 inspeccionar.py` en macOS/Linux. `read_bytes()` lee el archivo, no inicia el programa que contiene.\n\n**Resultado esperado:** la firma es `7f 45 4c 46`. Los tres bytes finales representan el nombre de un formato de ejecutable común en Linux. Si hay `FileNotFoundError`, revisa que la terminal y ambos archivos estén en la misma carpeta.",
+          "question": "¿Qué formato de archivo muestran los tres caracteres que imprime tu script?",
+          "answer_format": "Tres letras",
+          "hints": [
+            "Lee la línea que empieza por Formato en la salida de tu propio script.",
+            "Los bytes 45, 4c y 46 en hexadecimal representan letras ASCII."
+          ]
+        },
+        {
+          "title": "Lee una característica del encabezado",
+          "description": "## Los primeros bytes describen el archivo\nUn encabezado es un pequeño conjunto de datos al inicio del archivo. En este formato, el byte en la posición 4 indica la clase del ejecutable: el valor 1 corresponde a 32 bits y el valor 2 a 64 bits. Como Python cuenta desde cero, `datos[4]` lee el quinto byte.\n\nAñade esta línea al final de `inspeccionar.py`, guarda y vuelve a ejecutar tu script:\n\n```python\nprint('Clase:', datos[4])\n```\n\nInterpreta el número con la equivalencia anterior. No necesitas que tu sistema pueda ejecutar ese formato: leer una secuencia de bytes funciona igual en Windows, macOS y Linux.\n\n**Resultado esperado:** sabes describir el archivo con su formato y su número de bits sin haberlo iniciado.",
+          "question": "Según el valor de Clase, ¿de cuántos bits es el archivo stash?",
+          "answer_format": "32 o 64; solo el número",
+          "hints": [
+            "El valor de Clase es un código: no es directamente el número de bits.",
+            "Usa la equivalencia 1 → 32 bits; 2 → 64 bits."
+          ]
+        },
+        {
+          "title": "Busca texto y entrega la evidencia",
+          "description": "## Un programa también puede contener texto\nLos mensajes, nombres y otros textos legibles a veces están guardados literalmente en un binario. El análisis estático consiste en inspeccionar el archivo sin ejecutarlo. Vamos a buscar secuencias ASCII que coincidan con el formato de flag.\n\nAñade este código propio al final de tu script:\n\n```python\nimport re\n\ncandidatas = re.findall(rb'HTB\\{[\\x20-\\x7e]{1,200}?\\}', datos)\nprint('Coincidencias:', len(candidatas))\nfor candidata in candidatas:\n    print(candidata.decode('ascii'))\n```\n\n`rb` indica un patrón de bytes. `\\x20-\\x7e` limita la búsqueda a caracteres ASCII imprimibles. Las llaves delimitan el texto de la flag. Este patrón lee datos; no ejecuta instrucciones del archivo.\n\nGuarda y vuelve a ejecutar `py inspeccionar.py` o `python3 inspeccionar.py`. Contesta cuántas coincidencias encontraste. Después copia **la cadena completa**, incluyendo `HTB{` y `}`, en el campo de flag final.\n\n**Si no hay coincidencias:** comprueba el nombre `stash`, que estás usando el ZIP de este reto y que copiaste las barras invertidas del patrón. Si obtienes más de una, revisa las candidatas antes de enviar.\n\n## Qué te llevas\nUna revisión simple de cadenas puede descubrir datos expuestos accidentalmente. Esto no significa que todos los programas guarden secretos en texto claro: otros retos requerirán técnicas adicionales. Aquí el objetivo es reconocer evidencia y justificar el método.",
+          "question": "¿Cuántas coincidencias con el formato de flag encuentra el script?",
+          "answer_format": "Un número entero",
+          "hints": [
+            "Busca la salida que empieza por Coincidencias. No cuentes las líneas Firma, Formato ni Clase.",
+            "El reto incluye una única cadena completa con ese patrón. Copia solo esa cadena al validar la flag final."
+          ]
+        }
+      ]
+    }
+  ]
+}

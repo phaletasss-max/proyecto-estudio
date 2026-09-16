@@ -1,77 +1,41 @@
-import React from 'react';
+import { useRef, useState, type ComponentPropsWithoutRef } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useTheme } from '@/context/ThemeContext';
+import { Check, Copy } from 'lucide-react';
 
-interface WriteupRendererProps {
-  content: string;
+function CodeBlock({ children, ...props }: ComponentPropsWithoutRef<'pre'>) {
+  const content = useRef<HTMLPreElement>(null);
+  const [notice, setNotice] = useState('');
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(content.current?.textContent || ''); setNotice('Copiado'); }
+    catch { setNotice('Selecciona el código para copiarlo'); }
+  };
+  return <div className="my-4 min-w-0 overflow-hidden rounded-lg border border-border bg-elevated">
+    <div className="flex items-center justify-between gap-3 border-b border-border px-3 py-1 text-xs text-muted">
+      <span>Código / evidencia</span>
+      <button type="button" onClick={copy} className="inline-flex min-h-10 items-center gap-2 text-foreground" aria-label="Copiar código">{notice === 'Copiado' ? <Check size={14} /> : <Copy size={14} />} Copiar</button>
+    </div>
+    <pre {...props} ref={content} className="m-0 overflow-x-auto p-4 font-mono text-sm leading-6 text-foreground">{children}</pre>
+    {notice && <p role="status" className="px-4 pb-2 text-xs text-muted">{notice}</p>}
+  </div>;
 }
 
-export const WriteupRenderer: React.FC<WriteupRendererProps> = ({ content }) => {
-  const { theme } = useTheme();
-
-  return (
-    <div className={`writeup-content ${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
-      <Markdown
-        remarkPlugins={[remarkGfm]}
-        components={{
-          h1: ({ node, ...props }) => <h1 className={`text-3xl font-bold mt-8 mb-4 border-b pb-2 ${theme === 'dark' ? 'text-white border-gray-800' : 'text-gray-900 border-gray-200'}`} {...props} />,
-          h2: ({ node, ...props }) => <h2 className={`text-2xl font-bold mt-6 mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`} {...props} />,
-          h3: ({ node, ...props }) => <h3 className={`text-xl font-bold mt-5 mb-2 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`} {...props} />,
-          h4: ({ node, ...props }) => <h4 className={`text-lg font-bold mt-4 mb-2 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`} {...props} />,
-          p: ({ node, ...props }) => <p className="mb-4 leading-relaxed" {...props} />,
-          a: ({ node, ...props }) => <a className={`text-blue-500 hover:text-blue-400 underline decoration-blue-500/30 hover:decoration-blue-500 transition-colors`} target="_blank" rel="noopener noreferrer" {...props} />,
-          ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-4 space-y-1" {...props} />,
-          ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-4 space-y-1" {...props} />,
-          li: ({ node, ...props }) => <li className="ml-4" {...props} />,
-          blockquote: ({ node, ...props }) => (
-            <blockquote className={`border-l-4 pl-4 py-1 mb-4 italic rounded-r-lg ${
-              theme === 'dark' ? 'border-blue-500 bg-blue-900/20 text-gray-300' : 'border-blue-500 bg-blue-50 text-gray-700'
-            }`} {...props} />
-          ),
-          table: ({ node, ...props }) => (
-            <div className="overflow-x-auto mb-4">
-              <table className={`min-w-full border-collapse ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'}`} {...props} />
-            </div>
-          ),
-          th: ({ node, ...props }) => <th className={`border px-4 py-2 text-left font-bold ${theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-gray-100 text-gray-900'}`} {...props} />,
-          td: ({ node, ...props }) => <td className={`border px-4 py-2 ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'}`} {...props} />,
-          code: ({ node, className, children, ...props }: any) => {
-            const match = /language-(\w+)/.exec(className || '');
-            const isInline = !match && !className;
-            
-            if (isInline) {
-              return (
-                <code className={`px-1.5 py-0.5 rounded-md font-mono text-sm ${
-                  theme === 'dark' ? 'bg-gray-800 text-green-400' : 'bg-gray-100 text-pink-600'
-                }`} {...props}>
-                  {children}
-                </code>
-              );
-            }
-            
-            return (
-              <div className="rounded-lg overflow-hidden my-4 border border-gray-800">
-                <div className="bg-gray-900 px-4 py-2 flex items-center gap-2 border-b border-gray-800">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                  </div>
-                  {match && <span className="text-xs text-gray-500 ml-2 font-mono lowercase">{match[1]}</span>}
-                </div>
-                <pre className="bg-[#0d1117] p-4 overflow-x-auto">
-                  <code className="text-gray-300 font-mono text-sm block" {...props}>
-                    {children}
-                  </code>
-                </pre>
-              </div>
-            );
-          },
-        }}
-      >
-        {content}
-      </Markdown>
-    </div>
-  );
-};
+export function WriteupRenderer({ content }: { content: string }) {
+  return <div className="writeup-content min-w-0 break-words text-sm leading-7 text-foreground">
+    <Markdown remarkPlugins={[remarkGfm]} components={{
+      h1: ({node, ...props}) => <h2 className="mb-4 mt-6 text-2xl font-semibold" {...props} />,
+      h2: ({node, ...props}) => <h3 className="mb-3 mt-5 text-xl font-semibold" {...props} />,
+      h3: ({node, ...props}) => <h4 className="mb-3 mt-4 text-base font-semibold" {...props} />,
+      p: ({node, ...props}) => <p className="mb-4" {...props} />,
+      a: ({node, ...props}) => <a className="text-info underline underline-offset-4" target="_blank" rel="noopener noreferrer" {...props} />,
+      ul: ({node, ...props}) => <ul className="mb-4 list-disc space-y-1 pl-5" {...props} />,
+      ol: ({node, ...props}) => <ol className="mb-4 list-decimal space-y-2 pl-5" {...props} />,
+      blockquote: ({node, ...props}) => <blockquote className="mb-4 border-l-2 border-info bg-elevated p-3 text-muted" {...props} />,
+      table: ({node, ...props}) => <div className="mb-4 overflow-x-auto"><table className="w-full border-collapse text-left" {...props} /></div>,
+      th: ({node, ...props}) => <th className="border border-border bg-elevated px-3 py-2 font-semibold" {...props} />,
+      td: ({node, ...props}) => <td className="border border-border px-3 py-2" {...props} />,
+      pre: ({node, ...props}) => <CodeBlock {...props} />,
+      code: ({node, ...props}) => <code className="rounded bg-elevated px-1 font-mono text-[0.9em] text-info" {...props} />,
+    }}>{content}</Markdown>
+  </div>;
+}

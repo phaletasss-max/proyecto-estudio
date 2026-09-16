@@ -2,11 +2,12 @@ import React, { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
+import { AppShell } from '@/components/AppShell';
 import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 
 const Home = lazy(() => import('@/pages/Home'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const StudyLibrary = lazy(() => import('@/pages/StudyLibrary'));
 const Labs = lazy(() => import('@/pages/Labs'));
 const LabDetail = lazy(() => import('@/pages/LabDetail'));
 const Upload = lazy(() => import('@/pages/Upload'));
@@ -37,7 +38,7 @@ function RouteTransition() {
 }
 
 function LoadingRoute() {
-  return <div className="flex min-h-[70vh] items-center justify-center bg-[#07090f] pt-24" role="status" aria-label="Cargando página"><span className="h-7 w-7 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" /></div>;
+  return <div className="flex min-h-[70vh] items-center justify-center bg-background pt-24" role="status" aria-label="Cargando página"><span className="h-7 w-7 animate-spin rounded-full border-2 border-accent border-t-transparent" /></div>;
 }
 
 function AdminRoute() {
@@ -47,16 +48,18 @@ function AdminRoute() {
 }
 
 export const App: React.FC = () => {
-  const { theme } = useTheme();
+  const { pathname } = useLocation();
   return (
-    <div className={`relative min-h-screen overflow-x-hidden font-sans ${theme === 'dark' ? 'bg-[#07090f] text-white selection:bg-purple-500/30' : 'bg-slate-50 text-slate-950 selection:bg-purple-200'}`}>
+    <div className="relative min-h-screen overflow-x-hidden bg-background font-sans text-foreground selection:bg-accent/25">
       <Navbar />
       <RouteTransition />
       <main id="main-content" className="relative z-10">
         <Suspense fallback={<LoadingRoute />}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route element={<AppShell />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/library" element={<StudyLibrary />} />
             <Route path="/setup/wsl" element={<WslSetup />} />
             <Route path="/labs" element={<Labs />} />
             <Route path="/lab/:slug" element={<LabDetail />} />
@@ -71,11 +74,12 @@ export const App: React.FC = () => {
             <Route path="/admission" element={<Admission />} />
             <Route path="/admin/labs/new" element={<AdminRoute />} />
             <Route path="/upload" element={<Navigate to="/admin/labs/new" replace />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>
-      <Footer />
+      {pathname === '/' && <Footer />}
     </div>
   );
 };

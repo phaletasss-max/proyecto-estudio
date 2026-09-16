@@ -1,21 +1,80 @@
 @import "tailwindcss";
 @import "./workspace.css";
+@import "./typography.css";
 
 @theme {
   --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Special Elite', typewriter, serif;
+  --font-display: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-control: 8px;
+  --radius-card: 14px;
+  --radius-dialog: 18px;
+}
 
-  --color-wandor-dark: #0a0a0a;
-  --color-wandor-text: #1a1a1a;
-  --color-wandor-muted: #767676;
-  --color-wandor-prompt: #905831;
+@theme inline {
+  --color-background: var(--sb-bg);
+  --color-panel: var(--sb-panel);
+  --color-elevated: var(--sb-elevated);
+  --color-border: var(--sb-border);
+  --color-control-border: var(--sb-control-border);
+  --color-foreground: var(--sb-text);
+  --color-muted: var(--sb-muted);
+  --color-accent: var(--sb-accent);
+  --color-accent-text: var(--sb-accent-text);
+  --color-on-accent: var(--sb-on-accent);
+  --color-info: var(--sb-info);
+  --color-success: var(--sb-success);
+  --color-warning: var(--sb-warning);
+  --color-danger: var(--sb-danger);
+}
+
+:root {
+  color-scheme: dark;
+  --sb-bg: #0c0c12;
+  --sb-panel: #14141e;
+  --sb-elevated: #1e1d2b;
+  --sb-border: #393548;
+  --sb-control-border: #797188;
+  --sb-text: #f2f0f8;
+  --sb-muted: #aaa6ba;
+  --sb-accent: #b49aff;
+  --sb-accent-hover: #c4b0ff;
+  --sb-accent-text: #c6b1ff;
+  --sb-accent-soft: #262035;
+  --sb-on-accent: #1b102f;
+  --sb-info: #82d2e8;
+  --sb-success: #76d9b2;
+  --sb-warning: #edc47a;
+  --sb-danger: #ff98ab;
+  --sb-shadow: 0 12px 36px #00000024;
+}
+
+:root.light {
+  color-scheme: light;
+  --sb-bg: #f7f6fb;
+  --sb-panel: #ffffff;
+  --sb-elevated: #eeebf5;
+  --sb-border: #d8d3e5;
+  --sb-control-border: #898196;
+  --sb-text: #252033;
+  --sb-muted: #655d76;
+  --sb-accent: #6740bd;
+  --sb-accent-hover: #5630a8;
+  --sb-accent-text: #6239b5;
+  --sb-accent-soft: #eee7fa;
+  --sb-on-accent: #ffffff;
+  --sb-info: #17657a;
+  --sb-success: #176547;
+  --sb-warning: #835312;
+  --sb-danger: #b32b49;
+  --sb-shadow: 0 12px 36px #30204a09;
 }
 
 body {
-  font-family: 'Geist', sans-serif;
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   overflow-x: hidden;
-  background: #07090f;
+  background: var(--sb-bg);
+  color: var(--sb-text);
 }
 
 button,
@@ -27,9 +86,19 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid #a855f7;
+  outline: 2px solid var(--sb-accent-text);
   outline-offset: 3px;
 }
+
+::selection { background: var(--sb-accent-soft); color: var(--sb-accent-text); }
+input, textarea, select { accent-color: var(--sb-accent); }
+.sb-primary-button { background: var(--sb-accent); color: var(--sb-on-accent); border-color: var(--sb-accent); }
+.sb-primary-button:hover:not(:disabled) { background: var(--sb-accent-hover); color: var(--sb-on-accent); }
+.sb-study-card { box-shadow: var(--sb-shadow); }
+.sb-study-card:hover { border-color: var(--sb-control-border); }
+.sb-section-header { border-bottom: 1px solid var(--sb-border); }
+.sb-section-header h1 { letter-spacing: -.035em; }
+.sb-study-input { border-color: var(--sb-control-border); }
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -58,11 +127,11 @@ select {
 }
 
 .font-display {
-  font-family: 'Special Elite', typewriter, serif !important;
+  font-family: var(--font-display) !important;
 }
 
 .font-sans {
-  font-family: 'Geist', sans-serif !important;
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
 /* Gradient text — visible in both themes */

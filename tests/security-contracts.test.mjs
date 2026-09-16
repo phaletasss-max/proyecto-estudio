@@ -14,7 +14,7 @@ test('los fixtures públicos no contienen verificadores ni soluciones', () => {
 });
 
 test('las consultas públicas usan listas de columnas explícitas', () => {
-  const sources = ['src/hooks/useLabs.ts', 'src/hooks/useLabDetail.ts', 'src/pages/Profile.tsx', 'src/context/AuthContext.tsx'];
+  const sources = ['src/hooks/useLabs.ts', 'src/hooks/useLabDetail.ts', 'src/hooks/useStudyLibrary.ts', 'src/pages/Profile.tsx', 'src/context/AuthContext.tsx'];
   for (const source of sources) assert.doesNotMatch(read(source), /\.select\(\s*['"]\*['"]\s*\)/, source);
 });
 

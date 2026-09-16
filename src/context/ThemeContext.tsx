@@ -11,12 +11,14 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('shadowbytes_theme');
-    return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+    try {
+      const saved = localStorage.getItem('shadowbytes_theme');
+      return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+    } catch { return 'dark'; }
   });
 
   useEffect(() => {
-    localStorage.setItem('shadowbytes_theme', theme);
+    try { localStorage.setItem('shadowbytes_theme', theme); } catch { /* Theme still works without persistence. */ }
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');

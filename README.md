@@ -32,6 +32,7 @@ flowchart LR
 - **Labs:** reúne los retos publicados y permite filtrar por tema y dificultad.
 - **Rutas:** ordena teoría y práctica para saber qué hacer a continuación.
 - **Perfil:** muestra puntos, retos resueltos y el avance hacia el siguiente rango.
+- **Biblioteca y práctica:** organiza ZIP y writeups, tu siguiente acción, explicación personal y fecha de repaso. Consulta [la guía de estudio e importación](docs/biblioteca-estudio.md).
 
 ## Base de datos y progreso
 

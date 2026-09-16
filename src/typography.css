@@ -1,0 +1,56 @@
+/* One reading family, a distinct wordmark, and monospace only for technical data. */
+:root {
+  --sb-font-ui: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --sb-font-code: ui-monospace, 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+}
+body { font-family: var(--sb-font-ui); font-kerning: normal; }
+button, input, select, textarea { font-family: inherit; }
+main :is(h1, h2, h3, h4) {
+  font-family: var(--sb-font-ui);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+main h1 { font-weight: 700; letter-spacing: -.045em; line-height: 1.13; }
+main h2 { font-weight: 650; letter-spacing: -.028em; line-height: 1.3; }
+main :is(h3, h4) { font-weight: 600; letter-spacing: -.018em; line-height: 1.4; }
+.sb-app-content h1 { font-size: clamp(1.85rem, 1.25rem + 2vw, 2.8rem); }
+.sb-wordmark {
+  font-family: var(--sb-font-ui);
+  font-weight: 750;
+  font-size: 1.25rem;
+  letter-spacing: -.065em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.sb-wordmark span { font-weight: 500; letter-spacing: -.055em; }
+.sb-eyebrow, .sb-meta, .lab-eyebrow {
+  font-family: var(--sb-font-ui);
+  font-size: .72rem;
+  letter-spacing: .1em;
+  font-weight: 600;
+}
+.sb-sidebar-link { font-size: .8125rem; font-weight: 500; }
+.sb-button, .lab-button { font-size: .875rem; letter-spacing: -.01em; }
+.sb-field-label { font-size: .8125rem; font-weight: 500; }
+.sb-select { font-size: .875rem; }
+.sb-hero h1 { font-weight: 700; letter-spacing: -.06em; }
+.sb-hero-description { font-size: clamp(1.05rem, 1rem + .35vw, 1.25rem); line-height: 1.65; }
+.sb-hero-secondary { font-size: .9375rem; line-height: 1.8; }
+.sb-planner h2 { font-size: 1.5rem; line-height: 1.3; }
+.sb-recommendation p, .sb-path-card > p { font-size: .875rem; line-height: 1.75; }
+.sb-lesson-content :is(p, li) { font-size: 1rem; line-height: 1.8; }
+.sb-lesson-content p { max-width: 72ch; text-wrap: pretty; }
+.writeup-content { font-size: 1rem; line-height: 1.8; }
+.writeup-content :is(p, li, blockquote) { max-width: 76ch; text-wrap: pretty; }
+.writeup-content h2 { font-size: clamp(1.5rem, 1.25rem + .65vw, 1.9rem); }
+.writeup-content h3 { font-size: 1.35rem; }
+.writeup-content h4 { font-size: 1.1rem; }
+.writeup-content :is(h2, h3, h4) { margin-top: 2rem; margin-bottom: .85rem; }
+.writeup-content :is(pre, code), .font-mono, kbd { font-family: var(--sb-font-code); font-variant-ligatures: none; }
+.writeup-content pre { font-size: .85rem; line-height: 1.7; }
+.sb-app-content :is(input, textarea, select) { font-size: 1rem; }
+@media (max-width: 640px) {
+  .sb-wordmark { font-size: 1.125rem; }
+  .sb-hero h1 { font-size: clamp(3.1rem, 12vw, 4.25rem); line-height: 1.08; }
+  .sb-hero { gap: 2rem; }
+}

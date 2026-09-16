@@ -1,4 +1,5 @@
 import type { CTFLab } from '@/types/ctf';
+import { routerWorkspace } from './labWorkspaces';
 
 /**
  * Public, non-secret fixtures for explicit local demo mode.
@@ -22,6 +23,7 @@ export const REAL_LABS: CTFLab[] = [
     is_admission_challenge: true,
     is_members_only: false,
     points: 100,
+    workspace: routerWorkspace,
   },
   {
     id: 'demo-wsl-setup',
