@@ -1,9 +1,9 @@
 import { lazy, Suspense, useDeferredValue, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowRight, BookOpen, Download, RotateCcw, Search } from 'lucide-react';
+import { ArrowRight, BookOpen, CalendarPlus, Check, Circle, Download, Play, RotateCcw, Search, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useStudyLibrary } from '@/hooks/useStudyLibrary';
-import { emptyStudyProgress, exportStudyWriteup, isReviewDue, localStudyDate, prioritizeStudy, restoreStudyDraft, studyProgressError } from '@/lib/study';
+import { addStudyDays, emptyStudyProgress, exportStudyWriteup, isReviewDue, localStudyDate, prioritizeStudy, restoreStudyDraft, studyCompletion, studyMilestones, studyProgressError, studyWriteupTemplate, suggestedStudyAction } from '@/lib/study';
 import { supabase } from '@/lib/supabase';
 import { STUDY_STATUSES, type StudyProgress, type StudyResource, type StudyStatus } from '@/types/study';
 const WriteupRenderer = lazy(() => import('@/components/WriteupRenderer').then(module => ({ default: module.WriteupRenderer })));
@@ -38,6 +38,10 @@ function LibraryContent() {
   });
   const selected = resources.find(item => item.id === params.get('resource'));
   const canRead = user && ['admin', 'member'].includes(user.accessStatus);
+  const recommended = ordered[0];
+  const recommendedProgress = recommended ? states.get(recommended.id) : undefined;
+  const activeCount = progress.filter(item => ['practicing', 'documenting', 'review'].includes(item.status)).length;
+  const learnedCount = progress.filter(item => item.status === 'learned').length;
 
   return <section className="mx-auto max-w-7xl px-4 pb-8 pt-28 sm:px-6">
     <header className="sb-section-header mb-7 pb-6"><p className="text-xs uppercase tracking-widest text-accent-text">Tu mesa de estudio</p><h1 className="mt-3 text-3xl font-semibold">Biblioteca y práctica</h1><p className="mt-3 max-w-3xl text-sm leading-7 text-muted">Organiza los archivos guardados, practica y escribe lo que has entendido. Los writeups de referencia pueden contener la solución completa. Tu avance aquí es personal; los puntos se obtienen en los laboratorios con validación.</p></header>
@@ -46,8 +50,12 @@ function LibraryContent() {
       : error ? <div role="alert" className="rounded-card border border-border p-6"><p>{error}</p><button className={`${button} mt-4`} onClick={refetch}>Reintentar</button></div>
       : selected ? <StudyDeskLoader key={selected.id} resource={selected} onBack={() => { setParams({}); refetch(); }} />
       : <>
-        <div className="mb-6 grid gap-3 sm:grid-cols-3">{[
-          ['Materiales', resources.length], ['Con writeup de referencia', resources.filter(item => item.writeup_path).length], ['Repasos pendientes', progress.filter(item => isReviewDue(item, today)).length],
+        {recommended && <section className="mb-6 grid gap-5 rounded-card border border-border bg-panel p-5 shadow-[var(--sb-shadow)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center sm:p-6">
+          <div><p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-accent-text"><Sparkles size={15} /> Tu mejor siguiente paso</p><h2 className="mt-3 text-2xl font-semibold">{recommended.title}</h2><p className="mt-2 max-w-3xl text-sm leading-7 text-muted">{recommendedProgress?.next_action || suggestedStudyAction(recommended, { status: recommendedProgress?.status || 'queued' })}</p><p className="mt-3 text-xs text-muted">{isReviewDue(recommendedProgress, today) ? 'Repaso vencido: conviene hacerlo antes de empezar material nuevo.' : recommendedProgress?.status && recommendedProgress.status !== 'queued' ? `Continúa desde «${STUDY_STATUSES[recommendedProgress.status]}».` : recommended.readiness === 'guided' ? 'Tiene laboratorio guiado para comenzar con menos fricción.' : 'Es el siguiente material disponible en tu cola.'}</p></div>
+          <button className={`${button} sb-primary-button w-full md:w-auto`} onClick={() => setParams({ resource: recommended.id })}>Continuar ahora <ArrowRight size={16} /></button>
+        </section>}
+        <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[
+          ['Materiales', resources.length], ['En curso', activeCount], ['Aprendidos', learnedCount], ['Repasos pendientes', progress.filter(item => isReviewDue(item, today)).length],
         ].map(([label, count]) => <div key={label} className="rounded-card border border-border bg-panel p-4"><p className="text-sm text-muted">{label}</p><strong className="mt-2 block text-2xl">{count}</strong></div>)}</div>
         <div className="mb-6 grid gap-4 rounded-card border border-border bg-panel p-5 sm:grid-cols-3">
           <label className="text-sm">Buscar material<div className="relative mt-2"><Search size={16} className="absolute right-3 top-4 text-muted" /><input className={`${input} pr-10`} value={search} onChange={event => setSearch(event.target.value)} placeholder="Nombre, objetivo o categoría" /></div></label>
@@ -92,6 +100,7 @@ function StudyDeskLoader({ resource, onBack }: { resource: StudyResource; onBack
 
 function StudyDesk({ resource, saved, onBack }: { resource: StudyResource; saved: StudyProgress; onBack: () => void }) {
   const { user } = useAuth();
+  const today = localStudyDate();
   const draftKey = `shadowbytes:study-draft:${user?.id}:${resource.id}`;
   const [draft, setDraft] = useState(() => {
     try { return restoreStudyDraft(localStorage.getItem(draftKey), saved); } catch { return saved; }
@@ -106,6 +115,9 @@ function StudyDesk({ resource, saved, onBack }: { resource: StudyResource; saved
   const [referenceError, setReferenceError] = useState('');
   const [showReference, setShowReference] = useState(false);
   const dirty = JSON.stringify(draft) !== JSON.stringify(lastSaved);
+  const completion = studyCompletion(draft);
+  const milestones = studyMilestones(draft);
+  const suggestedAction = suggestedStudyAction(resource, draft);
   useEffect(() => {
     try {
       if (dirty) localStorage.setItem(draftKey, JSON.stringify(draft));
@@ -162,6 +174,10 @@ function StudyDesk({ resource, saved, onBack }: { resource: StudyResource; saved
     <button className={button} disabled={dirty || saving} onClick={onBack}>Volver a la biblioteca</button>{dirty && <p role="status" className="mt-2 text-sm text-warning">{draftStorageError ? 'No se pudo conservar el borrador en este navegador. Guarda o exporta antes de salir.' : 'Borrador conservado en este navegador. Pulsa Guardar mi progreso para sincronizarlo con tu cuenta.'}</p>}
     <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
       <article className="min-w-0 rounded-card border border-border bg-panel p-5 sm:p-7"><p className="text-xs text-muted">{resource.source} · {resource.category}</p><h2 className="mt-2 text-2xl font-semibold">{resource.title}</h2><p className="mt-4 text-sm leading-7">{resource.objective}</p><p className="mt-3 text-sm leading-7 text-muted"><strong>Entorno:</strong> {resource.environment}</p>{resource.import_note && <p className="mt-3 text-sm leading-7 text-muted">{resource.import_note}</p>}
+        <section className="my-6 rounded-card border border-border bg-background p-5" aria-labelledby="session-progress-title"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Sesión enfocada</p><h3 id="session-progress-title" className="mt-2 text-lg font-semibold">Avance de esta práctica</h3></div><strong className="font-mono text-2xl text-accent-text">{completion}%</strong></div><div className="mt-4 h-2 overflow-hidden rounded-full bg-elevated" role="progressbar" aria-label="Preparación de la práctica" aria-valuemin={0} aria-valuemax={100} aria-valuenow={completion}><div className="h-full bg-accent transition-[width]" style={{ width: `${completion}%` }} /></div>
+          <ul className="mt-4 grid gap-2 text-sm sm:grid-cols-2">{milestones.map(item => <li key={item.label} className={`flex items-center gap-2 ${item.complete ? 'text-success' : 'text-muted'}`}>{item.complete ? <Check size={16} /> : <Circle size={16} />} {item.label}</li>)}</ul>
+          <div className="mt-5 flex flex-wrap gap-2"><button className={`${button} sb-primary-button`} onClick={() => patch({ status: draft.status === 'queued' ? 'practicing' : draft.status, next_action: suggestedAction })}><Play size={16} /> {draft.status === 'queued' ? 'Preparar mi sesión' : 'Sugerir siguiente paso'}</button>{!draft.personal_writeup.trim() && <button className={button} onClick={() => patch({ personal_writeup: studyWriteupTemplate(resource.title), status: draft.status === 'queued' ? 'documenting' : draft.status })}><BookOpen size={16} /> Crear estructura de writeup</button>}<button className={button} onClick={() => patch({ review_on: addStudyDays(today, 7), status: draft.status === 'learned' ? 'review' : draft.status })}><CalendarPlus size={16} /> Repasar en 7 días</button></div>
+        </section>
         <ol className="my-6 list-decimal space-y-2 border-y border-border py-5 pl-5 text-sm leading-6"><li>Define qué quieres aprender y revisa los archivos.</li><li>Haz un intento y anota las hipótesis que funcionaron o fallaron.</li><li>Consulta la referencia si estás bloqueado y explica la solución con tus palabras.</li><li>Repite el procedimiento sin consultar la guía y programa un repaso.</li></ol>
         <fieldset disabled={saving} className="space-y-5">
           <label className="block text-sm font-semibold">Mi estado<select className={`${input} mt-2`} value={draft.status} onChange={event => patch({ status: event.target.value as StudyStatus })}>{Object.entries(STUDY_STATUSES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>

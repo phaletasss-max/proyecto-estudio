@@ -34,6 +34,45 @@ export function prioritizeStudy(resources: StudyResource[], progress: StudyProgr
 export function localStudyDate(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
+export function addStudyDays(day: string, amount: number) {
+  const [year, month, date] = day.split('-').map(Number);
+  if (!year || !month || !date || !Number.isInteger(amount)) return day;
+  return localStudyDate(new Date(year, month - 1, date + amount));
+}
+export function suggestedStudyAction(resource: Pick<StudyResource, 'category' | 'lab_slug' | 'archive_path' | 'archive_parts'>, progress: Pick<StudyProgress, 'status'>) {
+  if (progress.status === 'documenting') return 'Convertir las notas en un procedimiento reproducible y justificar cada conclusión con una evidencia.';
+  if (progress.status === 'review') return 'Repetir el procedimiento sin consultar la referencia y anotar el primer paso que no puedas explicar.';
+  if (progress.status === 'learned') return 'Explicar el método de memoria y comprobar una conclusión clave en un entorno autorizado.';
+  if (progress.status === 'practicing') return 'Probar una hipótesis concreta, guardar el resultado y decidir el siguiente experimento.';
+  if (resource.lab_slug) return 'Abrir el laboratorio guiado, completar el primer paso y registrar la evidencia obtenida.';
+  const categoryActions: Record<string, string> = {
+    Blockchain: 'Identificar el contrato, sus entradas y la condición que protege el objetivo antes de probar una transacción.',
+    Crypto: 'Identificar el formato, la transformación y una muestra conocida antes de escribir un script de prueba.',
+    Forensics: 'Inventariar los archivos, registrar sus hashes y construir una primera línea de tiempo de evidencias.',
+    Hardware: 'Identificar el formato de las señales o del firmware y documentar una observación verificable.',
+    ICS: 'Identificar el protocolo y los campos relevantes antes de formular una hipótesis sobre el tráfico.',
+    Pwn: 'Inspeccionar las protecciones del binario y localizar una entrada controlable antes de intentar explotarlo.',
+    Reversing: 'Identificar el punto de entrada y seguir una ruta de ejecución hasta una comparación relevante.',
+    Web: 'Enumerar las rutas y parámetros visibles, elegir un punto de entrada y registrar su respuesta base.',
+  };
+  if (categoryActions[resource.category]) return categoryActions[resource.category];
+  if (resource.archive_path || resource.archive_parts.length) return 'Descargar el material, verificar su SHA-256 e inventariar los archivos sin ejecutarlos.';
+  return 'Definir una pregunta concreta, reunir una evidencia y registrar qué resultado confirmaría la hipótesis.';
+}
+export function studyMilestones(progress: Pick<StudyProgress, 'status' | 'next_action' | 'personal_writeup' | 'review_on'>) {
+  return [
+    { label: 'Próximo paso definido', complete: progress.next_action.trim().length >= 12 },
+    { label: 'Práctica iniciada', complete: progress.status !== 'queued' },
+    { label: 'Método explicado', complete: ['review', 'learned'].includes(progress.status) && progress.personal_writeup.trim().length >= 80 },
+    { label: 'Repaso programado', complete: !!progress.review_on },
+  ];
+}
+export function studyCompletion(progress: Pick<StudyProgress, 'status' | 'next_action' | 'personal_writeup' | 'review_on'>) {
+  return studyMilestones(progress).filter(item => item.complete).length * 25;
+}
+export function studyWriteupTemplate(title: string) {
+  return `## Objetivo\n\n¿Qué quiero entender de ${title}?\n\n## Hipótesis\n\n¿Qué creo que ocurre y cómo puedo comprobarlo?\n\n## Intentos y evidencias\n\n- Comando o acción:\n- Resultado observado:\n- Interpretación:\n\n## Método reproducible\n\n1. \n2. \n3. \n\n## Lo que aprendí\n\n¿Qué podría explicar ahora sin consultar una guía?`;
+}
 export function exportStudyWriteup(title: string, progress: StudyProgress) {
   return `# ${title}\n\nWriteup personal de ShadowBytes. No acredita un solve ni puntos.\n\n${progress.personal_writeup}\n\n## Siguiente acción\n\n${progress.next_action || 'Por definir'}\n\nRepaso: ${progress.review_on || 'Sin fecha'}\n`;
 }

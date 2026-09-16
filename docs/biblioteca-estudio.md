@@ -2,6 +2,8 @@
 
 La sección `/library` reúne archivos de práctica y writeups de referencia para miembros. El panel `/dashboard` prioriza los repasos vencidos y las prácticas en curso.
 
+La biblioteca coloca primero **tu mejor siguiente paso**: un repaso vencido, una práctica en curso o un laboratorio guiado antes que material nuevo. Al abrir un recurso, la sección **Sesión enfocada** muestra cuatro hitos y permite preparar una acción concreta, crear la estructura del writeup y programar un repaso en siete días. Estas acciones preparan un borrador; pulsa **Guardar mi progreso** para sincronizarlo con tu cuenta.
+
 ## Una sesión de aprendizaje
 
 1. Elige un material y escribe una **siguiente acción concreta**.

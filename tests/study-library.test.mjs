@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 const source = readFileSync(new URL('../src/lib/study.ts', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
-const { emptyStudyProgress, studyProgressError, prioritizeStudy, isReviewDue, exportStudyWriteup, restoreStudyDraft } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+const { addStudyDays, emptyStudyProgress, studyCompletion, studyMilestones, studyProgressError, studyWriteupTemplate, suggestedStudyAction, prioritizeStudy, isReviewDue, exportStudyWriteup, restoreStudyDraft } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 
 test('recupera un borrador local sin mezclar recursos ni aceptar datos corruptos', () => {
   const saved = emptyStudyProgress('one');
@@ -39,6 +39,22 @@ test('aprender requiere reflexión propia y nunca acredita solves', () => {
   progress.personal_writeup = 'La observación está ligada a una prueba reproducible y permite explicar el resultado obtenido en este laboratorio.';
   assert.equal(studyProgressError(progress), null);
   assert.match(exportStudyWriteup('Reto', progress), /No acredita un solve ni puntos/);
+});
+test('convierte un material pendiente en una sesión concreta y medible', () => {
+  const resource = { category: 'Forensics', lab_slug: null, archive_path: 'reto.zip', archive_parts: [] };
+  const progress = emptyStudyProgress('test');
+  assert.match(suggestedStudyAction(resource, progress), /Inventariar los archivos/);
+  assert.equal(studyCompletion(progress), 0);
+  progress.status = 'practicing';
+  progress.next_action = suggestedStudyAction(resource, progress);
+  progress.personal_writeup = studyWriteupTemplate('Reto');
+  progress.review_on = addStudyDays('2026-09-16', 7);
+  assert.equal(progress.review_on, '2026-09-23');
+  assert.equal(studyCompletion(progress), 75);
+  progress.personal_writeup += '\n\nLa evidencia confirma la hipótesis porque el procedimiento fue repetido con los mismos datos y produjo el mismo resultado. También anoté sus límites y el paso que debo verificar de nuevo.';
+  progress.status = 'review';
+  assert.equal(studyCompletion(progress), 100);
+  assert.equal(studyMilestones(progress).every(item => item.complete), true);
 });
 test('la biblioteca mantiene RLS y los archivos privados', () => {
   const sql = readFileSync(new URL('../supabase/migrations/20260914_study_library.sql', import.meta.url), 'utf8');
