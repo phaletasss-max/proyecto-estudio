@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 const source = readFileSync(new URL('../src/lib/study.ts', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
-const { addStudyDays, completedFocusMinutes, emptyStudyProgress, focusRemainingSeconds, formatFocusTime, studyCompletion, studyMilestones, studyProgressError, studyWriteupTemplate, suggestedStudyAction, prioritizeStudy, isReviewDue, exportStudyWriteup, restoreStudyDraft, summarizeStudyActivity } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+const { addStudyDays, completedFocusMinutes, emptyStudyProgress, focusRemainingSeconds, formatFocusTime, studyCompletion, studyMilestones, studyProgressError, studyWriteupTemplate, suggestedStudyAction, prioritizeStudy, isReviewDue, exportStudyWriteup, restoreStudyDraft, summarizeStudyActivity, studyPlanReason, suggestedSessionMinutes } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 
 test('recupera un borrador local sin mezclar recursos ni aceptar datos corruptos', () => {
   const saved = emptyStudyProgress('one');
@@ -32,6 +32,14 @@ test('el repaso usa una fecha local inclusiva y excluye tareas sin empezar', () 
   assert.equal(isReviewDue({ status: 'review', review_on: '2026-09-14' }, '2026-09-14'), true);
   assert.equal(isReviewDue({ status: 'review', review_on: '2026-09-15' }, '2026-09-14'), false);
   assert.equal(isReviewDue({ status: 'queued', review_on: '2026-09-13' }, '2026-09-14'), false);
+});
+test('explica por qué cada práctica está en el plan y propone un bloque realista', () => {
+  const resource = { readiness: 'guided', writeup_path: null };
+  assert.equal(studyPlanReason(resource, { status: 'review', review_on: '2026-09-16' }, '2026-09-16'), 'Repaso vencido');
+  assert.equal(studyPlanReason(resource, { status: 'documenting', review_on: null }, '2026-09-16'), 'Writeup por terminar');
+  assert.equal(studyPlanReason(resource, undefined, '2026-09-16'), 'Laboratorio guiado');
+  assert.equal(suggestedSessionMinutes({ status: 'practicing' }), 45);
+  assert.equal(suggestedSessionMinutes(undefined), 25);
 });
 test('aprender requiere reflexión propia y nunca acredita solves', () => {
   const progress = { ...emptyStudyProgress('test'), status: 'learned' };

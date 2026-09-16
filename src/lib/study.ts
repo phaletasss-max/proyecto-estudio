@@ -31,6 +31,18 @@ export function prioritizeStudy(resources: StudyResource[], progress: StudyProgr
   };
   return [...resources].sort((a, b) => rank(a) - rank(b) || a.title.localeCompare(b.title));
 }
+export function studyPlanReason(resource: Pick<StudyResource, 'readiness' | 'writeup_path'>, progress: StudyProgressSummary | undefined, today: string) {
+  if (isReviewDue(progress, today)) return 'Repaso vencido';
+  if (progress?.status === 'practicing') return 'Práctica en curso';
+  if (progress?.status === 'documenting') return 'Writeup por terminar';
+  if (progress?.status === 'review') return 'Listo para repasar';
+  if (resource.readiness === 'guided') return 'Laboratorio guiado';
+  if (resource.writeup_path) return 'Referencia disponible';
+  return 'Material por explorar';
+}
+export function suggestedSessionMinutes(progress: StudyProgressSummary | undefined) {
+  return progress?.status === 'practicing' || progress?.status === 'documenting' ? 45 : 25;
+}
 export function localStudyDate(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
