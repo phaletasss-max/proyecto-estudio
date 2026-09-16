@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { LEARNING_PATHS } from '@/data/learningPaths';
 import { StudyNextSession } from '@/components/StudyNextSession';
+import { StudyActivitySummary } from '@/components/StudyActivitySummary';
 
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { moduleHref, pathProgress } from '@/lib/learningProgress';
@@ -53,6 +54,7 @@ export default function Dashboard() {
         </div>
 
         <StudyNextSession />
+        <StudyActivitySummary />
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <Link to="/setup/wsl" className="border border-border bg-panel p-5 hover:border-info"><Wrench className="h-5 w-5 text-info" /><h2 className="mt-4 font-bold">Preparar WSL</h2><p className="mt-2 text-sm text-muted">Configura Windows, Linux y VPN paso a paso.</p></Link>
           <Link to="/paths" className="border border-border bg-panel p-5 hover:border-accent"><BookOpen className="h-5 w-5 text-accent" /><h2 className="mt-4 font-bold">Explorar rutas</h2><p className="mt-2 text-sm text-muted">Consulta módulos disponibles y próximos contenidos.</p></Link>

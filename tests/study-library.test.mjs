@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 const source = readFileSync(new URL('../src/lib/study.ts', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
-const { addStudyDays, completedFocusMinutes, emptyStudyProgress, focusRemainingSeconds, formatFocusTime, studyCompletion, studyMilestones, studyProgressError, studyWriteupTemplate, suggestedStudyAction, prioritizeStudy, isReviewDue, exportStudyWriteup, restoreStudyDraft } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+const { addStudyDays, completedFocusMinutes, emptyStudyProgress, focusRemainingSeconds, formatFocusTime, studyCompletion, studyMilestones, studyProgressError, studyWriteupTemplate, suggestedStudyAction, prioritizeStudy, isReviewDue, exportStudyWriteup, restoreStudyDraft, summarizeStudyActivity } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 
 test('recupera un borrador local sin mezclar recursos ni aceptar datos corruptos', () => {
   const saved = emptyStudyProgress('one');
@@ -63,6 +63,25 @@ test('mide una sesión de enfoque sin registrar tiempos negativos o excesivos', 
   assert.equal(completedFocusMinutes(started, 25, started + 61_000), 2);
   assert.equal(completedFocusMinutes(started, 25, started + 60 * 60_000), 25);
   assert.equal(formatFocusTime(1410), '23:30');
+});
+test('resume el ritmo semanal, la racha y los últimos siete días', () => {
+  const session = (id, day, minutes) => ({ id, resource_id: 'lab', started_at: `${day}T15:00:00`, ended_at: `${day}T15:25:00`, duration_minutes: minutes, outcome: `Resultado de ${id}`, next_action: '', created_at: `${day}T15:25:00` });
+  const sessions = [session('one', '2026-09-16', 45), session('two', '2026-09-15', 25), session('three', '2026-09-14', 60), session('old', '2026-09-10', 90)];
+  const summary = summarizeStudyActivity(sessions, new Date(2026, 8, 16, 20), 150);
+  assert.equal(summary.minutesThisWeek, 130);
+  assert.equal(summary.sessionsThisWeek, 3);
+  assert.equal(summary.activeDaysThisWeek, 3);
+  assert.equal(summary.currentStreak, 3);
+  assert.equal(summary.weeklyGoalPercent, 87);
+  assert.equal(summary.recentSession.id, 'one');
+  assert.equal(summary.lastSevenDays.reduce((total, day) => total + day.minutes, 0), 220);
+});
+test('la racha continúa desde ayer y no cuenta sesiones futuras', () => {
+  const session = (id, day) => ({ id, resource_id: 'lab', started_at: `${day}T12:00:00`, ended_at: `${day}T12:25:00`, duration_minutes: 25, outcome: 'Resultado verificable', next_action: '', created_at: `${day}T12:25:00` });
+  const summary = summarizeStudyActivity([session('yesterday', '2026-09-15'), session('before', '2026-09-14'), session('future', '2026-09-17')], new Date(2026, 8, 16, 20));
+  assert.equal(summary.currentStreak, 2);
+  assert.equal(summary.sessionsThisWeek, 2);
+  assert.equal(summary.recentSession.id, 'yesterday');
 });
 test('la biblioteca mantiene RLS y los archivos privados', () => {
   const sql = readFileSync(new URL('../supabase/migrations/20260914_study_library.sql', import.meta.url), 'utf8');

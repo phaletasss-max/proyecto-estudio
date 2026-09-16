@@ -1,4 +1,4 @@
-import type { StudyProgress, StudyProgressSummary, StudyResource } from '@/types/study';
+import type { StudyActivitySummary, StudyProgress, StudyProgressSummary, StudyResource, StudySession } from '@/types/study';
 
 export const emptyStudyProgress = (id: string): StudyProgress => ({ resource_id: id, status: 'queued', next_action: '', personal_writeup: '', review_on: null });
 export function restoreStudyDraft(raw: string | null, saved: StudyProgress): StudyProgress {
@@ -83,6 +83,59 @@ export function completedFocusMinutes(startedAt: number, durationMinutes: number
 export function formatFocusTime(seconds: number) {
   const safe = Math.max(0, Math.floor(seconds));
   return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`;
+}
+function startOfLocalDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+export function studyWeekStart(date = new Date()) {
+  const start = startOfLocalDay(date);
+  const offset = (start.getDay() + 6) % 7;
+  start.setDate(start.getDate() - offset);
+  return start;
+}
+export function summarizeStudyActivity(sessions: StudySession[], now = new Date(), weeklyGoalMinutes = 150): StudyActivitySummary {
+  const today = startOfLocalDay(now);
+  const weekStart = studyWeekStart(now);
+  const validSessions = sessions
+    .filter(session => {
+      const startedAt = new Date(session.started_at).getTime();
+      return Number.isFinite(session.duration_minutes) && session.duration_minutes > 0 && !Number.isNaN(startedAt) && startedAt <= now.getTime();
+    })
+    .sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime());
+  const thisWeek = validSessions.filter(session => {
+    const started = new Date(session.started_at);
+    return started >= weekStart && started <= now;
+  });
+  const activeDays = new Set(validSessions.map(session => localStudyDate(new Date(session.started_at))));
+  let cursor = new Date(today);
+  if (!activeDays.has(localStudyDate(cursor))) cursor.setDate(cursor.getDate() - 1);
+  let currentStreak = 0;
+  while (activeDays.has(localStudyDate(cursor))) {
+    currentStreak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  const minutesThisWeek = thisWeek.reduce((total, session) => total + session.duration_minutes, 0);
+  const lastSevenDays = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(date.getDate() - (6 - index));
+    const day = localStudyDate(date);
+    return {
+      day,
+      label: new Intl.DateTimeFormat('es', { weekday: 'short' }).format(date).replace('.', ''),
+      minutes: validSessions
+        .filter(session => localStudyDate(new Date(session.started_at)) === day)
+        .reduce((total, session) => total + session.duration_minutes, 0),
+    };
+  });
+  return {
+    minutesThisWeek,
+    sessionsThisWeek: thisWeek.length,
+    activeDaysThisWeek: new Set(thisWeek.map(session => localStudyDate(new Date(session.started_at)))).size,
+    currentStreak,
+    weeklyGoalPercent: Math.min(100, Math.round((minutesThisWeek / Math.max(1, weeklyGoalMinutes)) * 100)),
+    recentSession: validSessions[0] ?? null,
+    lastSevenDays,
+  };
 }
 export function exportStudyWriteup(title: string, progress: StudyProgress) {
   return `# ${title}\n\nWriteup personal de ShadowBytes. No acredita un solve ni puntos.\n\n${progress.personal_writeup}\n\n## Siguiente acción\n\n${progress.next_action || 'Por definir'}\n\nRepaso: ${progress.review_on || 'Sin fecha'}\n`;

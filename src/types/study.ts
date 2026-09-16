@@ -17,3 +17,13 @@ export interface StudySession {
   id: string; resource_id: string; started_at: string; ended_at: string;
   duration_minutes: number; outcome: string; next_action: string; created_at: string;
 }
+
+export interface StudyActivitySummary {
+  minutesThisWeek: number;
+  sessionsThisWeek: number;
+  activeDaysThisWeek: number;
+  currentStreak: number;
+  weeklyGoalPercent: number;
+  recentSession: StudySession | null;
+  lastSevenDays: { day: string; label: string; minutes: number }[];
+}

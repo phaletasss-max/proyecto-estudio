@@ -6,6 +6,8 @@ La biblioteca coloca primero **tu mejor siguiente paso**: un repaso vencido, una
 
 Cada recurso incluye además bloques de enfoque de 25, 45 o 60 minutos. Al finalizar, registra qué probaste y qué evidencia obtuviste. Las últimas cinco sesiones aparecen en el mismo recurso y son privadas: RLS limita su lectura e inserción al dueño de la cuenta con acceso de miembro.
 
+El panel resume los últimos 90 días con una consulta limitada a 200 sesiones. Muestra minutos y días activos de la semana, la racha vigente, el avance hacia una meta base de 150 minutos y el resultado más reciente. Los cálculos se realizan en el navegador y las reflexiones continúan protegidas por RLS.
+
 ## Una sesión de aprendizaje
 
 1. Elige un material y escribe una **siguiente acción concreta**.
